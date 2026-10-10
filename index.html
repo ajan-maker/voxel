@@ -7,7 +7,9 @@
 <title>voxel</title>
 
 <style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -17,7 +19,9 @@ body {
   color: white;
 }
 
-canvas { display: block; }
+canvas {
+  display: block;
+}
 
 #crosshair {
   position: fixed;
@@ -117,46 +121,80 @@ button {
   font-weight: bold;
 }
 
-button:hover { background: #555e; }
+button:hover {
+  background: #555e;
+}
 
+/* MAIN MENU */
 #overlay {
   position: fixed;
   inset: 0;
-  z-index: 5;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #0009;
+  background: #595959;
 }
 
 #panel {
-  width: min(420px, 90%);
-  padding: 32px;
+  width: min(700px, 95%);
+  padding: 20px;
   text-align: center;
-  border: 2px solid #ffffff77;
-  border-radius: 15px;
-  background: #202b26ee;
-  box-shadow: 0 10px 50px #0008;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 #panel h1 {
-  font-size: 42px;
-  letter-spacing: 7px;
-  margin: 0 0 10px;
+  display: none;
 }
 
 #panel p {
-  color: #ddd;
-  line-height: 1.7;
+  color: black;
+  font-size: clamp(22px, 5vw, 48px);
+  line-height: 1.4;
+  margin: 0 0 35px;
 }
 
-#play {
+#panel .menu-button {
+  display: block;
   width: 100%;
-  margin-top: 12px;
+  min-height: 115px;
+  margin: 0 auto 34px;
   padding: 15px;
-  background: #48a447;
+  background: #b77d59;
   border: none;
-  font-size: 16px;
+  border-radius: 0;
+  color: black;
+  font-size: clamp(25px, 5vw, 48px);
+  font-weight: 400;
+  cursor: pointer;
+}
+
+#panel .menu-button:hover {
+  background: #c58b66;
+}
+
+#panel .description {
+  margin-bottom: 35px;
+}
+
+/* Rotating 3D pickaxe - menu only */
+#pickaxe-hud {
+  position: fixed;
+  right: 25px;
+  bottom: 25px;
+  width: 190px;
+  height: 190px;
+  pointer-events: none;
+  z-index: 11;
+}
+
+#pickaxe-hud canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 #message {
@@ -170,36 +208,42 @@ button:hover { background: #555e; }
   opacity: 0;
   transition: opacity .2s;
   pointer-events: none;
-  z-index: 6;
-}
-
-#pickaxe-hud {
-  position: fixed;
-  right: 30px;
-  bottom: 90px;
-  width: 165px;
-  height: 165px;
-  pointer-events: none;
-  z-index: 3;
-}
-
-#pickaxe-hud canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
+  z-index: 12;
 }
 
 @media(max-width:600px) {
-  #help { font-size: 10px; }
-  .slot { width: 45px; height: 51px; }
-  #buttons { top: 8px; right: 8px; }
-  #logo { font-size: 25px; }
+  #help {
+    font-size: 10px;
+  }
+
+  .slot {
+    width: 45px;
+    height: 51px;
+  }
+
+  #buttons {
+    top: 8px;
+    right: 8px;
+  }
+
+  #logo {
+    font-size: 25px;
+  }
 
   #pickaxe-hud {
-    right: 3px;
-    bottom: 82px;
-    width: 115px;
-    height: 115px;
+    right: 5px;
+    bottom: 5px;
+    width: 125px;
+    height: 125px;
+  }
+
+  #panel .menu-button {
+    min-height: 80px;
+    margin-bottom: 22px;
+  }
+
+  #panel p {
+    margin-bottom: 25px;
   }
 }
 </style>
@@ -215,6 +259,7 @@ button:hover { background: #555e; }
 
 <body>
 
+<!-- GAME HUD -->
 <div id="top">
   <div id="logo">voxel</div>
   <div id="status">LOADING WORLD...</div>
@@ -234,30 +279,33 @@ button:hover { background: #555e; }
   LEFT CLICK — Break block<br>
   RIGHT CLICK — Place block<br>
   1 / 2 / 3 — Select block<br>
-  ESC — Release mouse
+  ESC — Return to menu
 </div>
 
 <div id="message"></div>
 
+<!-- MAIN MENU -->
 <div id="overlay">
   <div id="panel">
-    <h1>voxel</h1>
-    <p>
-      Explore your own block world!<br>
-      Break blocks, place new ones,<br>
-      and save your world.
-    </p>
-    <button id="play">PLAY GAME</button>
-    <p style="font-size:12px">
-      Click PLAY GAME to start.
-    </p>
+    <p class="description">(previous explanation)</p>
+
+    <button id="play" class="menu-button">
+      JOIN WORLD
+    </button>
+
+    <button id="joinHub" class="menu-button">
+      JOIN HUB (WIP)
+    </button>
   </div>
 </div>
 
 <script type="module">
 import * as THREE from "three";
 
-// MAIN GAME
+// =============================
+// MAIN GAME SETUP
+// =============================
+
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87ceeb);
 scene.fog = new THREE.Fog(0x87ceeb, 25, 65);
@@ -282,7 +330,10 @@ sun.castShadow = true;
 sun.shadow.mapSize.set(1024, 1024);
 scene.add(sun);
 
-// BLOCKS
+// =============================
+// BLOCK SYSTEM
+// =============================
+
 const materials = {
   grass: new THREE.MeshLambertMaterial({ color: 0x55ad43 }),
   dirt: new THREE.MeshLambertMaterial({ color: 0x80502e }),
@@ -301,7 +352,8 @@ function addBlock(x, y, z, type) {
   if (blocks.has(k)) return;
 
   const mesh = new THREE.Mesh(
-    geometry, materials[type] || materials.grass
+    geometry,
+    materials[type] || materials.grass
   );
 
   mesh.position.set(x, y, z);
@@ -321,7 +373,9 @@ function removeBlock(mesh) {
 }
 
 function clearWorld() {
-  for (const mesh of blocks.values()) scene.remove(mesh);
+  for (const mesh of blocks.values()) {
+    scene.remove(mesh);
+  }
   blocks.clear();
 }
 
@@ -357,7 +411,10 @@ function generateWorld() {
   }
 }
 
-// SAVE SYSTEM
+// =============================
+// WORLD SAVING
+// =============================
+
 const SAVE_KEY = "voxel-world-v1";
 let saveTimer;
 let messageTimeout;
@@ -440,7 +497,10 @@ function loadWorld() {
 
 loadWorld();
 
+// =============================
 // PLAYER
+// =============================
+
 camera.position.set(0, 2.6, 5);
 
 let yaw = 0;
@@ -483,12 +543,15 @@ function collidesAt(px, py, pz) {
 
 function updatePlayer(delta) {
   const speed = 5.5;
+
   const forward = new THREE.Vector3(
     -Math.sin(yaw), 0, -Math.cos(yaw)
   );
+
   const right = new THREE.Vector3(
     Math.cos(yaw), 0, -Math.sin(yaw)
   );
+
   const direction = new THREE.Vector3();
 
   if (keys.KeyW) direction.add(forward);
@@ -500,11 +563,13 @@ function updatePlayer(delta) {
     direction.normalize().multiplyScalar(speed * delta);
 
     const nextX = camera.position.x + direction.x;
+
     if (!collidesAt(nextX, camera.position.y, camera.position.z)) {
       camera.position.x = nextX;
     }
 
     const nextZ = camera.position.z + direction.z;
+
     if (!collidesAt(camera.position.x, camera.position.y, nextZ)) {
       camera.position.z = nextZ;
     }
@@ -527,12 +592,17 @@ function updatePlayer(delta) {
   }
 }
 
+// =============================
 // HOTBAR
+// =============================
+
 const hotbar = document.getElementById("hotbar");
 
 blockNames.forEach((type, i) => {
   const slot = document.createElement("div");
+
   slot.className = "slot" + (i === 0 ? " selected" : "");
+
   slot.innerHTML =
     `<div class="swatch" style="background:${blockColors[i]}"></div>` +
     `${i + 1}: ${type.toUpperCase()}`;
@@ -549,16 +619,29 @@ function selectBlock(type) {
   });
 }
 
-// MOUSE CONTROLS
+// =============================
+// MENU AND POINTER LOCK
+// =============================
+
 const overlay = document.getElementById("overlay");
+const pickaxeHud = document.createElement("div");
+
+pickaxeHud.id = "pickaxe-hud";
+document.body.appendChild(pickaxeHud);
 
 document.getElementById("play").addEventListener("click", () => {
   renderer.domElement.requestPointerLock();
 });
 
+document.getElementById("joinHub").addEventListener("click", () => {
+  // JOIN HUB (WIP) intentionally does nothing.
+});
+
 document.addEventListener("pointerlockchange", () => {
   isLocked = document.pointerLockElement === renderer.domElement;
+
   overlay.style.display = isLocked ? "none" : "flex";
+  pickaxeHud.style.display = isLocked ? "none" : "block";
 });
 
 document.addEventListener("mousemove", event => {
@@ -566,6 +649,7 @@ document.addEventListener("mousemove", event => {
 
   yaw -= event.movementX * 0.002;
   pitch -= event.movementY * 0.002;
+
   pitch = Math.max(
     -Math.PI / 2 + 0.01,
     Math.min(Math.PI / 2 - 0.01, pitch)
@@ -595,10 +679,17 @@ document.addEventListener("keyup", event => {
   keys[event.code] = false;
 });
 
-document.addEventListener("contextmenu", event => event.preventDefault());
+document.addEventListener("contextmenu", event => {
+  event.preventDefault();
+});
+
+// =============================
+// BREAK AND PLACE BLOCKS
+// =============================
 
 function getTargetBlock() {
   raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+
   const hits = raycaster.intersectObjects([...blocks.values()], false);
   return hits.length ? hits[0] : null;
 }
@@ -616,6 +707,7 @@ document.addEventListener("mousedown", event => {
   if (event.button === 2) {
     const normal = hit.face.normal.clone();
     normal.transformDirection(hit.object.matrixWorld);
+
     const pos = hit.object.position.clone().add(normal);
 
     const px = camera.position.x;
@@ -639,26 +731,9 @@ document.addEventListener("mousedown", event => {
   }
 });
 
-// BUTTONS
-document.getElementById("saveBtn").addEventListener("click", () => {
-  if (saveWorld()) showMessage("World saved successfully!");
-});
-
-document.getElementById("resetBtn").addEventListener("click", () => {
-  if (!confirm("Are you sure you want to create a new world?")) return;
-
-  localStorage.removeItem(SAVE_KEY);
-  generateWorld();
-  camera.position.set(0, 2.6, 5);
-  velocityY = 0;
-  saveWorld();
-  showMessage("New world created!");
-});
-
-// ORIGINAL 3D STONE PICKAXE HUD
-const pickaxeHud = document.createElement("div");
-pickaxeHud.id = "pickaxe-hud";
-document.body.appendChild(pickaxeHud);
+// =============================
+// MENU-ONLY ROTATING STONE PICKAXE
+// =============================
 
 const pickScene = new THREE.Scene();
 
@@ -671,7 +746,7 @@ const pickRenderer = new THREE.WebGLRenderer({
 });
 
 pickRenderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-pickRenderer.setSize(165, 165);
+pickRenderer.setSize(190, 190);
 pickRenderer.setClearColor(0x000000, 0);
 pickaxeHud.appendChild(pickRenderer.domElement);
 
@@ -692,11 +767,12 @@ const handle = new THREE.Mesh(
     roughness: 0.85
   })
 );
+
 handle.rotation.z = -0.55;
 handle.position.set(-0.2, -0.15, 0);
 pickaxe.add(handle);
 
-// Asymmetric, jagged stone head
+// Irregular stone head
 const stoneMaterial = new THREE.MeshStandardMaterial({
   color: 0x555b61,
   roughness: 1,
@@ -707,16 +783,18 @@ const stoneHead = new THREE.Mesh(
   new THREE.IcosahedronGeometry(0.52, 0),
   stoneMaterial
 );
+
 stoneHead.scale.set(1.65, 0.65, 0.7);
 stoneHead.rotation.z = -0.35;
 stoneHead.position.set(0.45, 0.72, 0);
 pickaxe.add(stoneHead);
 
-// Pointed stone end
+// Pointed stone tip
 const stoneTip = new THREE.Mesh(
   new THREE.ConeGeometry(0.28, 0.65, 5),
   stoneMaterial
 );
+
 stoneTip.rotation.z = -1.15;
 stoneTip.position.set(1.05, 0.88, 0);
 pickaxe.add(stoneTip);
@@ -726,6 +804,7 @@ const binding = new THREE.Mesh(
   new THREE.CylinderGeometry(0.15, 0.15, 0.22, 8),
   new THREE.MeshStandardMaterial({ color: 0xb47743 })
 );
+
 binding.position.set(-0.05, 0.15, 0);
 binding.rotation.z = -0.55;
 pickaxe.add(binding);
@@ -748,16 +827,41 @@ function animatePickaxe() {
 
 animatePickaxe();
 
+// =============================
+// BUTTONS
+// =============================
+
+document.getElementById("saveBtn").addEventListener("click", () => {
+  if (saveWorld()) showMessage("World saved successfully!");
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  if (!confirm("Are you sure you want to create a new world?")) return;
+
+  localStorage.removeItem(SAVE_KEY);
+  generateWorld();
+  camera.position.set(0, 2.6, 5);
+  velocityY = 0;
+  saveWorld();
+  showMessage("New world created!");
+});
+
+// =============================
 // GAME LOOP
+// =============================
+
 let lastTime = performance.now();
 
 function animate(now) {
   requestAnimationFrame(animate);
 
   const delta = Math.min((now - lastTime) / 1000, 0.05);
+
   lastTime = now;
 
-  if (isLocked) updatePlayer(delta);
+  if (isLocked) {
+    updatePlayer(delta);
+  }
 
   renderer.render(scene, camera);
 }
@@ -768,6 +872,13 @@ addEventListener("resize", () => {
   camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(innerWidth, innerHeight);
+
+  pickCamera.aspect = 1;
+  pickCamera.updateProjectionMatrix();
+  pickRenderer.setSize(
+    pickaxeHud.clientWidth,
+    pickaxeHud.clientHeight
+  );
 });
 
 addEventListener("beforeunload", () => {
@@ -775,5 +886,6 @@ addEventListener("beforeunload", () => {
   saveWorld();
 });
 </script>
+
 </body>
 </html>
