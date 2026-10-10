@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>voxel</title>
+<title>VOXEL</title>
 
 <style>
 * {
@@ -125,7 +125,7 @@ button:hover {
   background: #555e;
 }
 
-/* MAIN MENU */
+/* VOXEL MENU */
 #overlay {
   position: fixed;
   inset: 0;
@@ -133,28 +133,34 @@ button:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #595959;
+  background-color: #777;
+  background-image:
+    linear-gradient(#0002 1px, transparent 1px),
+    linear-gradient(90deg, #0002 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
 #panel {
   width: min(700px, 95%);
   padding: 20px;
   text-align: center;
-  border: none;
-  border-radius: 0;
   background: transparent;
+  border: none;
   box-shadow: none;
 }
 
 #panel h1 {
-  display: none;
+  display: block;
+  color: black;
+  font-size: clamp(55px, 9vw, 100px);
+  font-weight: 900;
+  letter-spacing: 10px;
+  margin: 0 0 35px;
+  text-shadow: 2px 2px 0 #aaa;
 }
 
 #panel p {
-  color: black;
-  font-size: clamp(22px, 5vw, 48px);
-  line-height: 1.4;
-  margin: 0 0 35px;
+  display: none;
 }
 
 #panel .menu-button {
@@ -163,24 +169,24 @@ button:hover {
   min-height: 115px;
   margin: 0 auto 34px;
   padding: 15px;
-  background: #b77d59;
-  border: none;
-  border-radius: 0;
   color: black;
+  background-color: #a66d48;
+  background-image:
+    linear-gradient(#ffffff0c 1px, transparent 1px),
+    linear-gradient(90deg, #00000018 1px, transparent 1px);
+  background-size: 16px 16px;
+  border: 3px solid #805132;
+  border-radius: 0;
   font-size: clamp(25px, 5vw, 48px);
   font-weight: 400;
   cursor: pointer;
 }
 
 #panel .menu-button:hover {
-  background: #c58b66;
+  background-color: #bd8259;
 }
 
-#panel .description {
-  margin-bottom: 35px;
-}
-
-/* Rotating 3D pickaxe - menu only */
+/* MENU PICKAXE */
 #pickaxe-hud {
   position: fixed;
   right: 25px;
@@ -242,7 +248,7 @@ button:hover {
     margin-bottom: 22px;
   }
 
-  #panel p {
+  #panel h1 {
     margin-bottom: 25px;
   }
 }
@@ -287,7 +293,7 @@ button:hover {
 <!-- MAIN MENU -->
 <div id="overlay">
   <div id="panel">
-    <p class="description">(previous explanation)</p>
+    <h1>VOXEL</h1>
 
     <button id="play" class="menu-button">
       JOIN WORLD
@@ -303,7 +309,7 @@ button:hover {
 import * as THREE from "three";
 
 // =============================
-// MAIN GAME SETUP
+// GAME SETUP
 // =============================
 
 const scene = new THREE.Scene();
@@ -412,7 +418,7 @@ function generateWorld() {
 }
 
 // =============================
-// WORLD SAVING
+// SAVE / LOAD WORLD
 // =============================
 
 const SAVE_KEY = "voxel-world-v1";
@@ -513,6 +519,7 @@ let canJump = false;
 const keys = {};
 const playerRadius = 0.3;
 const playerHeight = 1.8;
+
 const raycaster = new THREE.Raycaster();
 raycaster.far = 6;
 
@@ -576,6 +583,7 @@ function updatePlayer(delta) {
   }
 
   velocityY -= 18 * delta;
+
   const nextY = camera.position.y + velocityY * delta;
 
   if (collidesAt(camera.position.x, nextY, camera.position.z)) {
@@ -620,7 +628,7 @@ function selectBlock(type) {
 }
 
 // =============================
-// MENU AND POINTER LOCK
+// MENU
 // =============================
 
 const overlay = document.getElementById("overlay");
@@ -634,7 +642,7 @@ document.getElementById("play").addEventListener("click", () => {
 });
 
 document.getElementById("joinHub").addEventListener("click", () => {
-  // JOIN HUB (WIP) intentionally does nothing.
+  // Work in progress. This button intentionally does nothing.
 });
 
 document.addEventListener("pointerlockchange", () => {
@@ -684,7 +692,7 @@ document.addEventListener("contextmenu", event => {
 });
 
 // =============================
-// BREAK AND PLACE BLOCKS
+// BLOCK BREAKING / PLACING
 // =============================
 
 function getTargetBlock() {
@@ -732,7 +740,8 @@ document.addEventListener("mousedown", event => {
 });
 
 // =============================
-// MENU-ONLY ROTATING STONE PICKAXE
+// 3D STONE PICKAXE
+// MENU ONLY
 // =============================
 
 const pickScene = new THREE.Scene();
@@ -759,7 +768,7 @@ pickScene.add(pickLight);
 const pickaxe = new THREE.Group();
 pickScene.add(pickaxe);
 
-// Wooden handle
+// Brown wooden handle
 const handle = new THREE.Mesh(
   new THREE.CylinderGeometry(0.09, 0.13, 1.9, 7),
   new THREE.MeshStandardMaterial({
@@ -772,7 +781,7 @@ handle.rotation.z = -0.55;
 handle.position.set(-0.2, -0.15, 0);
 pickaxe.add(handle);
 
-// Irregular stone head
+// Uneven stone head
 const stoneMaterial = new THREE.MeshStandardMaterial({
   color: 0x555b61,
   roughness: 1,
@@ -789,7 +798,7 @@ stoneHead.rotation.z = -0.35;
 stoneHead.position.set(0.45, 0.72, 0);
 pickaxe.add(stoneHead);
 
-// Pointed stone tip
+// Pointed stone end
 const stoneTip = new THREE.Mesh(
   new THREE.ConeGeometry(0.28, 0.65, 5),
   stoneMaterial
@@ -828,7 +837,7 @@ function animatePickaxe() {
 animatePickaxe();
 
 // =============================
-// BUTTONS
+// SAVE / RESET BUTTONS
 // =============================
 
 document.getElementById("saveBtn").addEventListener("click", () => {
@@ -856,12 +865,9 @@ function animate(now) {
   requestAnimationFrame(animate);
 
   const delta = Math.min((now - lastTime) / 1000, 0.05);
-
   lastTime = now;
 
-  if (isLocked) {
-    updatePlayer(delta);
-  }
+  if (isLocked) updatePlayer(delta);
 
   renderer.render(scene, camera);
 }
@@ -875,6 +881,7 @@ addEventListener("resize", () => {
 
   pickCamera.aspect = 1;
   pickCamera.updateProjectionMatrix();
+
   pickRenderer.setSize(
     pickaxeHud.clientWidth,
     pickaxeHud.clientHeight
