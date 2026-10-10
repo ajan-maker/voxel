@@ -170,6 +170,23 @@ button:hover { background: #555e; }
   opacity: 0;
   transition: opacity .2s;
   pointer-events: none;
+  z-index: 6;
+}
+
+#pickaxe-hud {
+  position: fixed;
+  right: 30px;
+  bottom: 90px;
+  width: 165px;
+  height: 165px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+#pickaxe-hud canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 @media(max-width:600px) {
@@ -177,6 +194,13 @@ button:hover { background: #555e; }
   .slot { width: 45px; height: 51px; }
   #buttons { top: 8px; right: 8px; }
   #logo { font-size: 25px; }
+
+  #pickaxe-hud {
+    right: 3px;
+    bottom: 82px;
+    width: 115px;
+    height: 115px;
+  }
 }
 </style>
 
@@ -225,7 +249,7 @@ button:hover { background: #555e; }
     </p>
     <button id="play">PLAY GAME</button>
     <p style="font-size:12px">
-      Click PLAY GAME to lock your mouse and start playing.
+      Click PLAY GAME to start.
     </p>
   </div>
 </div>
@@ -233,6 +257,7 @@ button:hover { background: #555e; }
 <script type="module">
 import * as THREE from "three";
 
+// MAIN GAME
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87ceeb);
 scene.fog = new THREE.Fog(0x87ceeb, 25, 65);
@@ -257,6 +282,7 @@ sun.castShadow = true;
 sun.shadow.mapSize.set(1024, 1024);
 scene.add(sun);
 
+// BLOCKS
 const materials = {
   grass: new THREE.MeshLambertMaterial({ color: 0x55ad43 }),
   dirt: new THREE.MeshLambertMaterial({ color: 0x80502e }),
@@ -270,7 +296,7 @@ const blocks = new Map();
 
 const key = (x, y, z) => `${x},${y},${z}`;
 
-function addBlock(x, y, z, type, shouldSave = false) {
+function addBlock(x, y, z, type) {
   const k = key(x, y, z);
   if (blocks.has(k)) return;
 
@@ -285,8 +311,6 @@ function addBlock(x, y, z, type, shouldSave = false) {
 
   scene.add(mesh);
   blocks.set(k, mesh);
-
-  if (shouldSave) scheduleSave();
 }
 
 function removeBlock(mesh) {
@@ -333,8 +357,10 @@ function generateWorld() {
   }
 }
 
+// SAVE SYSTEM
 const SAVE_KEY = "voxel-world-v1";
 let saveTimer;
+let messageTimeout;
 
 function showMessage(text) {
   const el = document.getElementById("message");
@@ -346,8 +372,6 @@ function showMessage(text) {
     el.style.opacity = "0";
   }, 1800);
 }
-
-let messageTimeout;
 
 function saveWorld() {
   try {
@@ -361,7 +385,7 @@ function saveWorld() {
     return true;
   } catch (error) {
     document.getElementById("status").textContent = "SAVE FAILED";
-    showMessage("Could not save! Check your browser storage.");
+    showMessage("Could not save world!");
     return false;
   }
 }
@@ -416,6 +440,7 @@ function loadWorld() {
 
 loadWorld();
 
+// PLAYER
 camera.position.set(0, 2.6, 5);
 
 let yaw = 0;
@@ -458,15 +483,12 @@ function collidesAt(px, py, pz) {
 
 function updatePlayer(delta) {
   const speed = 5.5;
-
   const forward = new THREE.Vector3(
     -Math.sin(yaw), 0, -Math.cos(yaw)
   );
-
   const right = new THREE.Vector3(
     Math.cos(yaw), 0, -Math.sin(yaw)
   );
-
   const direction = new THREE.Vector3();
 
   if (keys.KeyW) direction.add(forward);
@@ -478,13 +500,11 @@ function updatePlayer(delta) {
     direction.normalize().multiplyScalar(speed * delta);
 
     const nextX = camera.position.x + direction.x;
-
     if (!collidesAt(nextX, camera.position.y, camera.position.z)) {
       camera.position.x = nextX;
     }
 
     const nextZ = camera.position.z + direction.z;
-
     if (!collidesAt(camera.position.x, camera.position.y, nextZ)) {
       camera.position.z = nextZ;
     }
@@ -507,12 +527,12 @@ function updatePlayer(delta) {
   }
 }
 
+// HOTBAR
 const hotbar = document.getElementById("hotbar");
 
 blockNames.forEach((type, i) => {
   const slot = document.createElement("div");
   slot.className = "slot" + (i === 0 ? " selected" : "");
-
   slot.innerHTML =
     `<div class="swatch" style="background:${blockColors[i]}"></div>` +
     `${i + 1}: ${type.toUpperCase()}`;
@@ -529,13 +549,12 @@ function selectBlock(type) {
   });
 }
 
+// MOUSE CONTROLS
 const overlay = document.getElementById("overlay");
 
-function requestPlay() {
+document.getElementById("play").addEventListener("click", () => {
   renderer.domElement.requestPointerLock();
-}
-
-document.getElementById("play").addEventListener("click", requestPlay);
+});
 
 document.addEventListener("pointerlockchange", () => {
   isLocked = document.pointerLockElement === renderer.domElement;
@@ -547,7 +566,6 @@ document.addEventListener("mousemove", event => {
 
   yaw -= event.movementX * 0.002;
   pitch -= event.movementY * 0.002;
-
   pitch = Math.max(
     -Math.PI / 2 + 0.01,
     Math.min(Math.PI / 2 - 0.01, pitch)
@@ -598,17 +616,15 @@ document.addEventListener("mousedown", event => {
   if (event.button === 2) {
     const normal = hit.face.normal.clone();
     normal.transformDirection(hit.object.matrixWorld);
-
     const pos = hit.object.position.clone().add(normal);
 
     const px = camera.position.x;
-    const py = camera.position.y - playerHeight / 2;
     const pz = camera.position.z;
 
     const overlapsPlayer =
       Math.abs(pos.x - px) < 0.5 + playerRadius &&
       Math.abs(pos.z - pz) < 0.5 + playerRadius &&
-      Math.abs(pos.y - (py + playerHeight / 2)) < 1.45;
+      Math.abs(pos.y - camera.position.y) < 1.45;
 
     if (overlapsPlayer) return;
 
@@ -616,12 +632,14 @@ document.addEventListener("mousedown", event => {
       Math.round(pos.x),
       Math.round(pos.y),
       Math.round(pos.z),
-      selectedBlock,
-      true
+      selectedBlock
     );
+
+    scheduleSave();
   }
 });
 
+// BUTTONS
 document.getElementById("saveBtn").addEventListener("click", () => {
   if (saveWorld()) showMessage("World saved successfully!");
 });
@@ -637,6 +655,100 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   showMessage("New world created!");
 });
 
+// ORIGINAL 3D STONE PICKAXE HUD
+const pickaxeHud = document.createElement("div");
+pickaxeHud.id = "pickaxe-hud";
+document.body.appendChild(pickaxeHud);
+
+const pickScene = new THREE.Scene();
+
+const pickCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+pickCamera.position.set(0, 0, 7);
+
+const pickRenderer = new THREE.WebGLRenderer({
+  alpha: true,
+  antialias: true
+});
+
+pickRenderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+pickRenderer.setSize(165, 165);
+pickRenderer.setClearColor(0x000000, 0);
+pickaxeHud.appendChild(pickRenderer.domElement);
+
+pickScene.add(new THREE.HemisphereLight(0xffffff, 0x49413a, 2));
+
+const pickLight = new THREE.DirectionalLight(0xffffff, 3);
+pickLight.position.set(3, 5, 6);
+pickScene.add(pickLight);
+
+const pickaxe = new THREE.Group();
+pickScene.add(pickaxe);
+
+// Wooden handle
+const handle = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.09, 0.13, 1.9, 7),
+  new THREE.MeshStandardMaterial({
+    color: 0x986039,
+    roughness: 0.85
+  })
+);
+handle.rotation.z = -0.55;
+handle.position.set(-0.2, -0.15, 0);
+pickaxe.add(handle);
+
+// Asymmetric, jagged stone head
+const stoneMaterial = new THREE.MeshStandardMaterial({
+  color: 0x555b61,
+  roughness: 1,
+  flatShading: true
+});
+
+const stoneHead = new THREE.Mesh(
+  new THREE.IcosahedronGeometry(0.52, 0),
+  stoneMaterial
+);
+stoneHead.scale.set(1.65, 0.65, 0.7);
+stoneHead.rotation.z = -0.35;
+stoneHead.position.set(0.45, 0.72, 0);
+pickaxe.add(stoneHead);
+
+// Pointed stone end
+const stoneTip = new THREE.Mesh(
+  new THREE.ConeGeometry(0.28, 0.65, 5),
+  stoneMaterial
+);
+stoneTip.rotation.z = -1.15;
+stoneTip.position.set(1.05, 0.88, 0);
+pickaxe.add(stoneTip);
+
+// Copper binding
+const binding = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.15, 0.15, 0.22, 8),
+  new THREE.MeshStandardMaterial({ color: 0xb47743 })
+);
+binding.position.set(-0.05, 0.15, 0);
+binding.rotation.z = -0.55;
+pickaxe.add(binding);
+
+pickaxe.rotation.z = -0.25;
+pickaxe.scale.setScalar(0.85);
+
+let pickaxeTime = 0;
+
+function animatePickaxe() {
+  requestAnimationFrame(animatePickaxe);
+
+  pickaxeTime += 0.018;
+  pickaxe.rotation.y += 0.018;
+  pickaxe.rotation.x = Math.sin(pickaxeTime) * 0.12;
+  pickaxe.position.y = Math.sin(pickaxeTime * 1.5) * 0.08;
+
+  pickRenderer.render(pickScene, pickCamera);
+}
+
+animatePickaxe();
+
+// GAME LOOP
 let lastTime = performance.now();
 
 function animate(now) {
