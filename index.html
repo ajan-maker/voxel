@@ -1,0 +1,680 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>voxel</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  background: #87ceeb;
+  color: white;
+}
+
+canvas {
+  display: block;
+}
+
+#crosshair {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 25px;
+  font-weight: bold;
+  pointer-events: none;
+  text-shadow: 1px 1px 3px black;
+}
+
+#top {
+  position: fixed;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+  text-shadow: 2px 2px 4px black;
+}
+
+#logo {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: 5px;
+}
+
+#status {
+  margin-top: 7px;
+  font-size: 12px;
+  color: #e8ffe8;
+}
+
+#hotbar {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+}
+
+.slot {
+  width: 58px;
+  height: 58px;
+  border: 3px solid #777;
+  background: #222b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.slot.selected {
+  border-color: white;
+  background: #ffffff44;
+  transform: translateY(-5px);
+}
+
+.swatch {
+  width: 25px;
+  height: 25px;
+  margin-bottom: 4px;
+  border: 2px solid #0005;
+}
+
+#help {
+  position: fixed;
+  left: 15px;
+  bottom: 15px;
+  font-size: 12px;
+  line-height: 1.8;
+  background: #0009;
+  padding: 10px 14px;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+#buttons {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 7px;
+}
+
+button {
+  padding: 10px 13px;
+  background: #222d;
+  border: 1px solid #ffffff66;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  background: #555e;
+}
+
+#overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0009;
+}
+
+#panel {
+  width: min(420px, 90%);
+  padding: 32px;
+  text-align: center;
+  border: 2px solid #ffffff77;
+  border-radius: 15px;
+  background: #202b26ee;
+  box-shadow: 0 10px 50px #0008;
+}
+
+#panel h1 {
+  font-size: 42px;
+  letter-spacing: 7px;
+  margin: 0 0 10px;
+}
+
+#panel p {
+  color: #ddd;
+  line-height: 1.7;
+}
+
+#play {
+  width: 100%;
+  margin-top: 12px;
+  padding: 15px;
+  background: #48a447;
+  border: none;
+  font-size: 16px;
+}
+
+#message {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 15px;
+  background: #0009;
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity .2s;
+  pointer-events: none;
+}
+
+@media(max-width:600px) {
+  #help { font-size: 10px; }
+  .slot { width: 45px; height: 51px; }
+  #buttons { top: 8px; right: 8px; }
+  #logo { font-size: 25px; }
+}
+</style>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+  }
+}
+</script>
+</head>
+
+<body>
+
+<div id="top">
+  <div id="logo">voxel</div>
+  <div id="status">DÜNYA YÜKLENİYOR...</div>
+</div>
+
+<div id="buttons">
+  <button id="saveBtn">SAVE</button>
+  <button id="resetBtn">NEW WORLD</button>
+</div>
+
+<div id="crosshair">+</div>
+
+<div id="hotbar"></div>
+
+<div id="help">
+  WASD — Hareket<br>
+  SPACE — Zıpla<br>
+  SOL TIK — Blok kır<br>
+  SAĞ TIK — Blok koy<br>
+  1 / 2 / 3 — Blok seç<br>
+  ESC — Fareyi serbest bırak
+</div>
+
+<div id="message"></div>
+
+<div id="overlay">
+  <div id="panel">
+    <h1>voxel</h1>
+    <p>
+      Kendi blok dünyanı keşfet!<br>
+      Blokları kır, yeni bloklar yerleştir<br>
+      ve dünyanı kaydet.
+    </p>
+    <button id="play">OYUNA BAŞLA</button>
+    <p style="font-size:12px">
+      Kontrol için fare kilidi gerekir.
+    </p>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from "three";
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87ceeb);
+scene.fog = new THREE.Fog(0x87ceeb, 25, 65);
+
+const camera = new THREE.PerspectiveCamera(
+  75,
+  innerWidth / innerHeight,
+  0.1,
+  1000
+);
+
+const renderer = new THREE.WebGLRenderer({
+  antialias: true
+});
+
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.prepend(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x667755, 2));
+
+const sun = new THREE.DirectionalLight(0xffffff, 2);
+sun.position.set(15, 30, 10);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+scene.add(sun);
+
+// Blok malzemeleri
+const materials = {
+  grass: new THREE.MeshLambertMaterial({ color: 0x55ad43 }),
+  dirt: new THREE.MeshLambertMaterial({ color: 0x80502e }),
+  stone: new THREE.MeshLambertMaterial({ color: 0x858585 })
+};
+
+const blockNames = ["grass", "dirt", "stone"];
+const blockColors = ["#55ad43", "#80502e", "#858585"];
+
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const blocks = new Map();
+
+const key = (x, y, z) => `${x},${y},${z}`;
+
+function addBlock(x, y, z, type, shouldSave = false) {
+  const k = key(x, y, z);
+
+  if (blocks.has(k)) return;
+
+  const mesh = new THREE.Mesh(geometry, materials[type] || materials.grass);
+  mesh.position.set(x, y, z);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  mesh.userData = { x, y, z, type };
+
+  scene.add(mesh);
+  blocks.set(k, mesh);
+
+  if (shouldSave) scheduleSave();
+}
+
+function removeBlock(mesh) {
+  const { x, y, z } = mesh.userData;
+  scene.remove(mesh);
+  blocks.delete(key(x, y, z));
+  scheduleSave();
+}
+
+function clearWorld() {
+  for (const mesh of blocks.values()) scene.remove(mesh);
+  blocks.clear();
+}
+
+function generateWorld() {
+  clearWorld();
+
+  // Küçük, keşfedilebilir blok dünyası
+  for (let x = -12; x < 12; x++) {
+    for (let z = -12; z < 12; z++) {
+      addBlock(x, 0, z, "grass");
+      addBlock(x, -1, z, "dirt");
+      addBlock(x, -2, z, "stone");
+    }
+  }
+
+  // Dekoratif ağaçlar
+  const trees = [
+    [-7, -6], [6, -8], [-8, 5], [8, 6], [3, 9]
+  ];
+
+  for (const [x, z] of trees) {
+    for (let y = 1; y <= 3; y++) {
+      addBlock(x, y, z, "dirt");
+    }
+
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        for (let y = 3; y <= 4; y++) {
+          addBlock(x + dx, y, z + dz, "grass");
+        }
+      }
+    }
+
+    addBlock(x, 5, z, "grass");
+  }
+}
+
+// Kaydetme ve yükleme
+const SAVE_KEY = "voxel-world-v1";
+let saveTimer;
+
+function saveWorld() {
+  try {
+    const data = [...blocks.values()].map(mesh => {
+      const { x, y, z, type } = mesh.userData;
+      return [x, y, z, type];
+    });
+
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    document.getElementById("status").textContent = "WORLD SAVED ✓";
+    return true;
+  } catch (error) {
+    document.getElementById("status").textContent = "SAVE FAILED";
+    showMessage("Kaydedilemedi! Tarayıcı depolamasını kontrol et.");
+    return false;
+  }
+}
+
+function scheduleSave() {
+  document.getElementById("status").textContent = "UNSAVED CHANGES";
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveWorld, 400);
+}
+
+function loadWorld() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+
+    if (raw) {
+      const data = JSON.parse(raw);
+
+      if (Array.isArray(data) && data.length > 0 && data.length < 10000) {
+        clearWorld();
+
+        for (const item of data) {
+          if (!Array.isArray(item) || item.length !== 4) continue;
+
+          const [x, y, z, type] = item;
+
+          if (
+            !Number.isInteger(x) ||
+            !Number.isInteger(y) ||
+            !Number.isInteger(z) ||
+            !blockNames.includes(type) ||
+            Math.abs(x) > 100 ||
+            Math.abs(y) > 100 ||
+            Math.abs(z) > 100
+          ) continue;
+
+          addBlock(x, y, z, type);
+        }
+
+        if (blocks.size > 0) {
+          document.getElementById("status").textContent = "WORLD LOADED ✓";
+          return;
+        }
+      }
+    }
+  } catch (error) {
+    console.warn("Save could not be loaded", error);
+  }
+
+  generateWorld();
+  saveWorld();
+}
+
+loadWorld();
+
+// Oyuncu
+camera.position.set(0, 2.6, 5);
+
+let yaw = 0;
+let pitch = 0;
+let selectedBlock = "grass";
+let isLocked = false;
+let velocityY = 0;
+let canJump = false;
+
+const keys = {};
+const playerRadius = 0.3;
+const playerHeight = 1.8;
+const raycaster = new THREE.Raycaster();
+raycaster.far = 6;
+
+function updateCameraRotation() {
+  camera.rotation.order = "YXZ";
+  camera.rotation.y = yaw;
+  camera.rotation.x = pitch;
+}
+
+function collidesAt(px, py, pz) {
+  const minX = Math.floor(px - playerRadius + 0.5);
+  const maxX = Math.floor(px + playerRadius + 0.5);
+  const minY = Math.floor(py - playerHeight + 0.5);
+  const maxY = Math.floor(py + 0.1 + 0.5);
+  const minZ = Math.floor(pz - playerRadius + 0.5);
+  const maxZ = Math.floor(pz + playerRadius + 0.5);
+
+  for (let x = minX; x <= maxX; x++) {
+    for (let y = minY; y <= maxY; y++) {
+      for (let z = minZ; z <= maxZ; z++) {
+        if (blocks.has(key(x, y, z))) return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+function updatePlayer(delta) {
+  const speed = 5.5;
+  const forward = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw));
+  const right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
+
+  const direction = new THREE.Vector3();
+
+  if (keys.KeyW) direction.add(forward);
+  if (keys.KeyS) direction.sub(forward);
+  if (keys.KeyD) direction.add(right);
+  if (keys.KeyA) direction.sub(right);
+
+  if (direction.lengthSq() > 0) {
+    direction.normalize().multiplyScalar(speed * delta);
+
+    const nextX = camera.position.x + direction.x;
+    if (!collidesAt(nextX, camera.position.y, camera.position.z)) {
+      camera.position.x = nextX;
+    }
+
+    const nextZ = camera.position.z + direction.z;
+    if (!collidesAt(camera.position.x, camera.position.y, nextZ)) {
+      camera.position.z = nextZ;
+    }
+  }
+
+  velocityY -= 18 * delta;
+  let nextY = camera.position.y + velocityY * delta;
+
+  if (collidesAt(camera.position.x, nextY, camera.position.z)) {
+    if (velocityY < 0) canJump = true;
+    velocityY = 0;
+  } else {
+    canJump = false;
+    camera.position.y = nextY;
+  }
+
+  // Dünyanın dışına düşülürse başlangıca dön
+  if (camera.position.y < -20) {
+    camera.position.set(0, 2.6, 5);
+    velocityY = 0;
+  }
+}
+
+// Hotbar
+const hotbar = document.getElementById("hotbar");
+
+blockNames.forEach((type, i) => {
+  const slot = document.createElement("div");
+  slot.className = "slot" + (i === 0 ? " selected" : "");
+  slot.innerHTML =
+    `<div class="swatch" style="background:${blockColors[i]}"></div>` +
+    `${i + 1}: ${type.toUpperCase()}`;
+
+  slot.addEventListener("click", () => selectBlock(type));
+  hotbar.appendChild(slot);
+});
+
+function selectBlock(type) {
+  selectedBlock = type;
+
+  [...hotbar.children].forEach((slot, i) => {
+    slot.classList.toggle("selected", blockNames[i] === type);
+  });
+}
+
+// Fare kilidi
+const overlay = document.getElementById("overlay");
+
+function requestPlay() {
+  renderer.domElement.requestPointerLock();
+}
+
+document.getElementById("play").addEventListener("click", requestPlay);
+
+document.addEventListener("pointerlockchange", () => {
+  isLocked = document.pointerLockElement === renderer.domElement;
+  overlay.style.display = isLocked ? "none" : "flex";
+});
+
+document.addEventListener("mousemove", event => {
+  if (!isLocked) return;
+
+  yaw -= event.movementX * 0.002;
+  pitch -= event.movementY * 0.002;
+  pitch = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, pitch));
+
+  updateCameraRotation();
+});
+
+document.addEventListener("keydown", event => {
+  keys[event.code] = true;
+
+  if (["Space", "ArrowUp", "ArrowDown"].includes(event.code)) {
+    event.preventDefault();
+  }
+
+  if (event.code === "Space" && canJump && isLocked) {
+    velocityY = 7;
+    canJump = false;
+  }
+
+  if (event.code === "Digit1") selectBlock("grass");
+  if (event.code === "Digit2") selectBlock("dirt");
+  if (event.code === "Digit3") selectBlock("stone");
+});
+
+document.addEventListener("keyup", event => {
+  keys[event.code] = false;
+});
+
+document.addEventListener("contextmenu", event => event.preventDefault());
+
+// Blok seçme, kırma ve koyma
+function getTargetBlock() {
+  raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+
+  const hits = raycaster.intersectObjects([...blocks.values()], false);
+  return hits.length ? hits[0] : null;
+}
+
+document.addEventListener("mousedown", event => {
+  if (!isLocked) return;
+
+  const hit = getTargetBlock();
+  if (!hit) return;
+
+  if (event.button === 0) {
+    removeBlock(hit.object);
+  }
+
+  if (event.button === 2) {
+    const normal = hit.face.normal.clone();
+    normal.transformDirection(hit.object.matrixWorld);
+
+    const pos = hit.object.position.clone().add(normal);
+
+    const px = camera.position.x;
+    const py = camera.position.y - playerHeight / 2;
+    const pz = camera.position.z;
+
+    // Oyuncunun içine blok yerleştirilmesini engelle
+    const overlapsPlayer =
+      Math.abs(pos.x - px) < 0.5 + playerRadius &&
+      Math.abs(pos.z - pz) < 0.5 + playerRadius &&
+      Math.abs(pos.y - (py + playerHeight / 2)) < 1.45;
+
+    if (overlapsPlayer) return;
+
+    addBlock(
+      Math.round(pos.x),
+      Math.round(pos.y),
+      Math.round(pos.z),
+      selectedBlock,
+      true
+    );
+  }
+});
+
+// Butonlar
+document.getElementById("saveBtn").addEventListener("click", () => {
+  if (saveWorld()) showMessage("Dünya kaydedildi!");
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  if (!confirm("Dünyanı sıfırlamak istiyor musun?")) return;
+
+  localStorage.removeItem(SAVE_KEY);
+  generateWorld();
+  camera.position.set(0, 2.6, 5);
+  velocityY = 0;
+  saveWorld();
+  showMessage("Yeni dünya oluşturuldu!");
+});
+
+let messageTimeout;
+
+function showMessage(text) {
+  const el = document.getElementById("message");
+  el.textContent = text;
+  el.style.opacity = "1";
+
+  clearTimeout(messageTimeout);
+  messageTimeout = setTimeout(() => {
+    el.style.opacity = "0";
+  }, 1800);
+}
+
+// Oyun döngüsü
+let lastTime = performance.now();
+
+function animate(now) {
+  requestAnimationFrame(animate);
+
+  const delta = Math.min((now - lastTime) / 1000, 0.05);
+  lastTime = now;
+
+  if (isLocked) updatePlayer(delta);
+
+  renderer.render(scene, camera);
+}
+
+requestAnimationFrame(animate);
+
+addEventListener("resize", () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+addEventListener("beforeunload", () => {
+  clearTimeout(saveTimer);
+  saveWorld();
+});
+
+</script>
+</body>
+</html>
