@@ -1,15 +1,13 @@
 
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>voxel</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -19,9 +17,7 @@ body {
   color: white;
 }
 
-canvas {
-  display: block;
-}
+canvas { display: block; }
 
 #crosshair {
   position: fixed;
@@ -121,9 +117,7 @@ button {
   font-weight: bold;
 }
 
-button:hover {
-  background: #555e;
-}
+button:hover { background: #555e; }
 
 #overlay {
   position: fixed;
@@ -199,25 +193,24 @@ button:hover {
 
 <div id="top">
   <div id="logo">voxel</div>
-  <div id="status">DÜNYA YÜKLENİYOR...</div>
+  <div id="status">LOADING WORLD...</div>
 </div>
 
 <div id="buttons">
-  <button id="saveBtn">SAVE</button>
+  <button id="saveBtn">SAVE WORLD</button>
   <button id="resetBtn">NEW WORLD</button>
 </div>
 
 <div id="crosshair">+</div>
-
 <div id="hotbar"></div>
 
 <div id="help">
-  WASD — Hareket<br>
-  SPACE — Zıpla<br>
-  SOL TIK — Blok kır<br>
-  SAĞ TIK — Blok koy<br>
-  1 / 2 / 3 — Blok seç<br>
-  ESC — Fareyi serbest bırak
+  WASD — Move<br>
+  SPACE — Jump<br>
+  LEFT CLICK — Break block<br>
+  RIGHT CLICK — Place block<br>
+  1 / 2 / 3 — Select block<br>
+  ESC — Release mouse
 </div>
 
 <div id="message"></div>
@@ -226,13 +219,13 @@ button:hover {
   <div id="panel">
     <h1>voxel</h1>
     <p>
-      Kendi blok dünyanı keşfet!<br>
-      Blokları kır, yeni bloklar yerleştir<br>
-      ve dünyanı kaydet.
+      Explore your own block world!<br>
+      Break blocks, place new ones,<br>
+      and save your world.
     </p>
-    <button id="play">OYUNA BAŞLA</button>
+    <button id="play">PLAY GAME</button>
     <p style="font-size:12px">
-      Kontrol için fare kilidi gerekir.
+      Click PLAY GAME to lock your mouse and start playing.
     </p>
   </div>
 </div>
@@ -245,16 +238,10 @@ scene.background = new THREE.Color(0x87ceeb);
 scene.fog = new THREE.Fog(0x87ceeb, 25, 65);
 
 const camera = new THREE.PerspectiveCamera(
-  75,
-  innerWidth / innerHeight,
-  0.1,
-  1000
+  75, innerWidth / innerHeight, 0.1, 1000
 );
 
-const renderer = new THREE.WebGLRenderer({
-  antialias: true
-});
-
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(innerWidth, innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
@@ -270,7 +257,6 @@ sun.castShadow = true;
 sun.shadow.mapSize.set(1024, 1024);
 scene.add(sun);
 
-// Blok malzemeleri
 const materials = {
   grass: new THREE.MeshLambertMaterial({ color: 0x55ad43 }),
   dirt: new THREE.MeshLambertMaterial({ color: 0x80502e }),
@@ -279,7 +265,6 @@ const materials = {
 
 const blockNames = ["grass", "dirt", "stone"];
 const blockColors = ["#55ad43", "#80502e", "#858585"];
-
 const geometry = new THREE.BoxGeometry(1, 1, 1);
 const blocks = new Map();
 
@@ -287,10 +272,12 @@ const key = (x, y, z) => `${x},${y},${z}`;
 
 function addBlock(x, y, z, type, shouldSave = false) {
   const k = key(x, y, z);
-
   if (blocks.has(k)) return;
 
-  const mesh = new THREE.Mesh(geometry, materials[type] || materials.grass);
+  const mesh = new THREE.Mesh(
+    geometry, materials[type] || materials.grass
+  );
+
   mesh.position.set(x, y, z);
   mesh.castShadow = true;
   mesh.receiveShadow = true;
@@ -317,7 +304,6 @@ function clearWorld() {
 function generateWorld() {
   clearWorld();
 
-  // Küçük, keşfedilebilir blok dünyası
   for (let x = -12; x < 12; x++) {
     for (let z = -12; z < 12; z++) {
       addBlock(x, 0, z, "grass");
@@ -326,7 +312,6 @@ function generateWorld() {
     }
   }
 
-  // Dekoratif ağaçlar
   const trees = [
     [-7, -6], [6, -8], [-8, 5], [8, 6], [3, 9]
   ];
@@ -348,9 +333,21 @@ function generateWorld() {
   }
 }
 
-// Kaydetme ve yükleme
 const SAVE_KEY = "voxel-world-v1";
 let saveTimer;
+
+function showMessage(text) {
+  const el = document.getElementById("message");
+  el.textContent = text;
+  el.style.opacity = "1";
+
+  clearTimeout(messageTimeout);
+  messageTimeout = setTimeout(() => {
+    el.style.opacity = "0";
+  }, 1800);
+}
+
+let messageTimeout;
 
 function saveWorld() {
   try {
@@ -364,7 +361,7 @@ function saveWorld() {
     return true;
   } catch (error) {
     document.getElementById("status").textContent = "SAVE FAILED";
-    showMessage("Kaydedilemedi! Tarayıcı depolamasını kontrol et.");
+    showMessage("Could not save! Check your browser storage.");
     return false;
   }
 }
@@ -410,7 +407,7 @@ function loadWorld() {
       }
     }
   } catch (error) {
-    console.warn("Save could not be loaded", error);
+    console.warn("Could not load saved world.", error);
   }
 
   generateWorld();
@@ -419,7 +416,6 @@ function loadWorld() {
 
 loadWorld();
 
-// Oyuncu
 camera.position.set(0, 2.6, 5);
 
 let yaw = 0;
@@ -462,8 +458,14 @@ function collidesAt(px, py, pz) {
 
 function updatePlayer(delta) {
   const speed = 5.5;
-  const forward = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw));
-  const right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
+
+  const forward = new THREE.Vector3(
+    -Math.sin(yaw), 0, -Math.cos(yaw)
+  );
+
+  const right = new THREE.Vector3(
+    Math.cos(yaw), 0, -Math.sin(yaw)
+  );
 
   const direction = new THREE.Vector3();
 
@@ -476,18 +478,20 @@ function updatePlayer(delta) {
     direction.normalize().multiplyScalar(speed * delta);
 
     const nextX = camera.position.x + direction.x;
+
     if (!collidesAt(nextX, camera.position.y, camera.position.z)) {
       camera.position.x = nextX;
     }
 
     const nextZ = camera.position.z + direction.z;
+
     if (!collidesAt(camera.position.x, camera.position.y, nextZ)) {
       camera.position.z = nextZ;
     }
   }
 
   velocityY -= 18 * delta;
-  let nextY = camera.position.y + velocityY * delta;
+  const nextY = camera.position.y + velocityY * delta;
 
   if (collidesAt(camera.position.x, nextY, camera.position.z)) {
     if (velocityY < 0) canJump = true;
@@ -497,19 +501,18 @@ function updatePlayer(delta) {
     camera.position.y = nextY;
   }
 
-  // Dünyanın dışına düşülürse başlangıca dön
   if (camera.position.y < -20) {
     camera.position.set(0, 2.6, 5);
     velocityY = 0;
   }
 }
 
-// Hotbar
 const hotbar = document.getElementById("hotbar");
 
 blockNames.forEach((type, i) => {
   const slot = document.createElement("div");
   slot.className = "slot" + (i === 0 ? " selected" : "");
+
   slot.innerHTML =
     `<div class="swatch" style="background:${blockColors[i]}"></div>` +
     `${i + 1}: ${type.toUpperCase()}`;
@@ -526,7 +529,6 @@ function selectBlock(type) {
   });
 }
 
-// Fare kilidi
 const overlay = document.getElementById("overlay");
 
 function requestPlay() {
@@ -545,7 +547,11 @@ document.addEventListener("mousemove", event => {
 
   yaw -= event.movementX * 0.002;
   pitch -= event.movementY * 0.002;
-  pitch = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, pitch));
+
+  pitch = Math.max(
+    -Math.PI / 2 + 0.01,
+    Math.min(Math.PI / 2 - 0.01, pitch)
+  );
 
   updateCameraRotation();
 });
@@ -573,10 +579,8 @@ document.addEventListener("keyup", event => {
 
 document.addEventListener("contextmenu", event => event.preventDefault());
 
-// Blok seçme, kırma ve koyma
 function getTargetBlock() {
   raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-
   const hits = raycaster.intersectObjects([...blocks.values()], false);
   return hits.length ? hits[0] : null;
 }
@@ -601,7 +605,6 @@ document.addEventListener("mousedown", event => {
     const py = camera.position.y - playerHeight / 2;
     const pz = camera.position.z;
 
-    // Oyuncunun içine blok yerleştirilmesini engelle
     const overlapsPlayer =
       Math.abs(pos.x - px) < 0.5 + playerRadius &&
       Math.abs(pos.z - pz) < 0.5 + playerRadius &&
@@ -619,36 +622,21 @@ document.addEventListener("mousedown", event => {
   }
 });
 
-// Butonlar
 document.getElementById("saveBtn").addEventListener("click", () => {
-  if (saveWorld()) showMessage("Dünya kaydedildi!");
+  if (saveWorld()) showMessage("World saved successfully!");
 });
 
 document.getElementById("resetBtn").addEventListener("click", () => {
-  if (!confirm("Dünyanı sıfırlamak istiyor musun?")) return;
+  if (!confirm("Are you sure you want to create a new world?")) return;
 
   localStorage.removeItem(SAVE_KEY);
   generateWorld();
   camera.position.set(0, 2.6, 5);
   velocityY = 0;
   saveWorld();
-  showMessage("Yeni dünya oluşturuldu!");
+  showMessage("New world created!");
 });
 
-let messageTimeout;
-
-function showMessage(text) {
-  const el = document.getElementById("message");
-  el.textContent = text;
-  el.style.opacity = "1";
-
-  clearTimeout(messageTimeout);
-  messageTimeout = setTimeout(() => {
-    el.style.opacity = "0";
-  }, 1800);
-}
-
-// Oyun döngüsü
 let lastTime = performance.now();
 
 function animate(now) {
@@ -674,7 +662,6 @@ addEventListener("beforeunload", () => {
   clearTimeout(saveTimer);
   saveWorld();
 });
-
 </script>
 </body>
 </html>
