@@ -3,570 +3,896 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VOXEL</title>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;overflow:hidden;font-family:Arial,sans-serif;background:#87ceeb;color:white}
-canvas{display:block}
-#top{position:fixed;top:12px;left:50%;transform:translateX(-50%);text-align:center;text-shadow:2px 2px 4px #000;pointer-events:none;z-index:2}
-#logo{font-size:30px;font-weight:900;letter-spacing:5px}
-#status{font-size:12px;margin-top:6px}
-#crosshair{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:25px;text-shadow:1px 1px 3px black;pointer-events:none;z-index:2}
-#buttons{position:fixed;top:12px;right:12px;z-index:3}
-button{cursor:pointer;font-weight:bold;padding:10px 14px;background:#222d;border:1px solid #ffffff66;color:white}
-button:hover{background:#555e}
-#hotbar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:2}
-.slot{width:58px;height:58px;border:3px solid #777;background:#222b;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:10px;cursor:pointer}
-.slot.selected{border-color:white;background:#ffffff44;transform:translateY(-5px)}
-.swatch{width:25px;height:25px;margin-bottom:4px;border:2px solid #0005}
-#help{position:fixed;left:12px;bottom:12px;font-size:12px;line-height:1.8;background:#0009;padding:10px;pointer-events:none;z-index:2}
-#message{position:fixed;top:90px;left:50%;transform:translateX(-50%);padding:9px 15px;background:#0009;border-radius:5px;opacity:0;pointer-events:none;z-index:12}
-#overlay{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;background:#777;background-image:linear-gradient(#0002 1px,transparent 1px),linear-gradient(90deg,#0002 1px,transparent 1px);background-size:32px 32px}
-#panel{width:min(1000px,96%);padding:20px;text-align:center}
-#panel h1{color:#111;font-size:clamp(55px,9vw,100px);font-weight:900;letter-spacing:10px;margin:0 0 38px;text-shadow:2px 2px 0 #aaa}
-#menuButtons{display:flex;justify-content:center;align-items:stretch;gap:20px;width:100%}
-.menu-button{flex:1;min-width:0;min-height:115px;padding:15px;color:#17100b;background-color:#a66d48;background-image:linear-gradient(#ffffff0c 1px,transparent 1px),linear-gradient(90deg,#00000018 1px,transparent 1px);background-size:16px 16px;border:3px solid #805132;border-radius:0;font-size:clamp(19px,3vw,38px);font-weight:400}
-.menu-button:hover{background-color:#bd8259}
-#backButton{display:none;margin-top:22px;background:#a66d48;color:#17100b;border:2px solid #805132;border-radius:0;font-size:20px;padding:12px 30px}
-#pickaxe-hud{position:fixed;right:25px;bottom:25px;width:190px;height:190px;pointer-events:none;z-index:11}
-#pickaxe-hud canvas{width:100%;height:100%;display:block}
-@media(max-width:600px){
- #panel{padding:8px}
- #panel h1{font-size:50px;margin-bottom:25px}
- #menuButtons{gap:10px}
- .menu-button{min-height:90px;padding:8px;font-size:18px;overflow-wrap:anywhere}
- #hotbar{gap:3px}
- .slot{width:45px;height:50px}
- #help{font-size:10px}
- #pickaxe-hud{right:5px;bottom:5px;width:125px;height:125px}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  background: #87ceeb;
+  color: white;
+}
+
+canvas {
+  display: block;
+}
+
+#crosshair {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 25px;
+  font-weight: bold;
+  pointer-events: none;
+  text-shadow: 1px 1px 3px black;
+}
+
+#top {
+  position: fixed;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+  text-shadow: 2px 2px 4px black;
+}
+
+#logo {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: 5px;
+}
+
+#status {
+  margin-top: 7px;
+  font-size: 12px;
+  color: #e8ffe8;
+}
+
+#hotbar {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+}
+
+.slot {
+  width: 58px;
+  height: 58px;
+  border: 3px solid #777;
+  background: #222b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.slot.selected {
+  border-color: white;
+  background: #ffffff44;
+  transform: translateY(-5px);
+}
+
+.swatch {
+  width: 25px;
+  height: 25px;
+  margin-bottom: 4px;
+  border: 2px solid #0005;
+}
+
+#help {
+  position: fixed;
+  left: 15px;
+  bottom: 15px;
+  font-size: 12px;
+  line-height: 1.8;
+  background: #0009;
+  padding: 10px 14px;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+#buttons {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 7px;
+}
+
+button {
+  padding: 10px 13px;
+  background: #222d;
+  border: 1px solid #ffffff66;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  background: #555e;
+}
+
+/* VOXEL MENU */
+#overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #777;
+  background-image:
+    linear-gradient(#0002 1px, transparent 1px),
+    linear-gradient(90deg, #0002 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+#panel {
+  width: min(700px, 95%);
+  padding: 20px;
+  text-align: center;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+#panel h1 {
+  display: block;
+  color: black;
+  font-size: clamp(55px, 9vw, 100px);
+  font-weight: 900;
+  letter-spacing: 10px;
+  margin: 0 0 35px;
+  text-shadow: 2px 2px 0 #aaa;
+}
+
+#panel p {
+  display: none;
+}
+
+#panel .menu-button {
+  display: block;
+  width: 100%;
+  min-height: 115px;
+  margin: 0 auto 34px;
+  padding: 15px;
+  color: black;
+  background-color: #a66d48;
+  background-image:
+    linear-gradient(#ffffff0c 1px, transparent 1px),
+    linear-gradient(90deg, #00000018 1px, transparent 1px);
+  background-size: 16px 16px;
+  border: 3px solid #805132;
+  border-radius: 0;
+  font-size: clamp(25px, 5vw, 48px);
+  font-weight: 400;
+  cursor: pointer;
+}
+
+#panel .menu-button:hover {
+  background-color: #bd8259;
+}
+
+/* MENU PICKAXE */
+#pickaxe-hud {
+  position: fixed;
+  right: 25px;
+  bottom: 25px;
+  width: 190px;
+  height: 190px;
+  pointer-events: none;
+  z-index: 11;
+}
+
+#pickaxe-hud canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#message {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 15px;
+  background: #0009;
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity .2s;
+  pointer-events: none;
+  z-index: 12;
+}
+
+@media(max-width:600px) {
+  #help {
+    font-size: 10px;
+  }
+
+  .slot {
+    width: 45px;
+    height: 51px;
+  }
+
+  #buttons {
+    top: 8px;
+    right: 8px;
+  }
+
+  #logo {
+    font-size: 25px;
+  }
+
+  #pickaxe-hud {
+    right: 5px;
+    bottom: 5px;
+    width: 125px;
+    height: 125px;
+  }
+
+  #panel .menu-button {
+    min-height: 80px;
+    margin-bottom: 22px;
+  }
+
+  #panel h1 {
+    margin-bottom: 25px;
+  }
 }
 </style>
+
 <script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+  }
+}
 </script>
 </head>
+
 <body>
-<div id="top"><div id="logo">voxel</div><div id="status">WORLD READY</div></div>
-<div id="buttons"><button id="saveBtn">SAVE WORLD</button></div>
+
+<!-- GAME HUD -->
+<div id="top">
+  <div id="logo">voxel</div>
+  <div id="status">LOADING WORLD...</div>
+</div>
+
+<div id="buttons">
+  <button id="saveBtn">SAVE WORLD</button>
+  <button id="resetBtn">NEW WORLD</button>
+</div>
+
 <div id="crosshair">+</div>
 <div id="hotbar"></div>
-<div id="help">WASD — Move<br>SPACE — Jump<br>LEFT CLICK — Break block<br>RIGHT CLICK — Place block<br>1 / 2 / 3 — Select block<br>ESC — Menu</div>
+
+<div id="help">
+  WASD — Move<br>
+  SPACE — Jump<br>
+  LEFT CLICK — Break block<br>
+  RIGHT CLICK — Place block<br>
+  1 / 2 / 3 — Select block<br>
+  ESC — Return to menu
+</div>
+
 <div id="message"></div>
 
+<!-- MAIN MENU -->
 <div id="overlay">
- <div id="panel">
-  <h1 id="menuTitle">VOXEL</h1>
-  <div id="menuButtons"></div>
-  <button id="backButton">BACK</button>
- </div>
+  <div id="panel">
+    <h1>VOXEL</h1>
+
+    <button id="play" class="menu-button">
+      JOIN WORLD
+    </button>
+
+    <button id="joinHub" class="menu-button">
+      JOIN HUB (WIP)
+    </button>
+  </div>
 </div>
 
 <script type="module">
 import * as THREE from "three";
 
+// =============================
+// GAME SETUP
+// =============================
+
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87ceeb);
-scene.fog = new THREE.Fog(0x87ceeb,25,65);
+scene.fog = new THREE.Fog(0x87ceeb, 25, 65);
 
-const camera = new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1000);
-const renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(innerWidth,innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const camera = new THREE.PerspectiveCamera(
+  75, innerWidth / innerHeight, 0.1, 1000
+);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 document.body.prepend(renderer.domElement);
 
-scene.add(new THREE.HemisphereLight(0xffffff,0x667755,2));
-const sun = new THREE.DirectionalLight(0xffffff,2);
-sun.position.set(15,30,10);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x667755, 2));
+
+const sun = new THREE.DirectionalLight(0xffffff, 2);
+sun.position.set(15, 30, 10);
 sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
 scene.add(sun);
 
+// =============================
+// BLOCK SYSTEM
+// =============================
+
 const materials = {
- grass:new THREE.MeshLambertMaterial({color:0x55ad43}),
- dirt:new THREE.MeshLambertMaterial({color:0x80502e}),
- stone:new THREE.MeshLambertMaterial({color:0x858585})
+  grass: new THREE.MeshLambertMaterial({ color: 0x55ad43 }),
+  dirt: new THREE.MeshLambertMaterial({ color: 0x80502e }),
+  stone: new THREE.MeshLambertMaterial({ color: 0x858585 })
 };
-const types = ["grass","dirt","stone"];
-const colors = ["#55ad43","#80502e","#858585"];
-const geometry = new THREE.BoxGeometry(1,1,1);
+
+const blockNames = ["grass", "dirt", "stone"];
+const blockColors = ["#55ad43", "#80502e", "#858585"];
+const geometry = new THREE.BoxGeometry(1, 1, 1);
 const blocks = new Map();
-const SAVE_KEY = "voxel-world-v3";
-const key = (x,y,z) => `${x},${y},${z}`;
 
-let mode = "menu";
-let menuPage = "main";
-let isLocked = false;
-let selectedBlock = "grass";
-let yaw = 0, pitch = 0, velocityY = 0, canJump = false;
-let saveTimer, messageTimer;
-const keys = {};
-const playerRadius = .3, playerHeight = 1.8;
+const key = (x, y, z) => `${x},${y},${z}`;
 
-function addBlock(x,y,z,type) {
- const k = key(x,y,z);
- if (blocks.has(k)) return;
- const mesh = new THREE.Mesh(geometry,materials[type]||materials.grass);
- mesh.position.set(x,y,z);
- mesh.castShadow = true;
- mesh.receiveShadow = true;
- mesh.userData = {x,y,z,type};
- scene.add(mesh);
- blocks.set(k,mesh);
+function addBlock(x, y, z, type) {
+  const k = key(x, y, z);
+  if (blocks.has(k)) return;
+
+  const mesh = new THREE.Mesh(
+    geometry,
+    materials[type] || materials.grass
+  );
+
+  mesh.position.set(x, y, z);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  mesh.userData = { x, y, z, type };
+
+  scene.add(mesh);
+  blocks.set(k, mesh);
+}
+
+function removeBlock(mesh) {
+  const { x, y, z } = mesh.userData;
+  scene.remove(mesh);
+  blocks.delete(key(x, y, z));
+  scheduleSave();
 }
 
 function clearWorld() {
- for (const mesh of blocks.values()) scene.remove(mesh);
- blocks.clear();
+  for (const mesh of blocks.values()) {
+    scene.remove(mesh);
+  }
+  blocks.clear();
 }
 
 function generateWorld() {
- clearWorld();
- for (let x=-12;x<12;x++) {
-  for (let z=-12;z<12;z++) {
-   addBlock(x,0,z,"grass");
-   addBlock(x,-1,z,"dirt");
-   addBlock(x,-2,z,"stone");
+  clearWorld();
+
+  for (let x = -12; x < 12; x++) {
+    for (let z = -12; z < 12; z++) {
+      addBlock(x, 0, z, "grass");
+      addBlock(x, -1, z, "dirt");
+      addBlock(x, -2, z, "stone");
+    }
   }
- }
- for (const [x,z] of [[-7,-6],[6,-8],[-8,5],[8,6],[3,9]]) {
-  for (let y=1;y<=3;y++) addBlock(x,y,z,"dirt");
-  for (let dx=-1;dx<=1;dx++) {
-   for (let dz=-1;dz<=1;dz++) {
-    for (let y=3;y<=4;y++) addBlock(x+dx,y,z+dz,"grass");
-   }
+
+  const trees = [
+    [-7, -6], [6, -8], [-8, 5], [8, 6], [3, 9]
+  ];
+
+  for (const [x, z] of trees) {
+    for (let y = 1; y <= 3; y++) {
+      addBlock(x, y, z, "dirt");
+    }
+
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dz = -1; dz <= 1; dz++) {
+        for (let y = 3; y <= 4; y++) {
+          addBlock(x + dx, y, z + dz, "grass");
+        }
+      }
+    }
+
+    addBlock(x, 5, z, "grass");
   }
-  addBlock(x,5,z,"grass");
- }
 }
 
-// HUB: separate temporary area, not saved
-function generateHub() {
- clearWorld();
- for (let x=-5;x<5;x++) {
-  for (let z=-5;z<5;z++) {
-   for (let y=0;y<5;y++) addBlock(x,y,z,"stone");
-  }
- }
- document.getElementById("status").textContent = "HUB — BUILDING DISABLED";
-}
+// =============================
+// SAVE / LOAD WORLD
+// =============================
+
+const SAVE_KEY = "voxel-world-v1";
+let saveTimer;
+let messageTimeout;
 
 function showMessage(text) {
- const el = document.getElementById("message");
- el.textContent = text;
- el.style.opacity = 1;
- clearTimeout(messageTimer);
- messageTimer = setTimeout(()=>el.style.opacity=0,1800);
+  const el = document.getElementById("message");
+  el.textContent = text;
+  el.style.opacity = "1";
+
+  clearTimeout(messageTimeout);
+  messageTimeout = setTimeout(() => {
+    el.style.opacity = "0";
+  }, 1800);
 }
 
 function saveWorld() {
- if (mode==="hub") return false;
- try {
-  const data = [...blocks.values()].map(mesh=>{
-   const {x,y,z,type}=mesh.userData;
-   return [x,y,z,type];
-  });
-  localStorage.setItem(SAVE_KEY,JSON.stringify(data));
-  document.getElementById("status").textContent="WORLD SAVED ✓";
-  return true;
- } catch(e) {
-  showMessage("Could not save world!");
-  return false;
- }
+  try {
+    const data = [...blocks.values()].map(mesh => {
+      const { x, y, z, type } = mesh.userData;
+      return [x, y, z, type];
+    });
+
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    document.getElementById("status").textContent = "WORLD SAVED ✓";
+    return true;
+  } catch (error) {
+    document.getElementById("status").textContent = "SAVE FAILED";
+    showMessage("Could not save world!");
+    return false;
+  }
 }
 
 function scheduleSave() {
- if (mode!=="world") return;
- document.getElementById("status").textContent="UNSAVED CHANGES";
- clearTimeout(saveTimer);
- saveTimer=setTimeout(saveWorld,400);
+  document.getElementById("status").textContent = "UNSAVED CHANGES";
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveWorld, 400);
 }
 
-function loadSavedWorld() {
- try {
-  const raw=localStorage.getItem(SAVE_KEY);
-  if (raw) {
-   const data=JSON.parse(raw);
-   if (Array.isArray(data)&&data.length>0&&data.length<10000) {
-    clearWorld();
-    for (const item of data) {
-     if (!Array.isArray(item)||item.length!==4) continue;
-     const [x,y,z,type]=item;
-     if (Number.isInteger(x)&&Number.isInteger(y)&&Number.isInteger(z)&&
-         Math.abs(x)<=100&&Math.abs(y)<=100&&Math.abs(z)<=100&&types.includes(type)) {
-      addBlock(x,y,z,type);
-     }
+function loadWorld() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+
+    if (raw) {
+      const data = JSON.parse(raw);
+
+      if (Array.isArray(data) && data.length > 0 && data.length < 10000) {
+        clearWorld();
+
+        for (const item of data) {
+          if (!Array.isArray(item) || item.length !== 4) continue;
+
+          const [x, y, z, type] = item;
+
+          if (
+            !Number.isInteger(x) ||
+            !Number.isInteger(y) ||
+            !Number.isInteger(z) ||
+            !blockNames.includes(type) ||
+            Math.abs(x) > 100 ||
+            Math.abs(y) > 100 ||
+            Math.abs(z) > 100
+          ) continue;
+
+          addBlock(x, y, z, type);
+        }
+
+        if (blocks.size > 0) {
+          document.getElementById("status").textContent = "WORLD LOADED ✓";
+          return;
+        }
+      }
     }
-    if (blocks.size) return true;
-   }
+  } catch (error) {
+    console.warn("Could not load saved world.", error);
   }
- } catch(e) {
-  console.warn("Save could not be loaded",e);
- }
- generateWorld();
- saveWorld();
- return false;
+
+  generateWorld();
+  saveWorld();
 }
 
-camera.position.set(0,2.6,5);
+loadWorld();
 
-function updateRotation() {
- camera.rotation.order="YXZ";
- camera.rotation.y=yaw;
- camera.rotation.x=pitch;
+// =============================
+// PLAYER
+// =============================
+
+camera.position.set(0, 2.6, 5);
+
+let yaw = 0;
+let pitch = 0;
+let selectedBlock = "grass";
+let isLocked = false;
+let velocityY = 0;
+let canJump = false;
+
+const keys = {};
+const playerRadius = 0.3;
+const playerHeight = 1.8;
+
+const raycaster = new THREE.Raycaster();
+raycaster.far = 6;
+
+function updateCameraRotation() {
+  camera.rotation.order = "YXZ";
+  camera.rotation.y = yaw;
+  camera.rotation.x = pitch;
 }
 
-function collidesAt(px,py,pz) {
- const minX=Math.floor(px-playerRadius+.5),maxX=Math.floor(px+playerRadius+.5);
- const minY=Math.floor(py-playerHeight+.5),maxY=Math.floor(py+.1+.5);
- const minZ=Math.floor(pz-playerRadius+.5),maxZ=Math.floor(pz+playerRadius+.5);
- for (let x=minX;x<=maxX;x++) {
-  for (let y=minY;y<=maxY;y++) {
-   for (let z=minZ;z<=maxZ;z++) {
-    if (blocks.has(key(x,y,z))) return true;
-   }
+function collidesAt(px, py, pz) {
+  const minX = Math.floor(px - playerRadius + 0.5);
+  const maxX = Math.floor(px + playerRadius + 0.5);
+  const minY = Math.floor(py - playerHeight + 0.5);
+  const maxY = Math.floor(py + 0.1 + 0.5);
+  const minZ = Math.floor(pz - playerRadius + 0.5);
+  const maxZ = Math.floor(pz + playerRadius + 0.5);
+
+  for (let x = minX; x <= maxX; x++) {
+    for (let y = minY; y <= maxY; y++) {
+      for (let z = minZ; z <= maxZ; z++) {
+        if (blocks.has(key(x, y, z))) return true;
+      }
+    }
   }
- }
- return false;
+
+  return false;
 }
 
-function updatePlayer(dt) {
- const speed=5.5;
- const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
- const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
- const d=new THREE.Vector3();
- if(keys.KeyW)d.add(forward);
- if(keys.KeyS)d.sub(forward);
- if(keys.KeyD)d.add(right);
- if(keys.KeyA)d.sub(right);
- if(d.lengthSq()) {
-  d.normalize().multiplyScalar(speed*dt);
-  const nx=camera.position.x+d.x;
-  if(!collidesAt(nx,camera.position.y,camera.position.z))camera.position.x=nx;
-  const nz=camera.position.z+d.z;
-  if(!collidesAt(camera.position.x,camera.position.y,nz))camera.position.z=nz;
- }
- velocityY-=18*dt;
- const ny=camera.position.y+velocityY*dt;
- if(collidesAt(camera.position.x,ny,camera.position.z)) {
-  if(velocityY<0)canJump=true;
-  velocityY=0;
- } else {
-  canJump=false;
-  camera.position.y=ny;
- }
- if(camera.position.y < -20) {
-  camera.position.set(0,2.6,5);
-  velocityY=0;
- }
+function updatePlayer(delta) {
+  const speed = 5.5;
+
+  const forward = new THREE.Vector3(
+    -Math.sin(yaw), 0, -Math.cos(yaw)
+  );
+
+  const right = new THREE.Vector3(
+    Math.cos(yaw), 0, -Math.sin(yaw)
+  );
+
+  const direction = new THREE.Vector3();
+
+  if (keys.KeyW) direction.add(forward);
+  if (keys.KeyS) direction.sub(forward);
+  if (keys.KeyD) direction.add(right);
+  if (keys.KeyA) direction.sub(right);
+
+  if (direction.lengthSq() > 0) {
+    direction.normalize().multiplyScalar(speed * delta);
+
+    const nextX = camera.position.x + direction.x;
+
+    if (!collidesAt(nextX, camera.position.y, camera.position.z)) {
+      camera.position.x = nextX;
+    }
+
+    const nextZ = camera.position.z + direction.z;
+
+    if (!collidesAt(camera.position.x, camera.position.y, nextZ)) {
+      camera.position.z = nextZ;
+    }
+  }
+
+  velocityY -= 18 * delta;
+
+  const nextY = camera.position.y + velocityY * delta;
+
+  if (collidesAt(camera.position.x, nextY, camera.position.z)) {
+    if (velocityY < 0) canJump = true;
+    velocityY = 0;
+  } else {
+    canJump = false;
+    camera.position.y = nextY;
+  }
+
+  if (camera.position.y < -20) {
+    camera.position.set(0, 2.6, 5);
+    velocityY = 0;
+  }
 }
 
+// =============================
 // HOTBAR
-const hotbar=document.getElementById("hotbar");
-types.forEach((type,i)=>{
- const el=document.createElement("div");
- el.className="slot"+(i===0?" selected":"");
- el.innerHTML=`<div class="swatch" style="background:${colors[i]}"></div>${i+1}: ${type.toUpperCase()}`;
- el.onclick=()=>selectBlock(type);
- hotbar.appendChild(el);
+// =============================
+
+const hotbar = document.getElementById("hotbar");
+
+blockNames.forEach((type, i) => {
+  const slot = document.createElement("div");
+
+  slot.className = "slot" + (i === 0 ? " selected" : "");
+
+  slot.innerHTML =
+    `<div class="swatch" style="background:${blockColors[i]}"></div>` +
+    `${i + 1}: ${type.toUpperCase()}`;
+
+  slot.addEventListener("click", () => selectBlock(type));
+  hotbar.appendChild(slot);
 });
 
 function selectBlock(type) {
- selectedBlock=type;
- [...hotbar.children].forEach((el,i)=>el.classList.toggle("selected",types[i]===type));
+  selectedBlock = type;
+
+  [...hotbar.children].forEach((slot, i) => {
+    slot.classList.toggle("selected", blockNames[i] === type);
+  });
 }
 
+// =============================
 // MENU
-const overlay=document.getElementById("overlay");
-const menuTitle=document.getElementById("menuTitle");
-const menuButtons=document.getElementById("menuButtons");
-const backButton=document.getElementById("backButton");
-const topUI=document.getElementById("top");
-const topButtons=document.getElementById("buttons");
-const help=document.getElementById("help");
-const crosshair=document.getElementById("crosshair");
+// =============================
 
-const pickaxeHud=document.createElement("div");
-pickaxeHud.id="pickaxe-hud";
+const overlay = document.getElementById("overlay");
+const pickaxeHud = document.createElement("div");
+
+pickaxeHud.id = "pickaxe-hud";
 document.body.appendChild(pickaxeHud);
 
-function makeMenuButton(html,callback) {
- const b=document.createElement("button");
- b.className="menu-button";
- b.innerHTML=html;
- b.onclick=callback;
- return b;
-}
+document.getElementById("play").addEventListener("click", () => {
+  renderer.domElement.requestPointerLock();
+});
 
-function showMenu(page="main") {
- if (mode==="world") {
-  clearTimeout(saveTimer);
-  saveWorld();
- }
- if (document.pointerLockElement) document.exitPointerLock();
+document.getElementById("joinHub").addEventListener("click", () => {
+  // Work in progress. This button intentionally does nothing.
+});
 
- mode="menu";
- menuPage=page;
- overlay.style.display="flex";
- menuTitle.textContent=page==="main"?"VOXEL":"JOIN WORLD";
- menuButtons.innerHTML="";
+document.addEventListener("pointerlockchange", () => {
+  isLocked = document.pointerLockElement === renderer.domElement;
 
- if(page==="main") {
-  menuButtons.append(
-   makeMenuButton("HUB",enterHub),
-   makeMenuButton("JOIN WORLD",()=>showMenu("world"))
+  overlay.style.display = isLocked ? "none" : "flex";
+  pickaxeHud.style.display = isLocked ? "none" : "block";
+});
+
+document.addEventListener("mousemove", event => {
+  if (!isLocked) return;
+
+  yaw -= event.movementX * 0.002;
+  pitch -= event.movementY * 0.002;
+
+  pitch = Math.max(
+    -Math.PI / 2 + 0.01,
+    Math.min(Math.PI / 2 - 0.01, pitch)
   );
- } else {
-  menuButtons.append(
-   makeMenuButton("JOIN WORLD",joinWorld),
-   makeMenuButton("NEW WORLD<br><span style='font-size:.48em'>(DELETES THE OLD ONE)</span>",createNewWorld)
-  );
- }
 
- backButton.style.display=page==="world"?"inline-block":"none";
- backButton.onclick=()=>showMenu("main");
- pickaxeHud.style.display="block";
- topUI.style.display="none";
- topButtons.style.display="none";
- hotbar.style.display="none";
- help.style.display="none";
- crosshair.style.display="none";
-}
-
-function showGameHUD() {
- topUI.style.display="block";
- topButtons.style.display=mode==="world"?"block":"none";
- hotbar.style.display=mode==="world"?"flex":"none";
- help.style.display=mode==="world"?"block":"none";
- crosshair.style.display="block";
-}
-
-function startWorld() {
- mode="world";
- camera.position.set(0,2.6,5);
- yaw=0;pitch=0;velocityY=0;
- updateRotation();
- overlay.style.display="none";
- pickaxeHud.style.display="none";
- showGameHUD();
- renderer.domElement.requestPointerLock();
-}
-
-function joinWorld() {
- clearTimeout(saveTimer);
- loadSavedWorld();
- startWorld();
-}
-
-function createNewWorld() {
- if(!confirm("NEW WORLD will delete your old saved world. Continue?"))return;
- clearTimeout(saveTimer);
- localStorage.removeItem(SAVE_KEY);
- generateWorld();
- mode="world";
- saveWorld();
- startWorld();
-}
-
-// HUB ENTRY
-function enterHub() {
- clearTimeout(saveTimer);
- if(document.pointerLockElement) document.exitPointerLock();
-
- mode="hub";
- generateHub();
-
- camera.position.set(0,7,14);
- yaw=0;
- pitch=-0.15;
- velocityY=0;
- updateRotation();
-
- overlay.style.display="none";
- pickaxeHud.style.display="none";
- topUI.style.display="block";
- topButtons.style.display="none";
- hotbar.style.display="none";
- help.style.display="none";
- crosshair.style.display="block";
-
- document.getElementById("status").textContent="HUB — BUILDING DISABLED";
- showMessage("HUB — BUILDING DISABLED");
-}
-
-document.getElementById("hubButton").onclick=enterHub;
-document.getElementById("worldMenuButton").onclick=()=>showMenu("world");
-
-// ESC: HUB goes to main menu; normal world opens world menu
-document.addEventListener("pointerlockchange",()=>{
- isLocked=document.pointerLockElement===renderer.domElement;
- if(isLocked) {
-  overlay.style.display="none";
-  pickaxeHud.style.display="none";
- } else if(mode==="world") {
-  showMenu("world");
- }
+  updateCameraRotation();
 });
 
-document.addEventListener("mousemove",e=>{
- if(!isLocked)return;
- yaw-=e.movementX*.002;
- pitch-=e.movementY*.002;
- pitch=Math.max(-Math.PI/2+.01,Math.min(Math.PI/2-.01,pitch));
- updateRotation();
+document.addEventListener("keydown", event => {
+  keys[event.code] = true;
+
+  if (["Space", "ArrowUp", "ArrowDown"].includes(event.code)) {
+    event.preventDefault();
+  }
+
+  if (event.code === "Space" && canJump && isLocked) {
+    velocityY = 7;
+    canJump = false;
+  }
+
+  if (event.code === "Digit1") selectBlock("grass");
+  if (event.code === "Digit2") selectBlock("dirt");
+  if (event.code === "Digit3") selectBlock("stone");
 });
 
-document.addEventListener("keydown",e=>{
- keys[e.code]=true;
- if(["Space","ArrowUp","ArrowDown"].includes(e.code))e.preventDefault();
-
- if(e.code==="Escape"&&mode==="hub") {
-  showMenu("main");
-  return;
- }
-
- if(e.code==="Space"&&canJump&&isLocked&&mode==="world") {
-  velocityY=7;
-  canJump=false;
- }
-
- if(mode==="world") {
-  if(e.code==="Digit1")selectBlock("grass");
-  if(e.code==="Digit2")selectBlock("dirt");
-  if(e.code==="Digit3")selectBlock("stone");
- }
+document.addEventListener("keyup", event => {
+  keys[event.code] = false;
 });
 
-document.addEventListener("keyup",e=>keys[e.code]=false);
-document.addEventListener("contextmenu",e=>e.preventDefault());
+document.addEventListener("contextmenu", event => {
+  event.preventDefault();
+});
 
-// BREAK / PLACE: NORMAL WORLD ONLY
-const raycaster=new THREE.Raycaster();
-raycaster.far=6;
+// =============================
+// BLOCK BREAKING / PLACING
+// =============================
 
-function targetBlock() {
- raycaster.setFromCamera(new THREE.Vector2(0,0),camera);
- const hits=raycaster.intersectObjects([...blocks.values()],false);
- return hits.length?hits[0]:null;
+function getTargetBlock() {
+  raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+
+  const hits = raycaster.intersectObjects([...blocks.values()], false);
+  return hits.length ? hits[0] : null;
 }
 
-document.addEventListener("mousedown",e=>{
- if(!isLocked||mode!=="world")return;
- const hit=targetBlock();
- if(!hit)return;
+document.addEventListener("mousedown", event => {
+  if (!isLocked) return;
 
- if(e.button===0) {
-  const {x,y,z}=hit.object.userData;
-  scene.remove(hit.object);
-  blocks.delete(key(x,y,z));
-  scheduleSave();
- }
+  const hit = getTargetBlock();
+  if (!hit) return;
 
- if(e.button===2) {
-  const normal=hit.face.normal.clone().transformDirection(hit.object.matrixWorld);
-  const p=hit.object.position.clone().add(normal);
+  if (event.button === 0) {
+    removeBlock(hit.object);
+  }
 
-  if(Math.abs(p.x-camera.position.x)<.5+playerRadius&&
-     Math.abs(p.z-camera.position.z)<.5+playerRadius&&
-     Math.abs(p.y-camera.position.y)<1.45)return;
+  if (event.button === 2) {
+    const normal = hit.face.normal.clone();
+    normal.transformDirection(hit.object.matrixWorld);
 
-  addBlock(Math.round(p.x),Math.round(p.y),Math.round(p.z),selectedBlock);
-  scheduleSave();
- }
+    const pos = hit.object.position.clone().add(normal);
+
+    const px = camera.position.x;
+    const pz = camera.position.z;
+
+    const overlapsPlayer =
+      Math.abs(pos.x - px) < 0.5 + playerRadius &&
+      Math.abs(pos.z - pz) < 0.5 + playerRadius &&
+      Math.abs(pos.y - camera.position.y) < 1.45;
+
+    if (overlapsPlayer) return;
+
+    addBlock(
+      Math.round(pos.x),
+      Math.round(pos.y),
+      Math.round(pos.z),
+      selectedBlock
+    );
+
+    scheduleSave();
+  }
 });
 
-// ROTATING PICKAXE IN MENUS
-const pickScene=new THREE.Scene();
-const pickCamera=new THREE.PerspectiveCamera(35,1,.1,100);
-pickCamera.position.set(0,0,7);
+// =============================
+// 3D STONE PICKAXE
+// MENU ONLY
+// =============================
 
-const pickRenderer=new THREE.WebGLRenderer({alpha:true,antialias:true});
-pickRenderer.setPixelRatio(Math.min(devicePixelRatio,2));
-pickRenderer.setSize(190,190);
-pickRenderer.setClearColor(0,0);
+const pickScene = new THREE.Scene();
+
+const pickCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+pickCamera.position.set(0, 0, 7);
+
+const pickRenderer = new THREE.WebGLRenderer({
+  alpha: true,
+  antialias: true
+});
+
+pickRenderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+pickRenderer.setSize(190, 190);
+pickRenderer.setClearColor(0x000000, 0);
 pickaxeHud.appendChild(pickRenderer.domElement);
 
-pickScene.add(new THREE.HemisphereLight(0xffffff,0x49413a,2));
-const light=new THREE.DirectionalLight(0xffffff,3);
-light.position.set(3,5,6);
-pickScene.add(light);
+pickScene.add(new THREE.HemisphereLight(0xffffff, 0x49413a, 2));
 
-const pickaxe=new THREE.Group();
+const pickLight = new THREE.DirectionalLight(0xffffff, 3);
+pickLight.position.set(3, 5, 6);
+pickScene.add(pickLight);
+
+const pickaxe = new THREE.Group();
 pickScene.add(pickaxe);
 
-const handle=new THREE.Mesh(
- new THREE.CylinderGeometry(.09,.13,1.9,7),
- new THREE.MeshStandardMaterial({color:0x986039,roughness:.85})
+// Brown wooden handle
+const handle = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.09, 0.13, 1.9, 7),
+  new THREE.MeshStandardMaterial({
+    color: 0x986039,
+    roughness: 0.85
+  })
 );
-handle.rotation.z=-.55;
-handle.position.set(-.2,-.15,0);
+
+handle.rotation.z = -0.55;
+handle.position.set(-0.2, -0.15, 0);
 pickaxe.add(handle);
 
-const stoneMat=new THREE.MeshStandardMaterial({color:0x555b61,roughness:1,flatShading:true});
-const head=new THREE.Mesh(new THREE.IcosahedronGeometry(.52,0),stoneMat);
-head.scale.set(1.65,.65,.7);
-head.rotation.z=-.35;
-head.position.set(.45,.72,0);
-pickaxe.add(head);
+// Uneven stone head
+const stoneMaterial = new THREE.MeshStandardMaterial({
+  color: 0x555b61,
+  roughness: 1,
+  flatShading: true
+});
 
-const tip=new THREE.Mesh(new THREE.ConeGeometry(.28,.65,5),stoneMat);
-tip.rotation.z=-1.15;
-tip.position.set(1.05,.88,0);
-pickaxe.add(tip);
-
-const binding=new THREE.Mesh(
- new THREE.CylinderGeometry(.15,.15,.22,8),
- new THREE.MeshStandardMaterial({color:0xb47743})
+const stoneHead = new THREE.Mesh(
+  new THREE.IcosahedronGeometry(0.52, 0),
+  stoneMaterial
 );
-binding.position.set(-.05,.15,0);
-binding.rotation.z=-.55;
+
+stoneHead.scale.set(1.65, 0.65, 0.7);
+stoneHead.rotation.z = -0.35;
+stoneHead.position.set(0.45, 0.72, 0);
+pickaxe.add(stoneHead);
+
+// Pointed stone end
+const stoneTip = new THREE.Mesh(
+  new THREE.ConeGeometry(0.28, 0.65, 5),
+  stoneMaterial
+);
+
+stoneTip.rotation.z = -1.15;
+stoneTip.position.set(1.05, 0.88, 0);
+pickaxe.add(stoneTip);
+
+// Copper binding
+const binding = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.15, 0.15, 0.22, 8),
+  new THREE.MeshStandardMaterial({ color: 0xb47743 })
+);
+
+binding.position.set(-0.05, 0.15, 0);
+binding.rotation.z = -0.55;
 pickaxe.add(binding);
 
-pickaxe.rotation.z=-.25;
-pickaxe.scale.setScalar(.85);
+pickaxe.rotation.z = -0.25;
+pickaxe.scale.setScalar(0.85);
 
-let pickTime=0;
+let pickaxeTime = 0;
+
 function animatePickaxe() {
- requestAnimationFrame(animatePickaxe);
- pickTime+=.018;
- pickaxe.rotation.y+=.018;
- pickaxe.rotation.x=Math.sin(pickTime)*.12;
- pickaxe.position.y=Math.sin(pickTime*1.5)*.08;
- pickRenderer.render(pickScene,pickCamera);
+  requestAnimationFrame(animatePickaxe);
+
+  pickaxeTime += 0.018;
+  pickaxe.rotation.y += 0.018;
+  pickaxe.rotation.x = Math.sin(pickaxeTime) * 0.12;
+  pickaxe.position.y = Math.sin(pickaxeTime * 1.5) * 0.08;
+
+  pickRenderer.render(pickScene, pickCamera);
 }
+
 animatePickaxe();
 
-// SAVE BUTTON
-document.getElementById("saveBtn").onclick=()=>{
- if(mode==="world"&&saveWorld())showMessage("World saved!");
-};
+// =============================
+// SAVE / RESET BUTTONS
+// =============================
 
-// MAIN LOOP
-let last=performance.now();
+document.getElementById("saveBtn").addEventListener("click", () => {
+  if (saveWorld()) showMessage("World saved successfully!");
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  if (!confirm("Are you sure you want to create a new world?")) return;
+
+  localStorage.removeItem(SAVE_KEY);
+  generateWorld();
+  camera.position.set(0, 2.6, 5);
+  velocityY = 0;
+  saveWorld();
+  showMessage("New world created!");
+});
+
+// =============================
+// GAME LOOP
+// =============================
+
+let lastTime = performance.now();
+
 function animate(now) {
- requestAnimationFrame(animate);
- const dt=Math.min((now-last)/1000,.05);
- last=now;
- if(isLocked&&mode==="world")updatePlayer(dt);
- renderer.render(scene,camera);
+  requestAnimationFrame(animate);
+
+  const delta = Math.min((now - lastTime) / 1000, 0.05);
+  lastTime = now;
+
+  if (isLocked) updatePlayer(delta);
+
+  renderer.render(scene, camera);
 }
+
 requestAnimationFrame(animate);
 
-addEventListener("resize",()=>{
- camera.aspect=innerWidth/innerHeight;
- camera.updateProjectionMatrix();
- renderer.setSize(innerWidth,innerHeight);
- pickRenderer.setSize(pickaxeHud.clientWidth,pickaxeHud.clientHeight);
+addEventListener("resize", () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+
+  pickCamera.aspect = 1;
+  pickCamera.updateProjectionMatrix();
+
+  pickRenderer.setSize(
+    pickaxeHud.clientWidth,
+    pickaxeHud.clientHeight
+  );
 });
 
-addEventListener("beforeunload",()=>{
- clearTimeout(saveTimer);
- if(mode==="world")saveWorld();
+addEventListener("beforeunload", () => {
+  clearTimeout(saveTimer);
+  saveWorld();
 });
-
-clearWorld();
-showMenu("main");
 </script>
+
 </body>
 </html>
