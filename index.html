@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -203,17 +202,6 @@ button:hover { background: #555e; }
   transition: opacity .2s;
   pointer-events: none;
   z-index: 12;
-}
-
-/* HUB INVENTORY: ONLY 1, 2, 3 */
-#hotbar.hub-inventory .slot {
-  flex-direction: row;
-  font-size: 22px;
-  font-weight: bold;
-}
-
-#hotbar.hub-inventory .swatch {
-  display: none;
 }
 
 @media(max-width:600px) {
@@ -518,40 +506,17 @@ function updateCameraRotation() {
 }
 
 function collidesAt(px, py, pz) {
-  const minX = px - playerRadius;
-  const maxX = px + playerRadius;
-  const minY = py - playerHeight;
-  const maxY = py;
-  const minZ = pz - playerRadius;
-  const maxZ = pz + playerRadius;
+  const minX = Math.floor(px - playerRadius + 0.5);
+  const maxX = Math.floor(px + playerRadius + 0.5);
+  const minY = Math.floor(py - playerHeight + 0.5);
+  const maxY = Math.floor(py + 0.1 + 0.5);
+  const minZ = Math.floor(pz - playerRadius + 0.5);
+  const maxZ = Math.floor(pz + playerRadius + 0.5);
 
-  const startX = Math.floor(minX - 0.5);
-  const endX = Math.ceil(maxX + 0.5);
-  const startY = Math.floor(minY - 0.5);
-  const endY = Math.ceil(maxY + 0.5);
-  const startZ = Math.floor(minZ - 0.5);
-  const endZ = Math.ceil(maxZ + 0.5);
-
-  for (let x = startX; x <= endX; x++) {
-    for (let y = startY; y <= endY; y++) {
-      for (let z = startZ; z <= endZ; z++) {
-        if (!blocks.has(key(x, y, z))) continue;
-
-        const overlapX =
-          maxX > x - 0.5 + 0.001 &&
-          minX < x + 0.5 - 0.001;
-
-        const overlapY =
-          maxY > y - 0.5 + 0.001 &&
-          minY < y + 0.5 - 0.001;
-
-        const overlapZ =
-          maxZ > z - 0.5 + 0.001 &&
-          minZ < z + 0.5 - 0.001;
-
-        if (overlapX && overlapY && overlapZ) {
-          return true;
-        }
+  for (let x = minX; x <= maxX; x++) {
+    for (let y = minY; y <= maxY; y++) {
+      for (let z = minZ; z <= maxZ; z++) {
+        if (blocks.has(key(x, y, z))) return true;
       }
     }
   }
@@ -562,49 +527,28 @@ function collidesAt(px, py, pz) {
 function findLandingHeight(px, currentY, nextY, pz) {
   const currentFeet = currentY - playerHeight;
   const nextFeet = nextY - playerHeight;
-
-  if (nextFeet >= currentFeet) return null;
-
   let landingTop = -Infinity;
 
-  const minX = Math.floor(px - playerRadius - 0.5);
-  const maxX = Math.ceil(px + playerRadius + 0.5);
-  const minZ = Math.floor(pz - playerRadius - 0.5);
-  const maxZ = Math.ceil(pz + playerRadius + 0.5);
+  for (const mesh of blocks.values()) {
+    const { x, y, z } = mesh.userData;
 
-  for (let x = minX; x <= maxX; x++) {
-    for (let z = minZ; z <= maxZ; z++) {
-      for (
-        let y = Math.floor(nextFeet - 0.5);
-        y <= Math.ceil(currentFeet + 0.5);
-        y++
-      ) {
-        if (!blocks.has(key(x, y, z))) continue;
+    const overlapsX = Math.abs(px - x) < 0.5 + playerRadius;
+    const overlapsZ = Math.abs(pz - z) < 0.5 + playerRadius;
 
-        const overlapsX =
-          px + playerRadius > x - 0.5 + 0.001 &&
-          px - playerRadius < x + 0.5 - 0.001;
+    if (!overlapsX || !overlapsZ) continue;
 
-        const overlapsZ =
-          pz + playerRadius > z - 0.5 + 0.001 &&
-          pz - playerRadius < z + 0.5 - 0.001;
+    const top = y + 0.5;
 
-        const top = y + 0.5;
-
-        if (
-          overlapsX &&
-          overlapsZ &&
-          currentFeet >= top - 0.01 &&
-          nextFeet <= top &&
-          top > landingTop
-        ) {
-          landingTop = top;
-        }
-      }
+    if (
+      currentFeet >= top - 0.001 &&
+      nextFeet <= top &&
+      top > landingTop
+    ) {
+      landingTop = top;
     }
   }
 
-  return landingTop === -Infinity ? null : landingTop;
+  return landingTop;
 }
 
 function updatePlayer(delta) {
@@ -641,25 +585,30 @@ function updatePlayer(delta) {
     }
   }
 
-  const oldY = camera.position.y;
+  velocityY -= 18 * delta;
 
-  velocityY -= 20 * delta;
-  velocityY = Math.max(velocityY, -35);
-
-  const nextY = oldY + velocityY * delta;
+  const currentY = camera.position.y;
+  const nextY = currentY + velocityY * delta;
 
   if (velocityY <= 0) {
-    const landingTop = findLandingHeight(
+    const landingHeight = findLandingHeight(
       camera.position.x,
-      oldY,
+      currentY,
       nextY,
       camera.position.z
     );
 
-    if (landingTop !== null) {
-      camera.position.y = landingTop + playerHeight;
+    if (landingHeight !== -Infinity) {
+      camera.position.y = landingHeight + playerHeight;
       velocityY = 0;
       canJump = true;
+    } else if (collidesAt(
+      camera.position.x,
+      nextY,
+      camera.position.z
+    )) {
+      velocityY = 0;
+      canJump = false;
     } else {
       camera.position.y = nextY;
       canJump = false;
@@ -700,43 +649,16 @@ blockNames.forEach((type, i) => {
     `<div class="swatch" style="background:${blockColors[i]}"></div>` +
     `${i + 1}: ${type.toUpperCase()}`;
 
-  slot.addEventListener("click", () => {
-    if (!hubMode) selectBlock(type);
-  });
-
+  slot.addEventListener("click", () => selectBlock(type));
   hotbar.appendChild(slot);
 });
 
 function selectBlock(type) {
-  if (hubMode) return;
-
   selectedBlock = type;
 
   [...hotbar.children].forEach((slot, i) => {
     slot.classList.toggle("selected", blockNames[i] === type);
   });
-}
-
-// Switches between normal inventory and hub-only number GUI.
-function updateHotbarMode() {
-  if (hubMode) {
-    hotbar.classList.add("hub-inventory");
-
-    [...hotbar.children].forEach((slot, index) => {
-      slot.textContent = String(index + 1);
-      slot.classList.toggle("selected", index === 0);
-    });
-  } else {
-    hotbar.classList.remove("hub-inventory");
-
-    [...hotbar.children].forEach((slot, index) => {
-      slot.innerHTML =
-        `<div class="swatch" style="background:${blockColors[index]}"></div>` +
-        `${index + 1}: ${blockNames[index].toUpperCase()}`;
-    });
-
-    selectBlock(selectedBlock);
-  }
 }
 
 // =============================
@@ -766,18 +688,16 @@ function enterHub() {
   normalPitch = pitch;
 
   hubMode = true;
-  updateHotbarMode();
-
   clearWorld();
 
-  // 25 x 25 stone floor.
+  // Hub: stone floor 25 x 25.
   for (let x = -12; x <= 12; x++) {
     for (let z = -12; z <= 12; z++) {
       addBlock(x, 0, z, "stone");
     }
   }
 
-  // Walls: floor plus four wall layers = 5 blocks tall.
+  // Stone walls, four blocks above the floor.
   for (let y = 1; y <= 4; y++) {
     for (let i = -12; i <= 12; i++) {
       addBlock(i, y, -12, "stone");
@@ -792,9 +712,6 @@ function enterHub() {
   pitch = 0;
   velocityY = 0;
   canJump = false;
-
-  for (const code in keys) keys[code] = false;
-
   updateCameraRotation();
 
   document.getElementById("status").textContent =
@@ -816,39 +733,28 @@ function leaveHub() {
 
   if (normalPlayerPosition) {
     camera.position.copy(normalPlayerPosition);
-  } else {
-    camera.position.set(0, 2.6, 5);
   }
 
   yaw = normalYaw;
   pitch = normalPitch;
   velocityY = 0;
   canJump = false;
-
-  for (const code in keys) keys[code] = false;
+  updateCameraRotation();
 
   hubMode = false;
-  updateHotbarMode();
-
   normalWorldSnapshot = null;
   normalPlayerPosition = null;
-
-  updateCameraRotation();
 
   document.getElementById("status").textContent = "WORLD RESTORED";
 }
 
-// JOIN WORLD
 document.getElementById("play").addEventListener("click", () => {
   if (hubMode) leaveHub();
-
   renderer.domElement.requestPointerLock();
 });
 
-// JOIN HUB works again after ESC.
 document.getElementById("joinHub").addEventListener("click", () => {
-  if (hubMode) return;
-  enterHub();
+  if (!hubMode) enterHub();
 });
 
 document.addEventListener("pointerlockchange", () => {
@@ -857,9 +763,7 @@ document.addEventListener("pointerlockchange", () => {
   overlay.style.display = isLocked ? "none" : "flex";
   pickaxeHud.style.display = isLocked ? "none" : "block";
 
-  for (const code in keys) keys[code] = false;
-
-  // ESC exits hub, restores normal world and its inventory.
+  // ESC leaves the hub. JOIN HUB can be clicked again afterward.
   if (!isLocked && hubMode) {
     leaveHub();
   }
@@ -882,21 +786,18 @@ document.addEventListener("mousemove", event => {
 document.addEventListener("keydown", event => {
   keys[event.code] = true;
 
-  if (event.code === "Space") {
+  if (["Space", "ArrowUp", "ArrowDown"].includes(event.code)) {
     event.preventDefault();
-
-    if (canJump && isLocked) {
-      velocityY = 7;
-      canJump = false;
-    }
   }
 
-  // Number keys only select blocks in the normal world.
-  if (!hubMode) {
-    if (event.code === "Digit1") selectBlock("grass");
-    if (event.code === "Digit2") selectBlock("dirt");
-    if (event.code === "Digit3") selectBlock("stone");
+  if (event.code === "Space" && canJump && isLocked) {
+    velocityY = 7;
+    canJump = false;
   }
+
+  if (event.code === "Digit1") selectBlock("grass");
+  if (event.code === "Digit2") selectBlock("dirt");
+  if (event.code === "Digit3") selectBlock("stone");
 });
 
 document.addEventListener("keyup", event => {
@@ -921,10 +822,8 @@ function getTargetBlock() {
 document.addEventListener("mousedown", event => {
   if (!isLocked) return;
 
-  // No breaking or placing blocks in the hub.
+  // Blocks cannot be broken or placed in the hub.
   if (hubMode) return;
-
-  if (event.button !== 0 && event.button !== 2) return;
 
   const hit = getTargetBlock();
   if (!hit) return;
@@ -939,21 +838,23 @@ document.addEventListener("mousedown", event => {
 
     const pos = hit.object.position.clone().add(normal);
 
-    const x = Math.round(pos.x);
-    const y = Math.round(pos.y);
-    const z = Math.round(pos.z);
-
-    if (blocks.has(key(x, y, z))) return;
+    const px = camera.position.x;
+    const pz = camera.position.z;
 
     const overlapsPlayer =
-      Math.abs(x - camera.position.x) < 0.5 + playerRadius &&
-      Math.abs(z - camera.position.z) < 0.5 + playerRadius &&
-      y + 0.5 > camera.position.y - playerHeight &&
-      y - 0.5 < camera.position.y;
+      Math.abs(pos.x - px) < 0.5 + playerRadius &&
+      Math.abs(pos.z - pz) < 0.5 + playerRadius &&
+      Math.abs(pos.y - camera.position.y) < 1.45;
 
     if (overlapsPlayer) return;
 
-    addBlock(x, y, z, selectedBlock);
+    addBlock(
+      Math.round(pos.x),
+      Math.round(pos.y),
+      Math.round(pos.z),
+      selectedBlock
+    );
+
     scheduleSave();
   }
 });
@@ -1089,42 +990,4 @@ document.getElementById("resetBtn").addEventListener("click", () => {
 // GAME LOOP
 // =============================
 
-let lastTime = performance.now();
-
-function animate(now) {
-  requestAnimationFrame(animate);
-
-  const delta = Math.min((now - lastTime) / 1000, 0.05);
-  lastTime = now;
-
-  if (isLocked) updatePlayer(delta);
-
-  renderer.render(scene, camera);
-}
-
-requestAnimationFrame(animate);
-
-addEventListener("resize", () => {
-  camera.aspect = innerWidth / innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
-
-  pickCamera.aspect = 1;
-  pickCamera.updateProjectionMatrix();
-
-  pickRenderer.setSize(
-    pickaxeHud.clientWidth,
-    pickaxeHud.clientHeight
-  );
-});
-
-addEventListener("beforeunload", () => {
-  clearTimeout(saveTimer);
-
-  // Never save the temporary hub.
-  if (!hubMode) saveWorld();
-});
-</script>
-
-</body>
-</html>
+let lastTime = performance.now
