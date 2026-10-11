@@ -696,9 +696,10 @@ blockNames.forEach((type, i) => {
 
   slot.className = "slot" + (i === 0 ? " selected" : "");
 
-  slot.innerHTML =
-    <div class="swatch" style="background:${blockColors[i]}"></div> +
-    ${i + 1}: ${type.toUpperCase()};
+
+slot.innerHTML =
+  `<div class="swatch" style="background:${blockColors[i]}"></div>` +
+  `${i + 1}: ${type.toUpperCase()}`;
 
   slot.addEventListener("click", () => selectBlock(type));
   hotbar.appendChild(slot);
