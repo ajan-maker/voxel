@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -333,6 +334,8 @@ function addBlock(x, y, z, type) {
 }
 
 function removeBlock(mesh) {
+  if (hubMode) return;
+
   const { x, y, z } = mesh.userData;
   scene.remove(mesh);
   blocks.delete(key(x, y, z));
@@ -500,19 +503,44 @@ function updateCameraRotation() {
   camera.rotation.x = pitch;
 }
 
-// Collision detection for the player's body.
+// FIXED COLLISION:
+// The player's body is checked against the actual edges of blocks.
+// Touching the ground does not count as being inside it.
 function collidesAt(px, py, pz) {
-  const minX = Math.floor(px - playerRadius + 0.5);
-  const maxX = Math.floor(px + playerRadius + 0.5);
-  const minY = Math.floor(py - playerHeight + 0.5);
-  const maxY = Math.floor(py + 0.1 + 0.5);
-  const minZ = Math.floor(pz - playerRadius + 0.5);
-  const maxZ = Math.floor(pz + playerRadius + 0.5);
+  const minX = px - playerRadius;
+  const maxX = px + playerRadius;
+  const minY = py - playerHeight;
+  const maxY = py;
+  const minZ = pz - playerRadius;
+  const maxZ = pz + playerRadius;
 
-  for (let x = minX; x <= maxX; x++) {
-    for (let y = minY; y <= maxY; y++) {
-      for (let z = minZ; z <= maxZ; z++) {
-        if (blocks.has(key(x, y, z))) return true;
+  const startX = Math.floor(minX - 0.5);
+  const endX = Math.ceil(maxX + 0.5);
+  const startY = Math.floor(minY - 0.5);
+  const endY = Math.ceil(maxY + 0.5);
+  const startZ = Math.floor(minZ - 0.5);
+  const endZ = Math.ceil(maxZ + 0.5);
+
+  for (let x = startX; x <= endX; x++) {
+    for (let y = startY; y <= endY; y++) {
+      for (let z = startZ; z <= endZ; z++) {
+        if (!blocks.has(key(x, y, z))) continue;
+
+        const overlapX =
+          maxX > x - 0.5 + 0.001 &&
+          minX < x + 0.5 - 0.001;
+
+        const overlapY =
+          maxY > y - 0.5 + 0.001 &&
+          minY < y + 0.5 - 0.001;
+
+        const overlapZ =
+          maxZ > z - 0.5 + 0.001 &&
+          minZ < z + 0.5 - 0.001;
+
+        if (overlapX && overlapY && overlapZ) {
+          return true;
+        }
       }
     }
   }
@@ -520,35 +548,58 @@ function collidesAt(px, py, pz) {
   return false;
 }
 
-// Find the surface on which the player should land.
+// Find a block surface crossed by the player's feet while falling.
 function findLandingHeight(px, currentY, nextY, pz) {
   const currentFeet = currentY - playerHeight;
   const nextFeet = nextY - playerHeight;
+
+  if (nextFeet >= currentFeet) return null;
+
   let landingTop = -Infinity;
 
-  for (const mesh of blocks.values()) {
-    const { x, y, z } = mesh.userData;
+  const minX = Math.floor(px - playerRadius - 0.5);
+  const maxX = Math.ceil(px + playerRadius + 0.5);
+  const minZ = Math.floor(pz - playerRadius - 0.5);
+  const maxZ = Math.ceil(pz + playerRadius + 0.5);
 
-    const overlapsX = Math.abs(px - x) < 0.5 + playerRadius;
-    const overlapsZ = Math.abs(pz - z) < 0.5 + playerRadius;
+  for (let x = minX; x <= maxX; x++) {
+    for (let z = minZ; z <= maxZ; z++) {
+      for (
+        let y = Math.floor(nextFeet - 0.5);
+        y <= Math.ceil(currentFeet + 0.5);
+        y++
+      ) {
+        if (!blocks.has(key(x, y, z))) continue;
 
-    if (!overlapsX || !overlapsZ) continue;
+        const overlapsX =
+          px + playerRadius > x - 0.5 + 0.001 &&
+          px - playerRadius < x + 0.5 - 0.001;
 
-    const top = y + 0.5;
+        const overlapsZ =
+          pz + playerRadius > z - 0.5 + 0.001 &&
+          pz - playerRadius < z + 0.5 - 0.001;
 
-    // Only land on blocks crossed while moving downward.
-    if (
-      currentFeet >= top - 0.001 &&
-      nextFeet <= top &&
-      top > landingTop
-    ) {
-      landingTop = top;
+        const top = y + 0.5;
+
+        if (
+          overlapsX &&
+          overlapsZ &&
+          currentFeet >= top - 0.01 &&
+          nextFeet <= top &&
+          top > landingTop
+        ) {
+          landingTop = top;
+        }
+      }
     }
   }
 
-  return landingTop;
+  return landingTop === -Infinity ? null : landingTop;
 }
 
+// FIXED MOVEMENT:
+// X and Z movement are resolved separately.
+// Vertical movement uses stable gravity and landing detection.
 function updatePlayer(delta) {
   const speed = 5.5;
 
@@ -570,12 +621,14 @@ function updatePlayer(delta) {
   if (direction.lengthSq() > 0) {
     direction.normalize().multiplyScalar(speed * delta);
 
+    // Horizontal X collision.
     const nextX = camera.position.x + direction.x;
 
     if (!collidesAt(nextX, camera.position.y, camera.position.z)) {
       camera.position.x = nextX;
     }
 
+    // Horizontal Z collision.
     const nextZ = camera.position.z + direction.z;
 
     if (!collidesAt(camera.position.x, camera.position.y, nextZ)) {
@@ -583,37 +636,33 @@ function updatePlayer(delta) {
     }
   }
 
-  // Gravity and vertical collision resolution.
-  velocityY -= 18 * delta;
+  // Gravity.
+  const oldY = camera.position.y;
 
-  const currentY = camera.position.y;
-  const nextY = currentY + velocityY * delta;
+  velocityY -= 20 * delta;
+  velocityY = Math.max(velocityY, -35);
+
+  const nextY = oldY + velocityY * delta;
 
   if (velocityY <= 0) {
-    const landingHeight = findLandingHeight(
+    const landingTop = findLandingHeight(
       camera.position.x,
-      currentY,
+      oldY,
       nextY,
       camera.position.z
     );
 
-    if (landingHeight !== -Infinity) {
-      // Snap to the exact block surface instead of repeatedly colliding.
-      camera.position.y = landingHeight + playerHeight;
+    if (landingTop !== null) {
+      // Camera height = block top + player height.
+      camera.position.y = landingTop + playerHeight;
       velocityY = 0;
       canJump = true;
-    } else if (collidesAt(
-      camera.position.x,
-      nextY,
-      camera.position.z
-    )) {
-      velocityY = 0;
-      canJump = false;
     } else {
       camera.position.y = nextY;
       canJump = false;
     }
   } else {
+    // Stop the player when hitting the underside of a block.
     if (collidesAt(
       camera.position.x,
       nextY,
@@ -627,7 +676,7 @@ function updatePlayer(delta) {
     canJump = false;
   }
 
-  // Safety recovery if the player falls outside the world.
+  // Emergency recovery if the player somehow falls out of the world.
   if (camera.position.y < -20) {
     camera.position.set(0, 2.6, 5);
     velocityY = 0;
@@ -679,7 +728,6 @@ document.body.appendChild(pickaxeHud);
 function enterHub() {
   if (hubMode) return;
 
-  // Keep the normal world in memory.
   normalWorldSnapshot = [...blocks.values()].map(mesh => {
     const { x, y, z, type } = mesh.userData;
     return [x, y, z, type];
@@ -692,15 +740,14 @@ function enterHub() {
   hubMode = true;
   clearWorld();
 
-  // 25 x 25 stone floor, coordinates -12 through 12.
-  // All floor blocks are stone.
+  // Hub floor: 25 x 25 stone blocks.
   for (let x = -12; x <= 12; x++) {
     for (let z = -12; z <= 12; z++) {
       addBlock(x, 0, z, "stone");
     }
   }
 
-  // Stone walls. Floor + four wall layers = 5 blocks tall.
+  // Walls: floor plus four wall layers = 5 blocks tall.
   for (let y = 1; y <= 4; y++) {
     for (let i = -12; i <= 12; i++) {
       addBlock(i, y, -12, "stone");
@@ -710,12 +757,14 @@ function enterHub() {
     }
   }
 
-  // Place player safely inside the hub.
   camera.position.set(0, 2.6, 0);
   yaw = 0;
   pitch = 0;
   velocityY = 0;
   canJump = false;
+
+  for (const code in keys) keys[code] = false;
+
   updateCameraRotation();
 
   document.getElementById("status").textContent =
@@ -729,7 +778,6 @@ function leaveHub() {
 
   clearWorld();
 
-  // Restore the original world from memory.
   if (normalWorldSnapshot) {
     for (const [x, y, z, type] of normalWorldSnapshot) {
       addBlock(x, y, z, type);
@@ -738,27 +786,35 @@ function leaveHub() {
 
   if (normalPlayerPosition) {
     camera.position.copy(normalPlayerPosition);
+  } else {
+    camera.position.set(0, 2.6, 5);
   }
 
   yaw = normalYaw;
   pitch = normalPitch;
   velocityY = 0;
   canJump = false;
-  updateCameraRotation();
+
+  for (const code in keys) keys[code] = false;
 
   hubMode = false;
   normalWorldSnapshot = null;
   normalPlayerPosition = null;
+
+  updateCameraRotation();
 
   document.getElementById("status").textContent = "WORLD RESTORED";
 }
 
 document.getElementById("play").addEventListener("click", () => {
   if (hubMode) leaveHub();
+
   renderer.domElement.requestPointerLock();
 });
 
-document.getElementById("joinHub").addEventListener("click", enterHub);
+document.getElementById("joinHub").addEventListener("click", () => {
+  enterHub();
+});
 
 document.addEventListener("pointerlockchange", () => {
   isLocked = document.pointerLockElement === renderer.domElement;
@@ -766,7 +822,9 @@ document.addEventListener("pointerlockchange", () => {
   overlay.style.display = isLocked ? "none" : "flex";
   pickaxeHud.style.display = isLocked ? "none" : "block";
 
-  // ESC in the hub returns to the normal world.
+  for (const code in keys) keys[code] = false;
+
+  // ESC leaves the temporary hub.
   if (!isLocked && hubMode) {
     leaveHub();
   }
@@ -789,13 +847,13 @@ document.addEventListener("mousemove", event => {
 document.addEventListener("keydown", event => {
   keys[event.code] = true;
 
-  if (["Space", "ArrowUp", "ArrowDown"].includes(event.code)) {
+  if (event.code === "Space") {
     event.preventDefault();
-  }
 
-  if (event.code === "Space" && canJump && isLocked) {
-    velocityY = 7;
-    canJump = false;
+    if (canJump && isLocked) {
+      velocityY = 7;
+      canJump = false;
+    }
   }
 
   if (event.code === "Digit1") selectBlock("grass");
@@ -825,6 +883,11 @@ function getTargetBlock() {
 document.addEventListener("mousedown", event => {
   if (!isLocked) return;
 
+  // Blocks cannot be broken or placed in the hub.
+  if (hubMode) return;
+
+  if (event.button !== 0 && event.button !== 2) return;
+
   const hit = getTargetBlock();
   if (!hit) return;
 
@@ -838,23 +901,28 @@ document.addEventListener("mousedown", event => {
 
     const pos = hit.object.position.clone().add(normal);
 
-    const px = camera.position.x;
-    const pz = camera.position.z;
+    const x = Math.round(pos.x);
+    const y = Math.round(pos.y);
+    const z = Math.round(pos.z);
+
+    if (blocks.has(key(x, y, z))) return;
+
+    // Don't place a block inside the player's body.
+    if (collidesAt(
+      camera.position.x,
+      camera.position.y,
+      camera.position.z
+    )) return;
 
     const overlapsPlayer =
-      Math.abs(pos.x - px) < 0.5 + playerRadius &&
-      Math.abs(pos.z - pz) < 0.5 + playerRadius &&
-      Math.abs(pos.y - camera.position.y) < 1.45;
+      Math.abs(x - camera.position.x) < 0.5 + playerRadius &&
+      Math.abs(z - camera.position.z) < 0.5 + playerRadius &&
+      y + 0.5 > camera.position.y - playerHeight &&
+      y - 0.5 < camera.position.y;
 
     if (overlapsPlayer) return;
 
-    addBlock(
-      Math.round(pos.x),
-      Math.round(pos.y),
-      Math.round(pos.z),
-      hubMode ? "stone" : selectedBlock
-    );
-
+    addBlock(x, y, z, selectedBlock);
     scheduleSave();
   }
 });
@@ -1022,7 +1090,7 @@ addEventListener("resize", () => {
 addEventListener("beforeunload", () => {
   clearTimeout(saveTimer);
 
-  // Never save the temporary hub.
+  // The temporary hub must never overwrite the saved normal world.
   if (!hubMode) saveWorld();
 });
 </script>
