@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,250 +6,84 @@
 <title>VOXEL</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
-
+* { box-sizing: border-box; }
 body {
-  margin: 0;
-  overflow: hidden;
-  font-family: Arial, sans-serif;
-  background: #87ceeb;
-  color: white;
+  margin: 0; overflow: hidden; font-family: Arial, sans-serif;
+  background: #87ceeb; color: white;
 }
-
-canvas {
-  display: block;
-}
-
+canvas { display: block; }
 #crosshair {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 25px;
-  font-weight: bold;
-  pointer-events: none;
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-size: 25px; font-weight: bold; pointer-events: none;
   text-shadow: 1px 1px 3px black;
 }
-
 #top {
-  position: fixed;
-  top: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-  pointer-events: none;
-  text-shadow: 2px 2px 4px black;
+  position: fixed; top: 15px; left: 50%; transform: translateX(-50%);
+  text-align: center; pointer-events: none; text-shadow: 2px 2px 4px black;
 }
-
-#logo {
-  font-size: 32px;
-  font-weight: 900;
-  letter-spacing: 5px;
-}
-
-#status {
-  margin-top: 7px;
-  font-size: 12px;
-  color: #e8ffe8;
-}
-
+#logo { font-size: 32px; font-weight: 900; letter-spacing: 5px; }
+#status { margin-top: 7px; font-size: 12px; color: #e8ffe8; }
 #hotbar {
-  position: fixed;
-  bottom: 22px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 6px;
+  position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 6px;
 }
-
 .slot {
-  width: 58px;
-  height: 58px;
-  border: 3px solid #777;
-  background: #222b;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  font-size: 11px;
-  cursor: pointer;
+  width: 58px; height: 58px; border: 3px solid #777; background: #222b;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; font-size: 11px; cursor: pointer;
 }
-
-.slot.selected {
-  border-color: white;
-  background: #ffffff44;
-  transform: translateY(-5px);
-}
-
-.swatch {
-  width: 25px;
-  height: 25px;
-  margin-bottom: 4px;
-  border: 2px solid #0005;
-}
-
+.slot.selected { border-color: white; background: #ffffff44; transform: translateY(-5px); }
+.swatch { width: 25px; height: 25px; margin-bottom: 4px; border: 2px solid #0005; }
 #help {
-  position: fixed;
-  left: 15px;
-  bottom: 15px;
-  font-size: 12px;
-  line-height: 1.8;
-  background: #0009;
-  padding: 10px 14px;
-  border-radius: 8px;
-  pointer-events: none;
+  position: fixed; left: 15px; bottom: 15px; font-size: 12px; line-height: 1.8;
+  background: #0009; padding: 10px 14px; border-radius: 8px; pointer-events: none;
 }
-
-#buttons {
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  display: flex;
-  gap: 7px;
-}
-
+#buttons { position: fixed; top: 15px; right: 15px; display: flex; gap: 7px; }
 button {
-  padding: 10px 13px;
-  background: #222d;
-  border: 1px solid #ffffff66;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
+  padding: 10px 13px; background: #222d; border: 1px solid #ffffff66;
+  color: white; border-radius: 6px; cursor: pointer; font-weight: bold;
 }
-
-button:hover {
-  background: #555e;
-}
-
-/* VOXEL MENU */
+button:hover { background: #555e; }
 #overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #777;
-  background-image:
-    linear-gradient(#0002 1px, transparent 1px),
+  position: fixed; inset: 0; z-index: 10; display: flex; align-items: center;
+  justify-content: center; background-color: #777;
+  background-image: linear-gradient(#0002 1px, transparent 1px),
     linear-gradient(90deg, #0002 1px, transparent 1px);
   background-size: 32px 32px;
 }
-
-#panel {
-  width: min(700px, 95%);
-  padding: 20px;
-  text-align: center;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-}
-
+#panel { width: min(700px, 95%); padding: 20px; text-align: center; background: transparent; border: none; box-shadow: none; }
 #panel h1 {
-  display: block;
-  color: black;
-  font-size: clamp(55px, 9vw, 100px);
-  font-weight: 900;
-  letter-spacing: 10px;
-  margin: 0 0 35px;
-  text-shadow: 2px 2px 0 #aaa;
+  display: block; color: black; font-size: clamp(55px, 9vw, 100px); font-weight: 900;
+  letter-spacing: 10px; margin: 0 0 35px; text-shadow: 2px 2px 0 #aaa;
 }
-
-#panel p {
-  display: none;
-}
-
+#panel p { display: none; }
 #panel .menu-button {
-  display: block;
-  width: 100%;
-  min-height: 115px;
-  margin: 0 auto 34px;
-  padding: 15px;
-  color: black;
-  background-color: #a66d48;
-  background-image:
-    linear-gradient(#ffffff0c 1px, transparent 1px),
+  display: block; width: 100%; min-height: 115px; margin: 0 auto 34px; padding: 15px;
+  color: black; background-color: #a66d48;
+  background-image: linear-gradient(#ffffff0c 1px, transparent 1px),
     linear-gradient(90deg, #00000018 1px, transparent 1px);
-  background-size: 16px 16px;
-  border: 3px solid #805132;
-  border-radius: 0;
-  font-size: clamp(25px, 5vw, 48px);
-  font-weight: 400;
-  cursor: pointer;
+  background-size: 16px 16px; border: 3px solid #805132; border-radius: 0;
+  font-size: clamp(25px, 5vw, 48px); font-weight: 400; cursor: pointer;
 }
-
-#panel .menu-button:hover {
-  background-color: #bd8259;
-}
-
-/* MENU PICKAXE */
+#panel .menu-button:hover { background-color: #bd8259; }
 #pickaxe-hud {
-  position: fixed;
-  right: 25px;
-  bottom: 25px;
-  width: 190px;
-  height: 190px;
-  pointer-events: none;
-  z-index: 11;
+  position: fixed; right: 25px; bottom: 25px; width: 190px; height: 190px;
+  pointer-events: none; z-index: 11;
 }
-
-#pickaxe-hud canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
+#pickaxe-hud canvas { display: block; width: 100%; height: 100%; }
 #message {
-  position: fixed;
-  top: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 8px 15px;
-  background: #0009;
-  border-radius: 6px;
-  opacity: 0;
-  transition: opacity .2s;
-  pointer-events: none;
-  z-index: 12;
+  position: fixed; top: 100px; left: 50%; transform: translateX(-50%);
+  padding: 8px 15px; background: #0009; border-radius: 6px;
+  opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 12;
 }
-
 @media(max-width:600px) {
-  #help {
-    font-size: 10px;
-  }
-
-  .slot {
-    width: 45px;
-    height: 51px;
-  }
-
-  #buttons {
-    top: 8px;
-    right: 8px;
-  }
-
-  #logo {
-    font-size: 25px;
-  }
-
-  #pickaxe-hud {
-    right: 5px;
-    bottom: 5px;
-    width: 125px;
-    height: 125px;
-  }
-
-  #panel .menu-button {
-    min-height: 80px;
-    margin-bottom: 22px;
-  }
-
-  #panel h1 {
-    margin-bottom: 25px;
-  }
+  #help { font-size: 10px; }
+  .slot { width: 45px; height: 51px; }
+  #buttons { top: 8px; right: 8px; }
+  #logo { font-size: 25px; }
+  #pickaxe-hud { right: 5px; bottom: 5px; width: 125px; height: 125px; }
+  #panel .menu-button { min-height: 80px; margin-bottom: 22px; }
+  #panel h1 { margin-bottom: 25px; }
 }
 </style>
 
@@ -262,10 +95,8 @@ button:hover {
 }
 </script>
 </head>
-
 <body>
 
-<!-- GAME HUD -->
 <div id="top">
   <div id="logo">voxel</div>
   <div id="status">LOADING WORLD...</div>
@@ -290,36 +121,23 @@ button:hover {
 
 <div id="message"></div>
 
-<!-- MAIN MENU -->
 <div id="overlay">
   <div id="panel">
     <h1>VOXEL</h1>
-
-    <button id="play" class="menu-button">
-      JOIN WORLD
-    </button>
-
-    <button id="joinHub" class="menu-button">
-      JOIN HUB (WIP)
-    </button>
+    <button id="play" class="menu-button">JOIN WORLD</button>
+    <button id="joinHub" class="menu-button">JOIN HUB</button>
   </div>
 </div>
 
 <script type="module">
 import * as THREE from "three";
 
-// =============================
 // GAME SETUP
-// =============================
-
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87ceeb);
 scene.fog = new THREE.Fog(0x87ceeb, 25, 65);
 
-const camera = new THREE.PerspectiveCamera(
-  75, innerWidth / innerHeight, 0.1, 1000
-);
-
+const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(innerWidth, innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -329,17 +147,13 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 document.body.prepend(renderer.domElement);
 
 scene.add(new THREE.HemisphereLight(0xffffff, 0x667755, 2));
-
 const sun = new THREE.DirectionalLight(0xffffff, 2);
 sun.position.set(15, 30, 10);
 sun.castShadow = true;
 sun.shadow.mapSize.set(1024, 1024);
 scene.add(sun);
 
-// =============================
 // BLOCK SYSTEM
-// =============================
-
 const materials = {
   grass: new THREE.MeshLambertMaterial({ color: 0x55ad43 }),
   dirt: new THREE.MeshLambertMaterial({ color: 0x80502e }),
@@ -350,23 +164,17 @@ const blockNames = ["grass", "dirt", "stone"];
 const blockColors = ["#55ad43", "#80502e", "#858585"];
 const geometry = new THREE.BoxGeometry(1, 1, 1);
 const blocks = new Map();
-
 const key = (x, y, z) => `${x},${y},${z}`;
 
 function addBlock(x, y, z, type) {
   const k = key(x, y, z);
   if (blocks.has(k)) return;
 
-  const mesh = new THREE.Mesh(
-    geometry,
-    materials[type] || materials.grass
-  );
-
+  const mesh = new THREE.Mesh(geometry, materials[type] || materials.grass);
   mesh.position.set(x, y, z);
   mesh.castShadow = true;
   mesh.receiveShadow = true;
   mesh.userData = { x, y, z, type };
-
   scene.add(mesh);
   blocks.set(k, mesh);
 }
@@ -379,9 +187,7 @@ function removeBlock(mesh) {
 }
 
 function clearWorld() {
-  for (const mesh of blocks.values()) {
-    scene.remove(mesh);
-  }
+  for (const mesh of blocks.values()) scene.remove(mesh);
   blocks.clear();
 }
 
@@ -396,14 +202,10 @@ function generateWorld() {
     }
   }
 
-  const trees = [
-    [-7, -6], [6, -8], [-8, 5], [8, 6], [3, 9]
-  ];
+  const trees = [[-7, -6], [6, -8], [-8, 5], [8, 6], [3, 9]];
 
   for (const [x, z] of trees) {
-    for (let y = 1; y <= 3; y++) {
-      addBlock(x, y, z, "dirt");
-    }
+    for (let y = 1; y <= 3; y++) addBlock(x, y, z, "dirt");
 
     for (let dx = -1; dx <= 1; dx++) {
       for (let dz = -1; dz <= 1; dz++) {
@@ -417,13 +219,16 @@ function generateWorld() {
   }
 }
 
-// =============================
-// SAVE / LOAD WORLD
-// =============================
-
+// SAVE / LOAD
 const SAVE_KEY = "voxel-world-v1";
 let saveTimer;
 let messageTimeout;
+
+let hubMode = false;
+let normalWorldSnapshot = null;
+let normalPlayerPosition = null;
+let normalYaw = 0;
+let normalPitch = 0;
 
 function showMessage(text) {
   const el = document.getElementById("message");
@@ -437,6 +242,11 @@ function showMessage(text) {
 }
 
 function saveWorld() {
+  if (hubMode) {
+    showMessage("Hub world cannot be saved!");
+    return false;
+  }
+
   try {
     const data = [...blocks.values()].map(mesh => {
       const { x, y, z, type } = mesh.userData;
@@ -454,6 +264,8 @@ function saveWorld() {
 }
 
 function scheduleSave() {
+  if (hubMode) return;
+
   document.getElementById("status").textContent = "UNSAVED CHANGES";
   clearTimeout(saveTimer);
   saveTimer = setTimeout(saveWorld, 400);
@@ -503,10 +315,7 @@ function loadWorld() {
 
 loadWorld();
 
-// =============================
 // PLAYER
-// =============================
-
 camera.position.set(0, 2.6, 5);
 
 let yaw = 0;
@@ -519,7 +328,6 @@ let canJump = false;
 const keys = {};
 const playerRadius = 0.3;
 const playerHeight = 1.8;
-
 const raycaster = new THREE.Raycaster();
 raycaster.far = 6;
 
@@ -551,14 +359,8 @@ function collidesAt(px, py, pz) {
 function updatePlayer(delta) {
   const speed = 5.5;
 
-  const forward = new THREE.Vector3(
-    -Math.sin(yaw), 0, -Math.cos(yaw)
-  );
-
-  const right = new THREE.Vector3(
-    Math.cos(yaw), 0, -Math.sin(yaw)
-  );
-
+  const forward = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw));
+  const right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
   const direction = new THREE.Vector3();
 
   if (keys.KeyW) direction.add(forward);
@@ -570,20 +372,17 @@ function updatePlayer(delta) {
     direction.normalize().multiplyScalar(speed * delta);
 
     const nextX = camera.position.x + direction.x;
-
     if (!collidesAt(nextX, camera.position.y, camera.position.z)) {
       camera.position.x = nextX;
     }
 
     const nextZ = camera.position.z + direction.z;
-
     if (!collidesAt(camera.position.x, camera.position.y, nextZ)) {
       camera.position.z = nextZ;
     }
   }
 
   velocityY -= 18 * delta;
-
   const nextY = camera.position.y + velocityY * delta;
 
   if (collidesAt(camera.position.x, nextY, camera.position.z)) {
@@ -600,17 +399,12 @@ function updatePlayer(delta) {
   }
 }
 
-// =============================
 // HOTBAR
-// =============================
-
 const hotbar = document.getElementById("hotbar");
 
 blockNames.forEach((type, i) => {
   const slot = document.createElement("div");
-
   slot.className = "slot" + (i === 0 ? " selected" : "");
-
   slot.innerHTML =
     `<div class="swatch" style="background:${blockColors[i]}"></div>` +
     `${i + 1}: ${type.toUpperCase()}`;
@@ -627,29 +421,103 @@ function selectBlock(type) {
   });
 }
 
-// =============================
-// MENU
-// =============================
-
+// MENU + TEMPORARY HUB
 const overlay = document.getElementById("overlay");
 const pickaxeHud = document.createElement("div");
-
 pickaxeHud.id = "pickaxe-hud";
 document.body.appendChild(pickaxeHud);
 
 document.getElementById("play").addEventListener("click", () => {
+  if (hubMode) leaveHub();
   renderer.domElement.requestPointerLock();
 });
 
-document.getElementById("joinHub").addEventListener("click", () => {
-  // Work in progress. This button intentionally does nothing.
-});
+function enterHub() {
+  if (hubMode) return;
+
+  // Normal world is kept in memory, not overwritten.
+  normalWorldSnapshot = [...blocks.values()].map(mesh => {
+    const { x, y, z, type } = mesh.userData;
+    return [x, y, z, type];
+  });
+
+  normalPlayerPosition = camera.position.clone();
+  normalYaw = yaw;
+  normalPitch = pitch;
+
+  hubMode = true;
+  clearWorld();
+
+  // HUB: 10 x 10, completely made of stone.
+  // The floor and walls are 5 blocks high in total.
+  // Coordinates -5 through 4 give exactly 10 blocks per side.
+  for (let x = -5; x < 5; x++) {
+    for (let z = -5; z < 5; z++) {
+      for (let y = 0; y < 5; y++) {
+        const isWall =
+          x === -5 || x === 4 ||
+          z === -5 || z === 4;
+
+        // Every floor block is stone; walls are stone too.
+        if (y === 0 || isWall) {
+          addBlock(x, y, z, "stone");
+        }
+      }
+    }
+  }
+
+  camera.position.set(0, 2.6, 0);
+  yaw = 0;
+  pitch = 0;
+  velocityY = 0;
+  canJump = false;
+  updateCameraRotation();
+
+  document.getElementById("status").textContent = "HUB WORLD — NOT SAVED";
+  renderer.domElement.requestPointerLock();
+}
+
+function leaveHub() {
+  if (!hubMode) return;
+
+  clearWorld();
+
+  // Restore the original world exactly as it was before entering the hub.
+  if (normalWorldSnapshot) {
+    for (const [x, y, z, type] of normalWorldSnapshot) {
+      addBlock(x, y, z, type);
+    }
+  }
+
+  if (normalPlayerPosition) {
+    camera.position.copy(normalPlayerPosition);
+  }
+
+  yaw = normalYaw;
+  pitch = normalPitch;
+  velocityY = 0;
+  canJump = false;
+  updateCameraRotation();
+
+  hubMode = false;
+  normalWorldSnapshot = null;
+  normalPlayerPosition = null;
+
+  document.getElementById("status").textContent = "WORLD RESTORED";
+}
+
+document.getElementById("joinHub").addEventListener("click", enterHub);
 
 document.addEventListener("pointerlockchange", () => {
   isLocked = document.pointerLockElement === renderer.domElement;
 
   overlay.style.display = isLocked ? "none" : "flex";
   pickaxeHud.style.display = isLocked ? "none" : "block";
+
+  // Pressing ESC in the hub returns to the normal world.
+  if (!isLocked && hubMode) {
+    leaveHub();
+  }
 });
 
 document.addEventListener("mousemove", event => {
@@ -691,13 +559,9 @@ document.addEventListener("contextmenu", event => {
   event.preventDefault();
 });
 
-// =============================
 // BLOCK BREAKING / PLACING
-// =============================
-
 function getTargetBlock() {
   raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-
   const hits = raycaster.intersectObjects([...blocks.values()], false);
   return hits.length ? hits[0] : null;
 }
@@ -717,7 +581,6 @@ document.addEventListener("mousedown", event => {
     normal.transformDirection(hit.object.matrixWorld);
 
     const pos = hit.object.position.clone().add(normal);
-
     const px = camera.position.x;
     const pz = camera.position.z;
 
@@ -732,20 +595,15 @@ document.addEventListener("mousedown", event => {
       Math.round(pos.x),
       Math.round(pos.y),
       Math.round(pos.z),
-      selectedBlock
+      hubMode ? "stone" : selectedBlock
     );
 
     scheduleSave();
   }
 });
 
-// =============================
-// 3D STONE PICKAXE
-// MENU ONLY
-// =============================
-
+// 3D STONE PICKAXE — MENU ONLY
 const pickScene = new THREE.Scene();
-
 const pickCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
 pickCamera.position.set(0, 0, 7);
 
@@ -768,7 +626,6 @@ pickScene.add(pickLight);
 const pickaxe = new THREE.Group();
 pickScene.add(pickaxe);
 
-// Brown wooden handle
 const handle = new THREE.Mesh(
   new THREE.CylinderGeometry(0.09, 0.13, 1.9, 7),
   new THREE.MeshStandardMaterial({
@@ -781,7 +638,6 @@ handle.rotation.z = -0.55;
 handle.position.set(-0.2, -0.15, 0);
 pickaxe.add(handle);
 
-// Uneven stone head
 const stoneMaterial = new THREE.MeshStandardMaterial({
   color: 0x555b61,
   roughness: 1,
@@ -798,7 +654,6 @@ stoneHead.rotation.z = -0.35;
 stoneHead.position.set(0.45, 0.72, 0);
 pickaxe.add(stoneHead);
 
-// Pointed stone end
 const stoneTip = new THREE.Mesh(
   new THREE.ConeGeometry(0.28, 0.65, 5),
   stoneMaterial
@@ -808,7 +663,6 @@ stoneTip.rotation.z = -1.15;
 stoneTip.position.set(1.05, 0.88, 0);
 pickaxe.add(stoneTip);
 
-// Copper binding
 const binding = new THREE.Mesh(
   new THREE.CylinderGeometry(0.15, 0.15, 0.22, 8),
   new THREE.MeshStandardMaterial({ color: 0xb47743 })
@@ -836,15 +690,24 @@ function animatePickaxe() {
 
 animatePickaxe();
 
-// =============================
 // SAVE / RESET BUTTONS
-// =============================
-
 document.getElementById("saveBtn").addEventListener("click", () => {
-  if (saveWorld()) showMessage("World saved successfully!");
+  if (hubMode) {
+    showMessage("Hub world cannot be saved!");
+    return;
+  }
+
+  if (saveWorld()) {
+    showMessage("World saved successfully!");
+  }
 });
 
 document.getElementById("resetBtn").addEventListener("click", () => {
+  if (hubMode) {
+    showMessage("Leave the hub before creating a new world.");
+    return;
+  }
+
   if (!confirm("Are you sure you want to create a new world?")) return;
 
   localStorage.removeItem(SAVE_KEY);
@@ -855,10 +718,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   showMessage("New world created!");
 });
 
-// =============================
 // GAME LOOP
-// =============================
-
 let lastTime = performance.now();
 
 function animate(now) {
@@ -890,9 +750,8 @@ addEventListener("resize", () => {
 
 addEventListener("beforeunload", () => {
   clearTimeout(saveTimer);
-  saveWorld();
+  if (!hubMode) saveWorld();
 });
 </script>
-
 </body>
 </html>
