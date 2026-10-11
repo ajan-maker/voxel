@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -270,6 +269,51 @@ button:hover { background: #555e; }
 <script type="module">
 import * as THREE from "three";
 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import {
+  getAuth,
+  signInAnonymously
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+import {
+  getDatabase,
+  ref,
+  set,
+  onValue,
+  onDisconnect,
+  remove
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+
+// =============================
+// FIREBASE — HUB MULTIPLAYER ONLY
+// =============================
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC3SfEBKdlwZvTOTH-la0sK4A85h75W7s",
+  authDomain: "voxel-cc64b.firebaseapp.com",
+  databaseURL: "https://voxel-cc64b-default-rtdb.firebaseio.com",
+  projectId: "voxel-cc64b",
+  storageBucket: "voxel-cc64b.firebasestorage.app",
+  messagingSenderId: "961192561088",
+  appId: "1:961192561088:web:3258d76dd17f4d119c2025"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const firebaseAuth = getAuth(firebaseApp);
+const firebaseDatabase = getDatabase(firebaseApp);
+
+let firebaseUid = null;
+
+const firebaseReady = signInAnonymously(firebaseAuth)
+  .then(result => {
+    firebaseUid = result.user.uid;
+    return firebaseUid;
+  })
+  .catch(error => {
+    console.error("VOXEL HUB multiplayer sign-in failed:", error);
+    return null;
+  });
+
 // =============================
 // GAME SETUP
 // =============================
@@ -334,8 +378,6 @@ function addBlock(x, y, z, type) {
 }
 
 function removeBlock(mesh) {
-  if (hubMode) return;
-
   const { x, y, z } = mesh.userData;
   scene.remove(mesh);
   blocks.delete(key(x, y, z));
@@ -503,44 +545,19 @@ function updateCameraRotation() {
   camera.rotation.x = pitch;
 }
 
-// FIXED COLLISION:
-// The player's body is checked against the actual edges of blocks.
-// Touching the ground does not count as being inside it.
+// Collision detection for the player's body.
 function collidesAt(px, py, pz) {
-  const minX = px - playerRadius;
-  const maxX = px + playerRadius;
-  const minY = py - playerHeight;
-  const maxY = py;
-  const minZ = pz - playerRadius;
-  const maxZ = pz + playerRadius;
+  const minX = Math.floor(px - playerRadius + 0.5);
+  const maxX = Math.floor(px + playerRadius + 0.5);
+  const minY = Math.floor(py - playerHeight + 0.5);
+  const maxY = Math.floor(py + 0.1 + 0.5);
+  const minZ = Math.floor(pz - playerRadius + 0.5);
+  const maxZ = Math.floor(pz + playerRadius + 0.5);
 
-  const startX = Math.floor(minX - 0.5);
-  const endX = Math.ceil(maxX + 0.5);
-  const startY = Math.floor(minY - 0.5);
-  const endY = Math.ceil(maxY + 0.5);
-  const startZ = Math.floor(minZ - 0.5);
-  const endZ = Math.ceil(maxZ + 0.5);
-
-  for (let x = startX; x <= endX; x++) {
-    for (let y = startY; y <= endY; y++) {
-      for (let z = startZ; z <= endZ; z++) {
-        if (!blocks.has(key(x, y, z))) continue;
-
-        const overlapX =
-          maxX > x - 0.5 + 0.001 &&
-          minX < x + 0.5 - 0.001;
-
-        const overlapY =
-          maxY > y - 0.5 + 0.001 &&
-          minY < y + 0.5 - 0.001;
-
-        const overlapZ =
-          maxZ > z - 0.5 + 0.001 &&
-          minZ < z + 0.5 - 0.001;
-
-        if (overlapX && overlapY && overlapZ) {
-          return true;
-        }
+  for (let x = minX; x <= maxX; x++) {
+    for (let y = minY; y <= maxY; y++) {
+      for (let z = minZ; z <= maxZ; z++) {
+        if (blocks.has(key(x, y, z))) return true;
       }
     }
   }
@@ -548,58 +565,34 @@ function collidesAt(px, py, pz) {
   return false;
 }
 
-// Find a block surface crossed by the player's feet while falling.
+// Find the surface on which the player should land.
 function findLandingHeight(px, currentY, nextY, pz) {
   const currentFeet = currentY - playerHeight;
   const nextFeet = nextY - playerHeight;
-
-  if (nextFeet >= currentFeet) return null;
-
   let landingTop = -Infinity;
 
-  const minX = Math.floor(px - playerRadius - 0.5);
-  const maxX = Math.ceil(px + playerRadius + 0.5);
-  const minZ = Math.floor(pz - playerRadius - 0.5);
-  const maxZ = Math.ceil(pz + playerRadius + 0.5);
+  for (const mesh of blocks.values()) {
+    const { x, y, z } = mesh.userData;
 
-  for (let x = minX; x <= maxX; x++) {
-    for (let z = minZ; z <= maxZ; z++) {
-      for (
-        let y = Math.floor(nextFeet - 0.5);
-        y <= Math.ceil(currentFeet + 0.5);
-        y++
-      ) {
-        if (!blocks.has(key(x, y, z))) continue;
+    const overlapsX = Math.abs(px - x) < 0.5 + playerRadius;
+    const overlapsZ = Math.abs(pz - z) < 0.5 + playerRadius;
 
-        const overlapsX =
-          px + playerRadius > x - 0.5 + 0.001 &&
-          px - playerRadius < x + 0.5 - 0.001;
+    if (!overlapsX || !overlapsZ) continue;
 
-        const overlapsZ =
-          pz + playerRadius > z - 0.5 + 0.001 &&
-          pz - playerRadius < z + 0.5 - 0.001;
+    const top = y + 0.5;
 
-        const top = y + 0.5;
-
-        if (
-          overlapsX &&
-          overlapsZ &&
-          currentFeet >= top - 0.01 &&
-          nextFeet <= top &&
-          top > landingTop
-        ) {
-          landingTop = top;
-        }
-      }
+    if (
+      currentFeet >= top - 0.001 &&
+      nextFeet <= top &&
+      top > landingTop
+    ) {
+      landingTop = top;
     }
   }
 
-  return landingTop === -Infinity ? null : landingTop;
+  return landingTop;
 }
 
-// FIXED MOVEMENT:
-// X and Z movement are resolved separately.
-// Vertical movement uses stable gravity and landing detection.
 function updatePlayer(delta) {
   const speed = 5.5;
 
@@ -621,14 +614,12 @@ function updatePlayer(delta) {
   if (direction.lengthSq() > 0) {
     direction.normalize().multiplyScalar(speed * delta);
 
-    // Horizontal X collision.
     const nextX = camera.position.x + direction.x;
 
     if (!collidesAt(nextX, camera.position.y, camera.position.z)) {
       camera.position.x = nextX;
     }
 
-    // Horizontal Z collision.
     const nextZ = camera.position.z + direction.z;
 
     if (!collidesAt(camera.position.x, camera.position.y, nextZ)) {
@@ -636,33 +627,35 @@ function updatePlayer(delta) {
     }
   }
 
-  // Gravity.
-  const oldY = camera.position.y;
+  velocityY -= 18 * delta;
 
-  velocityY -= 20 * delta;
-  velocityY = Math.max(velocityY, -35);
-
-  const nextY = oldY + velocityY * delta;
+  const currentY = camera.position.y;
+  const nextY = currentY + velocityY * delta;
 
   if (velocityY <= 0) {
-    const landingTop = findLandingHeight(
+    const landingHeight = findLandingHeight(
       camera.position.x,
-      oldY,
+      currentY,
       nextY,
       camera.position.z
     );
 
-    if (landingTop !== null) {
-      // Camera height = block top + player height.
-      camera.position.y = landingTop + playerHeight;
+    if (landingHeight !== -Infinity) {
+      camera.position.y = landingHeight + playerHeight;
       velocityY = 0;
       canJump = true;
+    } else if (collidesAt(
+      camera.position.x,
+      nextY,
+      camera.position.z
+    )) {
+      velocityY = 0;
+      canJump = false;
     } else {
       camera.position.y = nextY;
       canJump = false;
     }
   } else {
-    // Stop the player when hitting the underside of a block.
     if (collidesAt(
       camera.position.x,
       nextY,
@@ -676,7 +669,6 @@ function updatePlayer(delta) {
     canJump = false;
   }
 
-  // Emergency recovery if the player somehow falls out of the world.
   if (camera.position.y < -20) {
     camera.position.set(0, 2.6, 5);
     velocityY = 0;
@@ -722,12 +714,173 @@ pickaxeHud.id = "pickaxe-hud";
 document.body.appendChild(pickaxeHud);
 
 // =============================
+// HUB MULTIPLAYER ONLY
+// =============================
+
+let hubMultiplayerActive = false;
+let hubPlayersUnsubscribe = null;
+let myHubPlayerRef = null;
+let hubLastSentAt = 0;
+let hubWritePending = false;
+
+const remoteHubPlayers = new Map();
+const remoteStoneGeometry = new THREE.BoxGeometry(1, 1, 1);
+const remoteStoneMaterial = new THREE.MeshLambertMaterial({
+  color: 0x858585
+});
+
+async function startHubMultiplayer() {
+  hubMultiplayerActive = true;
+
+  const uid = await firebaseReady;
+
+  if (!uid || !hubMultiplayerActive || !hubMode) {
+    if (!uid && hubMultiplayerActive && hubMode) {
+      showMessage("HUB multiplayer could not connect. Check Firebase Auth.");
+    }
+    return;
+  }
+
+  myHubPlayerRef = ref(firebaseDatabase, `hubPlayers/${uid}`);
+
+  try {
+    await onDisconnect(myHubPlayerRef).remove();
+
+    if (!hubMultiplayerActive || !hubMode) {
+      await remove(myHubPlayerRef);
+      return;
+    }
+
+    hubPlayersUnsubscribe = onValue(
+      ref(firebaseDatabase, "hubPlayers"),
+      snapshot => {
+        if (!hubMultiplayerActive || !hubMode) return;
+
+        const players = snapshot.val() || {};
+        const presentIds = new Set();
+
+        for (const [playerId, data] of Object.entries(players)) {
+          // Never show this browser's own block.
+          if (playerId === firebaseUid || !data) continue;
+
+          if (![data.x, data.y, data.z].every(
+            value => Number.isFinite(value)
+          )) continue;
+
+          presentIds.add(playerId);
+
+          let mesh = remoteHubPlayers.get(playerId);
+
+          if (!mesh) {
+            mesh = new THREE.Mesh(
+              remoteStoneGeometry,
+              remoteStoneMaterial
+            );
+
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+
+            scene.add(mesh);
+            remoteHubPlayers.set(playerId, mesh);
+          }
+
+          // The camera is at eye height, so lower the cube to the player's body.
+          mesh.position.set(data.x, data.y - 1.3, data.z);
+          mesh.rotation.y = Number.isFinite(data.yaw) ? data.yaw : 0;
+        }
+
+        // Remove blocks belonging to players who left the HUB.
+        for (const [playerId, mesh] of remoteHubPlayers) {
+          if (!presentIds.has(playerId)) {
+            scene.remove(mesh);
+            remoteHubPlayers.delete(playerId);
+          }
+        }
+      },
+      error => {
+        console.error("VOXEL HUB player-list error:", error);
+
+        if (hubMultiplayerActive && hubMode) {
+          showMessage("HUB multiplayer connection error. Check database rules.");
+        }
+      }
+    );
+  } catch (error) {
+    console.error("VOXEL HUB multiplayer setup failed:", error);
+
+    if (hubMultiplayerActive && hubMode) {
+      showMessage("HUB multiplayer setup failed. Check Firebase settings.");
+    }
+  }
+}
+
+function syncHubPlayer(now) {
+  // Position syncing only runs while the player is in the HUB.
+  if (
+    !hubMultiplayerActive ||
+    !hubMode ||
+    !firebaseUid ||
+    !myHubPlayerRef
+  ) return;
+
+  // Send position up to 10 times per second.
+  if (now - hubLastSentAt < 100 || hubWritePending) return;
+
+  hubLastSentAt = now;
+  hubWritePending = true;
+
+  set(myHubPlayerRef, {
+    x: camera.position.x,
+    y: camera.position.y,
+    z: camera.position.z,
+    yaw,
+    updatedAt: Date.now()
+  })
+    .catch(error => {
+      console.error("VOXEL HUB position sync failed:", error);
+    })
+    .finally(() => {
+      hubWritePending = false;
+    });
+}
+
+function stopHubMultiplayer() {
+  hubMultiplayerActive = false;
+
+  if (hubPlayersUnsubscribe) {
+    hubPlayersUnsubscribe();
+    hubPlayersUnsubscribe = null;
+  }
+
+  // Remove other players' cubes from this screen.
+  for (const mesh of remoteHubPlayers.values()) {
+    scene.remove(mesh);
+  }
+
+  remoteHubPlayers.clear();
+
+  // Remove our presence from the HUB database.
+  if (myHubPlayerRef) {
+    const playerRef = myHubPlayerRef;
+    myHubPlayerRef = null;
+
+    remove(playerRef).catch(error => {
+      console.warn("Could not remove HUB player presence:", error);
+    });
+  }
+
+  hubLastSentAt = 0;
+  hubWritePending = false;
+}
+
+// =============================
 // TEMPORARY HUB WORLD
 // =============================
 
 function enterHub() {
   if (hubMode) return;
 
+  // Keep the normal world in memory.
   normalWorldSnapshot = [...blocks.values()].map(mesh => {
     const { x, y, z, type } = mesh.userData;
     return [x, y, z, type];
@@ -740,14 +893,14 @@ function enterHub() {
   hubMode = true;
   clearWorld();
 
-  // Hub floor: 25 x 25 stone blocks.
+  // 25 x 25 stone floor.
   for (let x = -12; x <= 12; x++) {
     for (let z = -12; z <= 12; z++) {
       addBlock(x, 0, z, "stone");
     }
   }
 
-  // Walls: floor plus four wall layers = 5 blocks tall.
+  // Stone walls: four layers above the floor.
   for (let y = 1; y <= 4; y++) {
     for (let i = -12; i <= 12; i++) {
       addBlock(i, y, -12, "stone");
@@ -763,12 +916,13 @@ function enterHub() {
   velocityY = 0;
   canJump = false;
 
-  for (const code in keys) keys[code] = false;
-
   updateCameraRotation();
 
   document.getElementById("status").textContent =
     "HUB WORLD — NOT SAVED";
+
+  // Multiplayer is activated ONLY in the HUB.
+  startHubMultiplayer();
 
   renderer.domElement.requestPointerLock();
 }
@@ -776,8 +930,10 @@ function enterHub() {
 function leaveHub() {
   if (!hubMode) return;
 
+  stopHubMultiplayer();
   clearWorld();
 
+  // Restore the original world from memory.
   if (normalWorldSnapshot) {
     for (const [x, y, z, type] of normalWorldSnapshot) {
       addBlock(x, y, z, type);
@@ -786,8 +942,6 @@ function leaveHub() {
 
   if (normalPlayerPosition) {
     camera.position.copy(normalPlayerPosition);
-  } else {
-    camera.position.set(0, 2.6, 5);
   }
 
   yaw = normalYaw;
@@ -795,26 +949,21 @@ function leaveHub() {
   velocityY = 0;
   canJump = false;
 
-  for (const code in keys) keys[code] = false;
+  updateCameraRotation();
 
   hubMode = false;
   normalWorldSnapshot = null;
   normalPlayerPosition = null;
-
-  updateCameraRotation();
 
   document.getElementById("status").textContent = "WORLD RESTORED";
 }
 
 document.getElementById("play").addEventListener("click", () => {
   if (hubMode) leaveHub();
-
   renderer.domElement.requestPointerLock();
 });
 
-document.getElementById("joinHub").addEventListener("click", () => {
-  enterHub();
-});
+document.getElementById("joinHub").addEventListener("click", enterHub);
 
 document.addEventListener("pointerlockchange", () => {
   isLocked = document.pointerLockElement === renderer.domElement;
@@ -822,9 +971,7 @@ document.addEventListener("pointerlockchange", () => {
   overlay.style.display = isLocked ? "none" : "flex";
   pickaxeHud.style.display = isLocked ? "none" : "block";
 
-  for (const code in keys) keys[code] = false;
-
-  // ESC leaves the temporary hub.
+  // ESC in the HUB returns to the normal world.
   if (!isLocked && hubMode) {
     leaveHub();
   }
@@ -847,13 +994,13 @@ document.addEventListener("mousemove", event => {
 document.addEventListener("keydown", event => {
   keys[event.code] = true;
 
-  if (event.code === "Space") {
+  if (["Space", "ArrowUp", "ArrowDown"].includes(event.code)) {
     event.preventDefault();
+  }
 
-    if (canJump && isLocked) {
-      velocityY = 7;
-      canJump = false;
-    }
+  if (event.code === "Space" && canJump && isLocked) {
+    velocityY = 7;
+    canJump = false;
   }
 
   if (event.code === "Digit1") selectBlock("grass");
@@ -881,12 +1028,7 @@ function getTargetBlock() {
 }
 
 document.addEventListener("mousedown", event => {
-  if (!isLocked) return;
-
-  // Blocks cannot be broken or placed in the hub.
-  if (hubMode) return;
-
-  if (event.button !== 0 && event.button !== 2) return;
+  if (!isLocked || hubMode) return;
 
   const hit = getTargetBlock();
   if (!hit) return;
@@ -901,28 +1043,23 @@ document.addEventListener("mousedown", event => {
 
     const pos = hit.object.position.clone().add(normal);
 
-    const x = Math.round(pos.x);
-    const y = Math.round(pos.y);
-    const z = Math.round(pos.z);
-
-    if (blocks.has(key(x, y, z))) return;
-
-    // Don't place a block inside the player's body.
-    if (collidesAt(
-      camera.position.x,
-      camera.position.y,
-      camera.position.z
-    )) return;
+    const px = camera.position.x;
+    const pz = camera.position.z;
 
     const overlapsPlayer =
-      Math.abs(x - camera.position.x) < 0.5 + playerRadius &&
-      Math.abs(z - camera.position.z) < 0.5 + playerRadius &&
-      y + 0.5 > camera.position.y - playerHeight &&
-      y - 0.5 < camera.position.y;
+      Math.abs(pos.x - px) < 0.5 + playerRadius &&
+      Math.abs(pos.z - pz) < 0.5 + playerRadius &&
+      Math.abs(pos.y - camera.position.y) < 1.45;
 
     if (overlapsPlayer) return;
 
-    addBlock(x, y, z, selectedBlock);
+    addBlock(
+      Math.round(pos.x),
+      Math.round(pos.y),
+      Math.round(pos.z),
+      hubMode ? "stone" : selectedBlock
+    );
+
     scheduleSave();
   }
 });
@@ -1068,6 +1205,11 @@ function animate(now) {
 
   if (isLocked) updatePlayer(delta);
 
+  // Position syncing runs ONLY inside the HUB.
+  if (hubMode && isLocked) {
+    syncHubPlayer(now);
+  }
+
   renderer.render(scene, camera);
 }
 
@@ -1090,7 +1232,11 @@ addEventListener("resize", () => {
 addEventListener("beforeunload", () => {
   clearTimeout(saveTimer);
 
-  // The temporary hub must never overwrite the saved normal world.
+  // Remove this player from the HUB.
+  // Firebase onDisconnect is registered as a backup.
+  stopHubMultiplayer();
+
+  // Never save the temporary hub.
   if (!hubMode) saveWorld();
 });
 </script>
