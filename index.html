@@ -312,7 +312,9 @@ const blockColors = ["#55ad43", "#80502e", "#858585"];
 const geometry = new THREE.BoxGeometry(1, 1, 1);
 const blocks = new Map();
 
-const key = (x, y, z) => ${x},${y},${z};
+
+const key = (x, y, z) => `${x},${y},${z}`;
+
 
 function addBlock(x, y, z, type) {
   const k = key(x, y, z);
