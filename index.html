@@ -1108,7 +1108,7 @@ addEventListener("beforeunload",()=>{
  if(!hubMode)saveWorld();
 });
 </script>
- ```html
+
 <!-- EVENT BUTTON -->
 <button id="eventButton">EVENT</button>
 
@@ -1225,30 +1225,46 @@ addEventListener("beforeunload",()=>{
 </style>
 
 <script>
-
+```html
+<script>
+(() => {
   const eventButton = document.getElementById("eventButton");
   const eventScreen = document.getElementById("eventScreen");
   const eventClose = document.getElementById("eventClose");
   const eventImage = document.getElementById("eventImage");
   const claimButton = document.getElementById("claimButton");
+  const overlay = document.getElementById("overlay");
 
-  function openEvent() {
+  function updateEventVisibility() {
+    eventButton.style.display =
+      overlay.style.display !== "none" ? "block" : "none";
+  }
+
+  eventButton.addEventListener("click", () => {
     eventScreen.style.display = "flex";
-  }
+  });
 
-  function closeEvent() {
+  eventClose.addEventListener("click", () => {
     eventScreen.style.display = "none";
-  }
+  });
 
   function claimEvent() {
     eventScreen.classList.add("claimed");
   }
 
-  eventButton.addEventListener("click", openEvent);
-  eventClose.addEventListener("click", closeEvent);
   eventImage.addEventListener("click", claimEvent);
   claimButton.addEventListener("click", claimEvent);
+
+  const observer = new MutationObserver(updateEventVisibility);
+  observer.observe(overlay, {
+    attributes: true,
+    attributeFilter: ["style"]
+  });
+
+  updateEventVisibility();
 })();
+
+
 </script>
 
 </body>
