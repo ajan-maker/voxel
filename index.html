@@ -32,8 +32,11 @@ button:hover{background:#555e}
 #pickaxe-hud canvas{width:100%;height:100%}
 #message{position:fixed;top:100px;left:50%;transform:translateX(-50%);padding:8px 15px;background:#0009;border-radius:6px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30;white-space:nowrap}
 
+/* MOBILE CONTROLS */
 #mobileControls{display:none;position:fixed;inset:0;z-index:25;pointer-events:none;touch-action:none}
-#mobileMove{position:fixed;left:50%;bottom:15px;transform:translateX(-50%);width:150px;height:150px;pointer-events:auto}
+#mobileReset{position:absolute;top:10px;left:10px;pointer-events:auto;background:#8b3030;border:2px solid #ffffffaa;min-width:108px;min-height:40px}
+#mobileMenu{position:absolute;top:58px;left:10px;pointer-events:auto;background:#222d;min-width:108px;min-height:40px}
+#mobileMove{position:absolute;left:10px;top:106px;width:150px;height:150px;pointer-events:auto}
 .moveBtn{position:absolute;width:48px;height:48px;padding:0;border:2px solid #ffffffaa;border-radius:10px;background:#222c;color:white;font-size:24px;touch-action:none;user-select:none;-webkit-user-select:none}
 .moveBtn.active{background:#777e}
 #moveForward{top:0;left:51px}
@@ -42,12 +45,10 @@ button:hover{background:#555e}
 #moveRight{top:51px;left:102px}
 #mobileActions{position:absolute;right:20px;bottom:250px;display:flex;flex-direction:column;gap:8px;pointer-events:auto}
 #mobileActions button{min-width:108px;min-height:44px;background:#222d;border:2px solid #ffffff88}
-#mobileMenu{position:absolute;top:10px;left:10px;pointer-events:auto;background:#222d}
 #mobilePlace{background:#376b32!important}
 #mobileJump{background:#265b91!important}
 
 @media(pointer:coarse),(max-width:800px){
- #mobileControls{display:block}
  #help,#buttons{display:none}
  #hotbar{bottom:5px;gap:3px}
  .slot{width:48px;height:52px;font-size:9px}
@@ -57,7 +58,6 @@ button:hover{background:#555e}
  #pickaxe-hud{right:5px;bottom:5px;width:110px;height:110px}
  #panel .menu-button{min-height:75px;margin-bottom:18px}
  #panel h1{margin-bottom:25px}
- #mobileMove{bottom:10px}
 }
 </style>
 
@@ -91,12 +91,16 @@ button:hover{background:#555e}
 
 <div id="message"></div>
 
-<div id="mobileControls">
+<!-- Hidden in the main menu; shown only while playing on mobile -->
+<div id="mobileControls" style="display:none">
+ <button id="mobileReset">RESET</button>
  <button id="mobileMenu">MENU</button>
+
  <div id="mobileActions">
   <button id="mobileJump">JUMP ↑</button>
   <button id="mobilePlace">PLACE BLOCK</button>
  </div>
+
  <div id="mobileMove">
   <button class="moveBtn" id="moveForward">▲</button>
   <button class="moveBtn" id="moveLeft">◀</button>
@@ -296,6 +300,7 @@ const raycaster=new THREE.Raycaster();
 raycaster.far=6;
 
 const mobileDevice=window.matchMedia("(pointer: coarse), (max-width: 800px)");
+const mobileControls=document.getElementById("mobileControls");
 
 function updateCameraRotation(){
  camera.rotation.order="YXZ";
@@ -496,6 +501,7 @@ function startMobileGame(){
  isLocked=true;
  overlay.style.display="none";
  pickaxeHud.style.display="none";
+ mobileControls.style.display=mobileDevice.matches?"block":"none";
  updateCameraRotation();
 }
 
@@ -520,6 +526,7 @@ document.addEventListener("pointerlockchange",()=>{
  isLocked=document.pointerLockElement===renderer.domElement;
  overlay.style.display=isLocked?"none":"flex";
  pickaxeHud.style.display=isLocked?"none":"block";
+ mobileControls.style.display="none";
 
  for(const code in keys)keys[code]=false;
 
@@ -606,13 +613,44 @@ function stopMobileGame(){
 
  overlay.style.display="flex";
  pickaxeHud.style.display="block";
+ mobileControls.style.display="none";
 }
+
+// =====================
+// MOBILE MENU + RESET
+// =====================
 
 document.getElementById("mobileMenu").addEventListener("click",()=>{
  if(!mobileDevice.matches)return;
 
  if(isLocked)stopMobileGame();
  else overlay.style.display="flex";
+});
+
+document.getElementById("mobileReset").addEventListener("click",()=>{
+ if(!mobileDevice.matches||!isLocked)return;
+
+ // Return to the original world immediately.
+ clearTimeout(saveTimer);
+
+ if(hubMode)leaveHub();
+
+ localStorage.removeItem(SAVE_KEY);
+ generateWorld();
+
+ camera.position.set(0,2.6,5);
+ yaw=0;
+ pitch=0;
+ velocityY=0;
+ canJump=false;
+
+ for(const code in keys)keys[code]=false;
+
+ selectBlock("grass");
+ updateCameraRotation();
+
+ saveWorld();
+ showMessage("World reset!");
 });
 
 document.getElementById("mobileJump").addEventListener("pointerdown",event=>{
@@ -848,6 +886,10 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
  camera.position.set(0,2.6,5);
  velocityY=0;
  canJump=false;
+ yaw=0;
+ pitch=0;
+ updateCameraRotation();
+ selectBlock("grass");
  saveWorld();
  showMessage("New world created!");
 });
