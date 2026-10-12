@@ -509,8 +509,47 @@ function claimEvent(){
 
 eventButton.addEventListener("click",openEvent);
 eventClose.addEventListener("click",closeEvent);
-claimButton.addEventListener("click",claimEvent);
-eventImage.addEventListener("click",claimEvent);
+
+function claimEvent() {
+  localStorage.setItem("eventClaimed", "true");
+
+  eventScreen.style.background = "black";
+  eventImage.style.display = "none";
+  claimButton.style.display = "none";
+  eventScreen.querySelector(".event-content").style.display = "none";
+
+  let claimedText = document.getElementById("claimedText");
+
+  if (!claimedText) {
+    claimedText = document.createElement("div");
+    claimedText.id = "claimedText";
+    claimedText.textContent = "CLAIMED";
+    claimedText.style.cssText = `
+      color: white;
+      font-size: 40px;
+      font-weight: bold;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    `;
+    eventScreen.appendChild(claimedText);
+  }
+
+  claimedText.style.display = "block";
+}
+
+function loadClaimStatus() {
+  if (localStorage.getItem("eventClaimed") === "true") {
+    claimEvent();
+  }
+}
+
+claimButton.addEventListener("click", claimEvent);
+eventImage.addEventListener("click", claimEvent);
+
+loadClaimStatus();
+
 
 function updateCameraRotation(){
  camera.rotation.order="YXZ";
