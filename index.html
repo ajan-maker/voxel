@@ -494,29 +494,36 @@ function updateEventVisibility(){
  eventButton.style.display=menuOpen&&!isLocked?"block":"none";
 }
 
-function openEvent(){
- if(overlay.style.display==="none"||isLocked)return;
- eventScreen.style.display="flex";
+
+function openEvent() {
+  if (overlay.style.display === "none" || isLocked) return;
+
+  eventScreen.style.display = "flex";
+
+  if (localStorage.getItem("eventClaimed") === "true") {
+    showClaimed();
+  }
 }
 
-function closeEvent(){
- eventScreen.style.display="none";
+function closeEvent() {
+  eventScreen.style.display = "none";
 }
 
-function claimEvent(){
- eventScreen.classList.add("claimed");
-}
-
-eventButton.addEventListener("click",openEvent);
-eventClose.addEventListener("click",closeEvent);
-
-function claimEvent() {
-  localStorage.setItem("eventClaimed", "true");
-
+function showClaimed() {
+  eventScreen.classList.add("claimed");
   eventScreen.style.background = "black";
-  eventImage.style.display = "none";
-  claimButton.style.display = "none";
-  eventScreen.querySelector(".event-content").style.display = "none";
+
+  if (eventImage) {
+    eventImage.style.display = "none";
+  }
+
+  if (claimButton) {
+    claimButton.style.display = "none";
+  }
+
+  if (eventClose) {
+    eventClose.style.display = "none";
+  }
 
   let claimedText = document.getElementById("claimedText");
 
@@ -524,6 +531,7 @@ function claimEvent() {
     claimedText = document.createElement("div");
     claimedText.id = "claimedText";
     claimedText.textContent = "CLAIMED";
+
     claimedText.style.cssText = `
       color: white;
       font-size: 40px;
@@ -532,23 +540,30 @@ function claimEvent() {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      z-index: 9999;
+      pointer-events: none;
     `;
+
     eventScreen.appendChild(claimedText);
   }
 
   claimedText.style.display = "block";
 }
 
-function loadClaimStatus() {
-  if (localStorage.getItem("eventClaimed") === "true") {
-    claimEvent();
-  }
+function claimEvent() {
+  localStorage.setItem("eventClaimed", "true");
+  showClaimed();
 }
 
+eventButton.addEventListener("click", openEvent);
+eventClose.addEventListener("click", closeEvent);
 claimButton.addEventListener("click", claimEvent);
 eventImage.addEventListener("click", claimEvent);
 
-loadClaimStatus();
+// Sayfa yenilenince kayıtlı durumu kontrol et
+if (localStorage.getItem("eventClaimed") === "true") {
+  showClaimed();
+}
 
 
 function updateCameraRotation(){
