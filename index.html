@@ -32,7 +32,87 @@ button:hover{background:#555e}
 #pickaxe-hud canvas{width:100%;height:100%}
 #message{position:fixed;top:100px;left:50%;transform:translateX(-50%);padding:8px 15px;background:#0009;border-radius:6px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30;white-space:nowrap}
 
-/* MOBILE CONTROLS */
+/* EVENT BUTTON: MAIN MENU ONLY */
+#eventButton{
+ position:fixed;
+ top:15px;
+ right:15px;
+ z-index:19;
+ min-width:105px;
+ min-height:45px;
+ background:#25bd45;
+ border:3px solid #16832c;
+ color:white;
+ border-radius:6px;
+ font-size:17px;
+ font-weight:900;
+}
+body.in-game #eventButton{display:none!important}
+
+/* EVENT SCREEN */
+#eventScreen{
+ display:none;
+ position:fixed;
+ inset:0;
+ z-index:100;
+ background:#ffd900;
+ align-items:center;
+ justify-content:center;
+ flex-direction:column;
+ touch-action:manipulation;
+}
+#eventClose{
+ position:absolute;
+ top:15px;
+ right:15px;
+ width:48px;
+ height:48px;
+ padding:0;
+ background:#222;
+ color:white;
+ border:2px solid white;
+ border-radius:5px;
+ font-size:25px;
+ z-index:102;
+}
+#eventContent{
+ width:90%;
+ max-width:420px;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ gap:24px;
+}
+#eventImage{
+ display:block;
+ width:100%;
+ max-width:320px;
+ max-height:48vh;
+ object-fit:contain;
+ cursor:pointer;
+}
+#claimButton{
+ width:100%;
+ min-height:75px;
+ background:#fff000;
+ color:black;
+ border:4px solid #222;
+ border-radius:0;
+ font-size:32px;
+ font-weight:900;
+}
+#eventClaimed{
+ display:none;
+ color:white;
+ font-size:clamp(38px,9vw,65px);
+ font-weight:900;
+ letter-spacing:3px;
+ text-align:center;
+}
+#eventScreen.claimed{background:#000}
+#eventScreen.claimed #eventContent{display:none}
+#eventScreen.claimed #eventClaimed{display:block}
+
 #mobileControls{
  display:none;
  position:fixed;
@@ -41,7 +121,6 @@ button:hover{background:#555e}
  pointer-events:none;
  touch-action:none
 }
-
 #mobileReset{
  position:absolute;
  top:10px;
@@ -52,7 +131,6 @@ button:hover{background:#555e}
  min-width:108px;
  min-height:40px
 }
-
 #mobileMenu{
  position:absolute;
  top:58px;
@@ -62,7 +140,6 @@ button:hover{background:#555e}
  min-width:108px;
  min-height:40px
 }
-
 #mobileActions{
  position:absolute;
  top:106px;
@@ -72,17 +149,14 @@ button:hover{background:#555e}
  gap:8px;
  pointer-events:auto
 }
-
 #mobileActions button{
  min-width:108px;
  min-height:44px;
  background:#222d;
  border:2px solid #ffffff88
 }
-
 #mobilePlace{background:#376b32!important}
 #mobileJump{background:#265b91!important}
-
 #mobileMove{
  position:absolute;
  left:10px;
@@ -91,7 +165,6 @@ button:hover{background:#555e}
  height:150px;
  pointer-events:auto
 }
-
 .moveBtn{
  position:absolute;
  width:48px;
@@ -106,7 +179,6 @@ button:hover{background:#555e}
  user-select:none;
  -webkit-user-select:none
 }
-
 .moveBtn.active{background:#777e}
 #moveForward{top:0;left:51px}
 #moveLeft{top:51px;left:0}
@@ -123,6 +195,10 @@ button:hover{background:#555e}
  #pickaxe-hud{right:5px;bottom:5px;width:110px;height:110px}
  #panel .menu-button{min-height:75px;margin-bottom:18px}
  #panel h1{margin-bottom:25px}
+ #eventButton{top:10px;right:10px;min-width:90px;min-height:42px}
+ #eventContent{width:88%}
+ #eventImage{max-height:42vh}
+ #claimButton{min-height:70px;font-size:28px}
 }
 </style>
 
@@ -156,7 +232,22 @@ button:hover{background:#555e}
 
 <div id="message"></div>
 
-<!-- MOBILE CONTROLS: hidden in the main menu -->
+<!-- EVENT BUTTON -->
+<button id="eventButton">EVENT</button>
+
+<!-- EVENT SCREEN -->
+<div id="eventScreen">
+ <button id="eventClose">X</button>
+
+ <div id="eventContent">
+  <img id="eventImage" src="verity.block" alt="Event photo">
+  <button id="claimButton">CLAIM!</button>
+ </div>
+
+ <div id="eventClaimed">CLAIMED</div>
+</div>
+
+<!-- MOBILE CONTROLS -->
 <div id="mobileControls" style="display:none">
  <button id="mobileReset">RESET</button>
  <button id="mobileMenu">MENU</button>
@@ -189,12 +280,12 @@ import * as THREE from "three";
 // GAME SETUP
 // =====================
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87ceeb);
-scene.fog = new THREE.Fog(0x87ceeb,25,65);
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x87ceeb);
+scene.fog=new THREE.Fog(0x87ceeb,25,65);
 
-const camera = new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1000);
-const renderer = new THREE.WebGLRenderer({antialias:true});
+const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1000);
+const renderer=new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.shadowMap.enabled=true;
@@ -322,7 +413,6 @@ function saveWorld(){
 
 function scheduleSave(){
  if(hubMode)return;
-
  document.getElementById("status").textContent="UNSAVED CHANGES";
  clearTimeout(saveTimer);
  saveTimer=setTimeout(saveWorld,400);
@@ -340,7 +430,6 @@ function loadWorld(){
 
     for(const item of data){
      if(!Array.isArray(item)||item.length!==4)continue;
-
      const [x,y,z,type]=item;
 
      if(!Number.isInteger(x)||!Number.isInteger(y)||!Number.isInteger(z)||
@@ -385,6 +474,43 @@ raycaster.far=6;
 const mobileDevice=window.matchMedia("(pointer: coarse), (max-width: 800px)");
 const mobileControls=document.getElementById("mobileControls");
 const mobileReset=document.getElementById("mobileReset");
+const overlay=document.getElementById("overlay");
+const pickaxeHud=document.createElement("div");
+pickaxeHud.id="pickaxe-hud";
+document.body.appendChild(pickaxeHud);
+
+// =====================
+// EVENT SYSTEM
+// =====================
+
+const eventButton=document.getElementById("eventButton");
+const eventScreen=document.getElementById("eventScreen");
+const eventClose=document.getElementById("eventClose");
+const eventImage=document.getElementById("eventImage");
+const claimButton=document.getElementById("claimButton");
+
+function updateEventVisibility(){
+ const menuOpen=overlay.style.display!=="none";
+ eventButton.style.display=menuOpen&&!isLocked?"block":"none";
+}
+
+function openEvent(){
+ if(overlay.style.display==="none"||isLocked)return;
+ eventScreen.style.display="flex";
+}
+
+function closeEvent(){
+ eventScreen.style.display="none";
+}
+
+function claimEvent(){
+ eventScreen.classList.add("claimed");
+}
+
+eventButton.addEventListener("click",openEvent);
+eventClose.addEventListener("click",closeEvent);
+claimButton.addEventListener("click",claimEvent);
+eventImage.addEventListener("click",claimEvent);
 
 function updateCameraRotation(){
  camera.rotation.order="YXZ";
@@ -415,7 +541,6 @@ function collidesAt(px,py,pz){
 function findLandingHeight(px,currentY,nextY,pz){
  const currentFeet=currentY-playerHeight;
  const nextFeet=nextY-playerHeight;
-
  if(nextFeet>=currentFeet)return null;
 
  let landingTop=-Infinity;
@@ -441,7 +566,6 @@ function findLandingHeight(px,currentY,nextY,pz){
 
 function updatePlayer(delta){
  const speed=5.5;
-
  const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
  const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
  const direction=new THREE.Vector3();
@@ -453,18 +577,12 @@ function updatePlayer(delta){
 
  if(direction.lengthSq()>0){
   direction.normalize().multiplyScalar(speed*delta);
-
   const nextX=camera.position.x+direction.x;
 
-  if(!collidesAt(nextX,camera.position.y,camera.position.z)){
-   camera.position.x=nextX;
-  }
+  if(!collidesAt(nextX,camera.position.y,camera.position.z))camera.position.x=nextX;
 
   const nextZ=camera.position.z+direction.z;
-
-  if(!collidesAt(camera.position.x,camera.position.y,nextZ)){
-   camera.position.z=nextZ;
-  }
+  if(!collidesAt(camera.position.x,camera.position.y,nextZ))camera.position.z=nextZ;
  }
 
  const oldY=camera.position.y;
@@ -488,7 +606,6 @@ function updatePlayer(delta){
   }else{
    camera.position.y=nextY;
   }
-
   canJump=false;
  }
 
@@ -507,31 +624,18 @@ const hotbar=document.getElementById("hotbar");
 
 blockNames.forEach((type,i)=>{
  const slot=document.createElement("div");
-
  slot.className="slot"+(i===0?" selected":"");
  slot.innerHTML=`<div class="swatch" style="background:${blockColors[i]}"></div>${i+1}: ${type.toUpperCase()}`;
  slot.addEventListener("click",()=>selectBlock(type));
-
  hotbar.appendChild(slot);
 });
 
 function selectBlock(type){
  selectedBlock=type;
-
  [...hotbar.children].forEach((slot,i)=>{
   slot.classList.toggle("selected",blockNames[i]===type);
  });
 }
-
-// =====================
-// MENU / PICKAXE
-// =====================
-
-const overlay=document.getElementById("overlay");
-const pickaxeHud=document.createElement("div");
-
-pickaxeHud.id="pickaxe-hud";
-document.body.appendChild(pickaxeHud);
 
 // =====================
 // HUB WORLD
@@ -548,18 +652,13 @@ function enterHub(){
  normalPlayerPosition=camera.position.clone();
  normalYaw=yaw;
  normalPitch=pitch;
-
  hubMode=true;
 
- // RESET is hidden while inside HUB.
  mobileReset.style.display="none";
-
  clearWorld();
 
  for(let x=-12;x<=12;x++){
-  for(let z=-12;z<=12;z++){
-   addBlock(x,0,z,"stone");
-  }
+  for(let z=-12;z<=12;z++)addBlock(x,0,z,"stone");
  }
 
  for(let y=1;y<=4;y++){
@@ -578,7 +677,6 @@ function enterHub(){
  canJump=false;
 
  for(const code in keys)keys[code]=false;
-
  updateCameraRotation();
 
  document.getElementById("status").textContent="HUB WORLD — NOT SAVED";
@@ -588,20 +686,14 @@ function enterHub(){
 
 function leaveHub(){
  if(!hubMode)return;
-
  clearWorld();
 
  if(normalWorldSnapshot){
-  for(const [x,y,z,type] of normalWorldSnapshot){
-   addBlock(x,y,z,type);
-  }
+  for(const [x,y,z,type] of normalWorldSnapshot)addBlock(x,y,z,type);
  }
 
- if(normalPlayerPosition){
-  camera.position.copy(normalPlayerPosition);
- }else{
-  camera.position.set(0,2.6,5);
- }
+ if(normalPlayerPosition)camera.position.copy(normalPlayerPosition);
+ else camera.position.set(0,2.6,5);
 
  yaw=normalYaw;
  pitch=normalPitch;
@@ -611,15 +703,12 @@ function leaveHub(){
  for(const code in keys)keys[code]=false;
 
  hubMode=false;
-
- // Restore RESET after leaving HUB.
  mobileReset.style.display="block";
 
  normalWorldSnapshot=null;
  normalPlayerPosition=null;
 
  updateCameraRotation();
-
  document.getElementById("status").textContent="WORLD RESTORED";
 }
 
@@ -629,14 +718,12 @@ function leaveHub(){
 
 function startMobileGame(){
  isLocked=true;
+ document.body.classList.add("in-game");
  overlay.style.display="none";
  pickaxeHud.style.display="none";
-
  mobileControls.style.display=mobileDevice.matches?"block":"none";
-
- // Make sure RESET visibility matches the current world.
  mobileReset.style.display=hubMode?"none":"block";
-
+ updateEventVisibility();
  updateCameraRotation();
 }
 
@@ -653,15 +740,14 @@ document.getElementById("play").addEventListener("click",()=>{
 document.getElementById("joinHub").addEventListener("click",()=>{
  enterHub();
 
- if(mobileDevice.matches){
-  startMobileGame();
- }
+ if(mobileDevice.matches)startMobileGame();
 });
 
 document.addEventListener("pointerlockchange",()=>{
  if(mobileDevice.matches)return;
 
  isLocked=document.pointerLockElement===renderer.domElement;
+ document.body.classList.toggle("in-game",isLocked);
  overlay.style.display=isLocked?"none":"flex";
  pickaxeHud.style.display=isLocked?"none":"block";
  mobileControls.style.display="none";
@@ -669,15 +755,14 @@ document.addEventListener("pointerlockchange",()=>{
  for(const code in keys)keys[code]=false;
 
  if(!isLocked&&hubMode)leaveHub();
+ updateEventVisibility();
 });
 
 document.addEventListener("mousemove",event=>{
  if(!isLocked||mobileDevice.matches)return;
-
  yaw-=event.movementX*.002;
  pitch-=event.movementY*.002;
  pitch=Math.max(-Math.PI/2+.01,Math.min(Math.PI/2-.01,pitch));
-
  updateCameraRotation();
 });
 
@@ -690,7 +775,6 @@ document.addEventListener("keydown",event=>{
 
  if(event.code==="Space"){
   event.preventDefault();
-
   if(canJump&&isLocked){
    velocityY=7;
    canJump=false;
@@ -707,14 +791,11 @@ document.addEventListener("keydown",event=>{
  }
 });
 
-document.addEventListener("keyup",event=>{
- keys[event.code]=false;
-});
-
+document.addEventListener("keyup",event=>{keys[event.code]=false});
 document.addEventListener("contextmenu",event=>event.preventDefault());
 
 // =====================
-// MOBILE MOVEMENT BUTTONS
+// MOBILE MOVEMENT
 // =====================
 
 function mobileButton(id,keyCode){
@@ -723,13 +804,12 @@ function mobileButton(id,keyCode){
  btn.addEventListener("pointerdown",event=>{
   event.preventDefault();
   event.stopPropagation();
-
   btn.setPointerCapture(event.pointerId);
   keys[keyCode]=true;
   btn.classList.add("active");
  });
 
- function release(event){
+ function release(){
   keys[keyCode]=false;
   btn.classList.remove("active");
  }
@@ -753,31 +833,28 @@ function stopMobileGame(){
 
  if(hubMode)leaveHub();
 
+ document.body.classList.remove("in-game");
  overlay.style.display="flex";
  pickaxeHud.style.display="block";
  mobileControls.style.display="none";
+ updateEventVisibility();
 }
 
 // =====================
-// MOBILE MENU + RESET
+// MOBILE MENU / RESET
 // =====================
 
 document.getElementById("mobileMenu").addEventListener("click",()=>{
  if(!mobileDevice.matches)return;
-
- if(isLocked){
-  stopMobileGame();
- }else{
-  overlay.style.display="flex";
- }
+ if(isLocked)stopMobileGame();
+ else overlay.style.display="flex";
+ updateEventVisibility();
 });
 
 document.getElementById("mobileReset").addEventListener("click",()=>{
- // RESET is only for mobile gameplay outside HUB.
  if(!mobileDevice.matches||!isLocked||hubMode)return;
 
  clearTimeout(saveTimer);
-
  localStorage.removeItem(SAVE_KEY);
  generateWorld();
 
@@ -791,14 +868,12 @@ document.getElementById("mobileReset").addEventListener("click",()=>{
 
  selectBlock("grass");
  updateCameraRotation();
-
  saveWorld();
  showMessage("World reset!");
 });
 
 document.getElementById("mobileJump").addEventListener("pointerdown",event=>{
  event.preventDefault();
-
  if(isLocked&&canJump){
   velocityY=7;
   canJump=false;
@@ -806,7 +881,7 @@ document.getElementById("mobileJump").addEventListener("pointerdown",event=>{
 });
 
 // =====================
-// MOBILE LOOK + TAP TO PLACE
+// MOBILE LOOK
 // =====================
 
 let mobileLooking=false;
@@ -820,10 +895,8 @@ renderer.domElement.addEventListener("pointerdown",event=>{
 
  mobileLooking=true;
  lookPointerId=event.pointerId;
-
  lastTouchX=touchStartX=event.clientX;
  lastTouchY=touchStartY=event.clientY;
-
  touchMoved=false;
 });
 
@@ -833,9 +906,7 @@ renderer.domElement.addEventListener("pointermove",event=>{
  const dx=event.clientX-lastTouchX;
  const dy=event.clientY-lastTouchY;
 
- if(Math.abs(event.clientX-touchStartX)>7||Math.abs(event.clientY-touchStartY)>7){
-  touchMoved=true;
- }
+ if(Math.abs(event.clientX-touchStartX)>7||Math.abs(event.clientY-touchStartY)>7)touchMoved=true;
 
  lastTouchX=event.clientX;
  lastTouchY=event.clientY;
@@ -843,16 +914,13 @@ renderer.domElement.addEventListener("pointermove",event=>{
  yaw-=dx*.006;
  pitch-=dy*.006;
  pitch=Math.max(-Math.PI/2+.01,Math.min(Math.PI/2-.01,pitch));
-
  updateCameraRotation();
 });
 
 renderer.domElement.addEventListener("pointerup",event=>{
  if(!mobileDevice.matches||event.pointerId!==lookPointerId)return;
 
- if(!touchMoved&&isLocked&&!hubMode){
-  placeBlockAtCrosshair();
- }
+ if(!touchMoved&&isLocked&&!hubMode)placeBlockAtCrosshair();
 
  mobileLooking=false;
  lookPointerId=null;
@@ -865,33 +933,26 @@ renderer.domElement.addEventListener("pointercancel",()=>{
 
 document.getElementById("mobilePlace").addEventListener("pointerdown",event=>{
  event.preventDefault();
-
- if(isLocked&&!hubMode){
-  placeBlockAtCrosshair();
- }
+ if(isLocked&&!hubMode)placeBlockAtCrosshair();
 });
 
 // =====================
-// BLOCK BREAKING / PLACING
+// BREAK / PLACE BLOCKS
 // =====================
 
 function getTargetBlock(){
  raycaster.setFromCamera(new THREE.Vector2(0,0),camera);
-
  const hits=raycaster.intersectObjects([...blocks.values()],false);
-
  return hits.length?hits[0]:null;
 }
 
 function placeBlockAtCrosshair(){
  if(!isLocked||hubMode)return;
-
  const hit=getTargetBlock();
  if(!hit)return;
 
  const normal=hit.face.normal.clone();
  normal.transformDirection(hit.object.matrixWorld);
-
  const pos=hit.object.position.clone().add(normal);
 
  const x=Math.round(pos.x);
@@ -913,8 +974,7 @@ function placeBlockAtCrosshair(){
 }
 
 document.addEventListener("mousedown",event=>{
- if(!isLocked||hubMode)return;
- if(mobileDevice.matches)return;
+ if(!isLocked||hubMode||mobileDevice.matches)return;
  if(event.button!==0&&event.button!==2)return;
 
  const hit=getTargetBlock();
@@ -927,7 +987,6 @@ document.addEventListener("mousedown",event=>{
  if(event.button===2){
   const normal=hit.face.normal.clone();
   normal.transformDirection(hit.object.matrixWorld);
-
   const pos=hit.object.position.clone().add(normal);
 
   const x=Math.round(pos.x);
@@ -975,32 +1034,21 @@ const handle=new THREE.Mesh(
  new THREE.CylinderGeometry(.09,.13,1.9,7),
  new THREE.MeshStandardMaterial({color:0x986039,roughness:.85})
 );
-
 handle.rotation.z=-.55;
 handle.position.set(-.2,-.15,0);
 pickaxe.add(handle);
 
 const stoneMaterial=new THREE.MeshStandardMaterial({
- color:0x555b61,
- roughness:1,
- flatShading:true
+ color:0x555b61,roughness:1,flatShading:true
 });
 
-const stoneHead=new THREE.Mesh(
- new THREE.IcosahedronGeometry(.52,0),
- stoneMaterial
-);
-
+const stoneHead=new THREE.Mesh(new THREE.IcosahedronGeometry(.52,0),stoneMaterial);
 stoneHead.scale.set(1.65,.65,.7);
 stoneHead.rotation.z=-.35;
 stoneHead.position.set(.45,.72,0);
 pickaxe.add(stoneHead);
 
-const stoneTip=new THREE.Mesh(
- new THREE.ConeGeometry(.28,.65,5),
- stoneMaterial
-);
-
+const stoneTip=new THREE.Mesh(new THREE.ConeGeometry(.28,.65,5),stoneMaterial);
 stoneTip.rotation.z=-1.15;
 stoneTip.position.set(1.05,.88,0);
 pickaxe.add(stoneTip);
@@ -1009,7 +1057,6 @@ const binding=new THREE.Mesh(
  new THREE.CylinderGeometry(.15,.15,.22,8),
  new THREE.MeshStandardMaterial({color:0xb47743})
 );
-
 binding.position.set(-.05,.15,0);
 binding.rotation.z=-.55;
 pickaxe.add(binding);
@@ -1021,15 +1068,12 @@ let pickaxeTime=0;
 
 function animatePickaxe(){
  requestAnimationFrame(animatePickaxe);
-
  pickaxeTime+=.018;
  pickaxe.rotation.y+=.018;
  pickaxe.rotation.x=Math.sin(pickaxeTime)*.12;
  pickaxe.position.y=Math.sin(pickaxeTime*1.5)*.08;
-
  pickRenderer.render(pickScene,pickCamera);
 }
-
 animatePickaxe();
 
 // =====================
@@ -1041,10 +1085,7 @@ document.getElementById("saveBtn").addEventListener("click",()=>{
   showMessage("Hub world cannot be saved!");
   return;
  }
-
- if(saveWorld()){
-  showMessage("World saved successfully!");
- }
+ if(saveWorld())showMessage("World saved successfully!");
 });
 
 document.getElementById("resetBtn").addEventListener("click",()=>{
@@ -1052,12 +1093,10 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
   showMessage("Leave the hub before creating a new world.");
   return;
  }
-
  if(!confirm("Are you sure you want to create a new world?"))return;
 
  localStorage.removeItem(SAVE_KEY);
  generateWorld();
-
  camera.position.set(0,2.6,5);
  velocityY=0;
  canJump=false;
@@ -1067,7 +1106,6 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
  updateCameraRotation();
  selectBlock("grass");
  saveWorld();
-
  showMessage("New world created!");
 });
 
@@ -1079,191 +1117,31 @@ let lastTime=performance.now();
 
 function animate(now){
  requestAnimationFrame(animate);
-
  const delta=Math.min((now-lastTime)/1000,.05);
  lastTime=now;
 
  if(isLocked)updatePlayer(delta);
-
  renderer.render(scene,camera);
 }
-
 requestAnimationFrame(animate);
 
 addEventListener("resize",()=>{
  camera.aspect=innerWidth/innerHeight;
  camera.updateProjectionMatrix();
-
  renderer.setSize(innerWidth,innerHeight);
 
  pickCamera.aspect=1;
  pickCamera.updateProjectionMatrix();
-
  pickRenderer.setSize(pickaxeHud.clientWidth,pickaxeHud.clientHeight);
 });
 
 addEventListener("beforeunload",()=>{
  clearTimeout(saveTimer);
-
  if(!hubMode)saveWorld();
 });
+
+// Initial menu visibility
+updateEventVisibility();
 </script>
-
-<!-- EVENT BUTTON -->
-<button id="eventButton">EVENT</button>
-
-<!-- EVENT SCREEN -->
-<div id="eventScreen">
-  <button id="eventClose">X</button>
-
-  <div id="eventContent">
-    <img id="eventImage" src="verity.block" alt="Event">
-
-    <button id="claimButton">CLAIM!</button>
-  </div>
-</div>
-
-<style>
-#eventButton {
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  z-index: 15;
-  min-width: 100px;
-  min-height: 45px;
-  background: #24bd45;
-  color: white;
-  border: 2px solid #16832c;
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-#eventScreen {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: #ffd900;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-
-#eventClose {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  background: #222;
-  color: white;
-  border: 2px solid white;
-  font-size: 23px;
-  z-index: 2;
-}
-
-#eventContent {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 25px;
-  width: 90%;
-  max-width: 420px;
-}
-
-#eventImage {
-  display: block;
-  width: 100%;
-  max-width: 320px;
-  max-height: 50vh;
-  object-fit: contain;
-  cursor: pointer;
-}
-
-#claimButton {
-  width: 100%;
-  min-height: 75px;
-  background: #fff000;
-  color: black;
-  border: 4px solid black;
-  border-radius: 0;
-  font-size: 32px;
-  font-weight: 900;
-}
-
-#eventScreen.claimed {
-  background: black;
-}
-
-#eventScreen.claimed #eventContent {
-  display: none;
-}
-
-@media (pointer: coarse), (max-width: 800px) {
-  #eventButton {
-    top: 10px;
-    right: 10px;
-    min-width: 90px;
-    min-height: 42px;
-  }
-
-  #eventContent {
-    width: 88%;
-  }
-
-  #eventImage {
-    max-height: 45vh;
-  }
-
-  #claimButton {
-    min-height: 70px;
-    font-size: 28px;
-  }
-}
-</style>
-
-<script>
-```html
-<script>
-(() => {
-  const eventButton = document.getElementById("eventButton");
-  const eventScreen = document.getElementById("eventScreen");
-  const eventClose = document.getElementById("eventClose");
-  const eventImage = document.getElementById("eventImage");
-  const claimButton = document.getElementById("claimButton");
-  const overlay = document.getElementById("overlay");
-
-  function updateEventVisibility() {
-    eventButton.style.display =
-      overlay.style.display !== "none" ? "block" : "none";
-  }
-
-  eventButton.addEventListener("click", () => {
-    eventScreen.style.display = "flex";
-  });
-
-  eventClose.addEventListener("click", () => {
-    eventScreen.style.display = "none";
-  });
-
-  function claimEvent() {
-    eventScreen.classList.add("claimed");
-  }
-
-  eventImage.addEventListener("click", claimEvent);
-  claimButton.addEventListener("click", claimEvent);
-
-  const observer = new MutationObserver(updateEventVisibility);
-  observer.observe(overlay, {
-    attributes: true,
-    attributeFilter: ["style"]
-  });
-
-  updateEventVisibility();
-})();
-
-
 </body>
 </html>
