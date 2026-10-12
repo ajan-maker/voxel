@@ -32,8 +32,8 @@ button:hover{background:#555e}
 #pickaxe-hud canvas{width:100%;height:100%}
 #message{position:fixed;top:100px;left:50%;transform:translateX(-50%);padding:8px 15px;background:#0009;border-radius:6px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30;white-space:nowrap}
 
-#mobileControls{display:none;position:fixed;inset:0;z-index:9;pointer-events:none;touch-action:none}
-#mobileMove{position:absolute;right:15px;bottom:85px;width:150px;height:150px;pointer-events:auto}
+#mobileControls{display:none;position:fixed;inset:0;z-index:25;pointer-events:none;touch-action:none}
+#mobileMove{position:fixed;left:50%;bottom:15px;transform:translateX(-50%);width:150px;height:150px;pointer-events:auto}
 .moveBtn{position:absolute;width:48px;height:48px;padding:0;border:2px solid #ffffffaa;border-radius:10px;background:#222c;color:white;font-size:24px;touch-action:none;user-select:none;-webkit-user-select:none}
 .moveBtn.active{background:#777e}
 #moveForward{top:0;left:51px}
@@ -42,7 +42,7 @@ button:hover{background:#555e}
 #moveRight{top:51px;left:102px}
 #mobileActions{position:absolute;right:20px;bottom:250px;display:flex;flex-direction:column;gap:8px;pointer-events:auto}
 #mobileActions button{min-width:108px;min-height:44px;background:#222d;border:2px solid #ffffff88}
-#mobileMenu{position:absolute;top:65px;left:10px;pointer-events:auto;background:#222d}
+#mobileMenu{position:absolute;top:10px;left:10px;pointer-events:auto;background:#222d}
 #mobilePlace{background:#376b32!important}
 #mobileJump{background:#265b91!important}
 
@@ -57,6 +57,7 @@ button:hover{background:#555e}
  #pickaxe-hud{right:5px;bottom:5px;width:110px;height:110px}
  #panel .menu-button{min-height:75px;margin-bottom:18px}
  #panel h1{margin-bottom:25px}
+ #mobileMove{bottom:10px}
 }
 </style>
 
