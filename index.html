@@ -33,20 +33,85 @@ button:hover{background:#555e}
 #message{position:fixed;top:100px;left:50%;transform:translateX(-50%);padding:8px 15px;background:#0009;border-radius:6px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30;white-space:nowrap}
 
 /* MOBILE CONTROLS */
-#mobileControls{display:none;position:fixed;inset:0;z-index:25;pointer-events:none;touch-action:none}
-#mobileReset{position:absolute;top:10px;left:10px;pointer-events:auto;background:#8b3030;border:2px solid #ffffffaa;min-width:108px;min-height:40px}
-#mobileMenu{position:absolute;top:58px;left:10px;pointer-events:auto;background:#222d;min-width:108px;min-height:40px}
-#mobileMove{position:absolute;left:10px;top:106px;width:150px;height:150px;pointer-events:auto}
-.moveBtn{position:absolute;width:48px;height:48px;padding:0;border:2px solid #ffffffaa;border-radius:10px;background:#222c;color:white;font-size:24px;touch-action:none;user-select:none;-webkit-user-select:none}
+#mobileControls{
+ display:none;
+ position:fixed;
+ inset:0;
+ z-index:25;
+ pointer-events:none;
+ touch-action:none
+}
+
+#mobileReset{
+ position:absolute;
+ top:10px;
+ left:10px;
+ pointer-events:auto;
+ background:#8b3030;
+ border:2px solid #ffffffaa;
+ min-width:108px;
+ min-height:40px
+}
+
+#mobileMenu{
+ position:absolute;
+ top:58px;
+ left:10px;
+ pointer-events:auto;
+ background:#222d;
+ min-width:108px;
+ min-height:40px
+}
+
+#mobileActions{
+ position:absolute;
+ top:106px;
+ left:10px;
+ display:flex;
+ flex-direction:column;
+ gap:8px;
+ pointer-events:auto
+}
+
+#mobileActions button{
+ min-width:108px;
+ min-height:44px;
+ background:#222d;
+ border:2px solid #ffffff88
+}
+
+#mobilePlace{background:#376b32!important}
+#mobileJump{background:#265b91!important}
+
+#mobileMove{
+ position:absolute;
+ left:10px;
+ top:210px;
+ width:150px;
+ height:150px;
+ pointer-events:auto
+}
+
+.moveBtn{
+ position:absolute;
+ width:48px;
+ height:48px;
+ padding:0;
+ border:2px solid #ffffffaa;
+ border-radius:10px;
+ background:#222c;
+ color:white;
+ font-size:24px;
+ touch-action:none;
+ user-select:none;
+ -webkit-user-select:none
+}
+
 .moveBtn.active{background:#777e}
 #moveForward{top:0;left:51px}
 #moveLeft{top:51px;left:0}
 #moveBack{top:51px;left:51px}
 #moveRight{top:51px;left:102px}
-#mobileActions{position:absolute;right:20px;bottom:250px;display:flex;flex-direction:column;gap:8px;pointer-events:auto}
-#mobileActions button{min-width:108px;min-height:44px;background:#222d;border:2px solid #ffffff88}
-#mobilePlace{background:#376b32!important}
-#mobileJump{background:#265b91!important}
 
 @media(pointer:coarse),(max-width:800px){
  #help,#buttons{display:none}
@@ -91,7 +156,7 @@ button:hover{background:#555e}
 
 <div id="message"></div>
 
-<!-- Hidden in the main menu; shown only while playing on mobile -->
+<!-- MOBILE CONTROLS: hidden in the main menu -->
 <div id="mobileControls" style="display:none">
  <button id="mobileReset">RESET</button>
  <button id="mobileMenu">MENU</button>
@@ -197,6 +262,7 @@ function clearWorld(){
 
 function generateWorld(){
  clearWorld();
+
  for(let x=-12;x<12;x++){
   for(let z=-12;z<12;z++){
    addBlock(x,0,z,"grass");
@@ -204,14 +270,18 @@ function generateWorld(){
    addBlock(x,-2,z,"stone");
   }
  }
+
  const trees=[[-7,-6],[6,-8],[-8,5],[8,6],[3,9]];
+
  for(const [x,z] of trees){
   for(let y=1;y<=3;y++)addBlock(x,y,z,"dirt");
+
   for(let dx=-1;dx<=1;dx++){
    for(let dz=-1;dz<=1;dz++){
     for(let y=3;y<=4;y++)addBlock(x+dx,y,z+dz,"grass");
    }
   }
+
   addBlock(x,5,z,"grass");
  }
 }
@@ -233,11 +303,13 @@ function showMessage(text){
 
 function saveWorld(){
  if(hubMode)return false;
+
  try{
   const data=[...blocks.values()].map(m=>{
    const {x,y,z,type}=m.userData;
    return [x,y,z,type];
   });
+
   localStorage.setItem(SAVE_KEY,JSON.stringify(data));
   document.getElementById("status").textContent="WORLD SAVED ✓";
   return true;
@@ -250,6 +322,7 @@ function saveWorld(){
 
 function scheduleSave(){
  if(hubMode)return;
+
  document.getElementById("status").textContent="UNSAVED CHANGES";
  clearTimeout(saveTimer);
  saveTimer=setTimeout(saveWorld,400);
@@ -258,24 +331,34 @@ function scheduleSave(){
 function loadWorld(){
  try{
   const raw=localStorage.getItem(SAVE_KEY);
+
   if(raw){
    const data=JSON.parse(raw);
+
    if(Array.isArray(data)&&data.length>0&&data.length<10000){
     clearWorld();
+
     for(const item of data){
      if(!Array.isArray(item)||item.length!==4)continue;
+
      const [x,y,z,type]=item;
+
      if(!Number.isInteger(x)||!Number.isInteger(y)||!Number.isInteger(z)||
        !blockNames.includes(type)||Math.abs(x)>100||Math.abs(y)>100||Math.abs(z)>100)continue;
+
      addBlock(x,y,z,type);
     }
+
     if(blocks.size>0){
      document.getElementById("status").textContent="WORLD LOADED ✓";
      return;
     }
    }
   }
- }catch(e){console.warn("Could not load saved world.",e);}
+ }catch(e){
+  console.warn("Could not load saved world.",e);
+ }
+
  generateWorld();
  saveWorld();
 }
@@ -301,6 +384,7 @@ raycaster.far=6;
 
 const mobileDevice=window.matchMedia("(pointer: coarse), (max-width: 800px)");
 const mobileControls=document.getElementById("mobileControls");
+const mobileReset=document.getElementById("mobileReset");
 
 function updateCameraRotation(){
  camera.rotation.order="YXZ";
@@ -317,37 +401,47 @@ function collidesAt(px,py,pz){
   for(let y=Math.floor(minY-.5);y<=Math.ceil(maxY+.5);y++){
    for(let z=Math.floor(minZ-.5);z<=Math.ceil(maxZ+.5);z++){
     if(!blocks.has(key(x,y,z)))continue;
+
     if(maxX>x-.499&&minX<x+.499&&
        maxY>y-.499&&minY<y+.499&&
        maxZ>z-.499&&minZ<z+.499)return true;
    }
   }
  }
+
  return false;
 }
 
 function findLandingHeight(px,currentY,nextY,pz){
  const currentFeet=currentY-playerHeight;
  const nextFeet=nextY-playerHeight;
+
  if(nextFeet>=currentFeet)return null;
 
  let landingTop=-Infinity;
+
  for(let x=Math.floor(px-playerRadius-.5);x<=Math.ceil(px+playerRadius+.5);x++){
   for(let z=Math.floor(pz-playerRadius-.5);z<=Math.ceil(pz+playerRadius+.5);z++){
    for(let y=Math.floor(nextFeet-.5);y<=Math.ceil(currentFeet+.5);y++){
     if(!blocks.has(key(x,y,z)))continue;
+
     const overlapsX=px+playerRadius>x-.499&&px-playerRadius<x+.499;
     const overlapsZ=pz+playerRadius>z-.499&&pz-playerRadius<z+.499;
     const top=y+.5;
-    if(overlapsX&&overlapsZ&&currentFeet>=top-.01&&nextFeet<=top&&top>landingTop)landingTop=top;
+
+    if(overlapsX&&overlapsZ&&currentFeet>=top-.01&&nextFeet<=top&&top>landingTop){
+     landingTop=top;
+    }
    }
   }
  }
+
  return landingTop===-Infinity?null:landingTop;
 }
 
 function updatePlayer(delta){
  const speed=5.5;
+
  const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
  const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
  const direction=new THREE.Vector3();
@@ -359,10 +453,18 @@ function updatePlayer(delta){
 
  if(direction.lengthSq()>0){
   direction.normalize().multiplyScalar(speed*delta);
+
   const nextX=camera.position.x+direction.x;
-  if(!collidesAt(nextX,camera.position.y,camera.position.z))camera.position.x=nextX;
+
+  if(!collidesAt(nextX,camera.position.y,camera.position.z)){
+   camera.position.x=nextX;
+  }
+
   const nextZ=camera.position.z+direction.z;
-  if(!collidesAt(camera.position.x,camera.position.y,nextZ))camera.position.z=nextZ;
+
+  if(!collidesAt(camera.position.x,camera.position.y,nextZ)){
+   camera.position.z=nextZ;
+  }
  }
 
  const oldY=camera.position.y;
@@ -371,6 +473,7 @@ function updatePlayer(delta){
 
  if(velocityY<=0){
   const top=findLandingHeight(camera.position.x,oldY,nextY,camera.position.z);
+
   if(top!==null){
    camera.position.y=top+playerHeight;
    velocityY=0;
@@ -382,7 +485,10 @@ function updatePlayer(delta){
  }else{
   if(collidesAt(camera.position.x,nextY,camera.position.z)){
    velocityY=0;
-  }else camera.position.y=nextY;
+  }else{
+   camera.position.y=nextY;
+  }
+
   canJump=false;
  }
 
@@ -401,14 +507,17 @@ const hotbar=document.getElementById("hotbar");
 
 blockNames.forEach((type,i)=>{
  const slot=document.createElement("div");
+
  slot.className="slot"+(i===0?" selected":"");
  slot.innerHTML=`<div class="swatch" style="background:${blockColors[i]}"></div>${i+1}: ${type.toUpperCase()}`;
  slot.addEventListener("click",()=>selectBlock(type));
+
  hotbar.appendChild(slot);
 });
 
 function selectBlock(type){
  selectedBlock=type;
+
  [...hotbar.children].forEach((slot,i)=>{
   slot.classList.toggle("selected",blockNames[i]===type);
  });
@@ -420,6 +529,7 @@ function selectBlock(type){
 
 const overlay=document.getElementById("overlay");
 const pickaxeHud=document.createElement("div");
+
 pickaxeHud.id="pickaxe-hud";
 document.body.appendChild(pickaxeHud);
 
@@ -440,10 +550,16 @@ function enterHub(){
  normalPitch=pitch;
 
  hubMode=true;
+
+ // RESET is hidden while inside HUB.
+ mobileReset.style.display="none";
+
  clearWorld();
 
  for(let x=-12;x<=12;x++){
-  for(let z=-12;z<=12;z++)addBlock(x,0,z,"stone");
+  for(let z=-12;z<=12;z++){
+   addBlock(x,0,z,"stone");
+  }
  }
 
  for(let y=1;y<=4;y++){
@@ -460,7 +576,9 @@ function enterHub(){
  pitch=0;
  velocityY=0;
  canJump=false;
+
  for(const code in keys)keys[code]=false;
+
  updateCameraRotation();
 
  document.getElementById("status").textContent="HUB WORLD — NOT SAVED";
@@ -470,14 +588,20 @@ function enterHub(){
 
 function leaveHub(){
  if(!hubMode)return;
+
  clearWorld();
 
  if(normalWorldSnapshot){
-  for(const [x,y,z,type] of normalWorldSnapshot)addBlock(x,y,z,type);
+  for(const [x,y,z,type] of normalWorldSnapshot){
+   addBlock(x,y,z,type);
+  }
  }
 
- if(normalPlayerPosition)camera.position.copy(normalPlayerPosition);
- else camera.position.set(0,2.6,5);
+ if(normalPlayerPosition){
+  camera.position.copy(normalPlayerPosition);
+ }else{
+  camera.position.set(0,2.6,5);
+ }
 
  yaw=normalYaw;
  pitch=normalPitch;
@@ -487,9 +611,15 @@ function leaveHub(){
  for(const code in keys)keys[code]=false;
 
  hubMode=false;
+
+ // Restore RESET after leaving HUB.
+ mobileReset.style.display="block";
+
  normalWorldSnapshot=null;
  normalPlayerPosition=null;
+
  updateCameraRotation();
+
  document.getElementById("status").textContent="WORLD RESTORED";
 }
 
@@ -501,7 +631,12 @@ function startMobileGame(){
  isLocked=true;
  overlay.style.display="none";
  pickaxeHud.style.display="none";
+
  mobileControls.style.display=mobileDevice.matches?"block":"none";
+
+ // Make sure RESET visibility matches the current world.
+ mobileReset.style.display=hubMode?"none":"block";
+
  updateCameraRotation();
 }
 
@@ -517,7 +652,10 @@ document.getElementById("play").addEventListener("click",()=>{
 
 document.getElementById("joinHub").addEventListener("click",()=>{
  enterHub();
- if(mobileDevice.matches)startMobileGame();
+
+ if(mobileDevice.matches){
+  startMobileGame();
+ }
 });
 
 document.addEventListener("pointerlockchange",()=>{
@@ -535,9 +673,11 @@ document.addEventListener("pointerlockchange",()=>{
 
 document.addEventListener("mousemove",event=>{
  if(!isLocked||mobileDevice.matches)return;
+
  yaw-=event.movementX*.002;
  pitch-=event.movementY*.002;
  pitch=Math.max(-Math.PI/2+.01,Math.min(Math.PI/2-.01,pitch));
+
  updateCameraRotation();
 });
 
@@ -550,6 +690,7 @@ document.addEventListener("keydown",event=>{
 
  if(event.code==="Space"){
   event.preventDefault();
+
   if(canJump&&isLocked){
    velocityY=7;
    canJump=false;
@@ -582,6 +723,7 @@ function mobileButton(id,keyCode){
  btn.addEventListener("pointerdown",event=>{
   event.preventDefault();
   event.stopPropagation();
+
   btn.setPointerCapture(event.pointerId);
   keys[keyCode]=true;
   btn.classList.add("active");
@@ -623,17 +765,18 @@ function stopMobileGame(){
 document.getElementById("mobileMenu").addEventListener("click",()=>{
  if(!mobileDevice.matches)return;
 
- if(isLocked)stopMobileGame();
- else overlay.style.display="flex";
+ if(isLocked){
+  stopMobileGame();
+ }else{
+  overlay.style.display="flex";
+ }
 });
 
 document.getElementById("mobileReset").addEventListener("click",()=>{
- if(!mobileDevice.matches||!isLocked)return;
+ // RESET is only for mobile gameplay outside HUB.
+ if(!mobileDevice.matches||!isLocked||hubMode)return;
 
- // Return to the original world immediately.
  clearTimeout(saveTimer);
-
- if(hubMode)leaveHub();
 
  localStorage.removeItem(SAVE_KEY);
  generateWorld();
@@ -655,6 +798,7 @@ document.getElementById("mobileReset").addEventListener("click",()=>{
 
 document.getElementById("mobileJump").addEventListener("pointerdown",event=>{
  event.preventDefault();
+
  if(isLocked&&canJump){
   velocityY=7;
   canJump=false;
@@ -676,8 +820,10 @@ renderer.domElement.addEventListener("pointerdown",event=>{
 
  mobileLooking=true;
  lookPointerId=event.pointerId;
+
  lastTouchX=touchStartX=event.clientX;
  lastTouchY=touchStartY=event.clientY;
+
  touchMoved=false;
 });
 
@@ -697,6 +843,7 @@ renderer.domElement.addEventListener("pointermove",event=>{
  yaw-=dx*.006;
  pitch-=dy*.006;
  pitch=Math.max(-Math.PI/2+.01,Math.min(Math.PI/2-.01,pitch));
+
  updateCameraRotation();
 });
 
@@ -718,7 +865,10 @@ renderer.domElement.addEventListener("pointercancel",()=>{
 
 document.getElementById("mobilePlace").addEventListener("pointerdown",event=>{
  event.preventDefault();
- if(isLocked&&!hubMode)placeBlockAtCrosshair();
+
+ if(isLocked&&!hubMode){
+  placeBlockAtCrosshair();
+ }
 });
 
 // =====================
@@ -727,7 +877,9 @@ document.getElementById("mobilePlace").addEventListener("pointerdown",event=>{
 
 function getTargetBlock(){
  raycaster.setFromCamera(new THREE.Vector2(0,0),camera);
+
  const hits=raycaster.intersectObjects([...blocks.values()],false);
+
  return hits.length?hits[0]:null;
 }
 
@@ -739,6 +891,7 @@ function placeBlockAtCrosshair(){
 
  const normal=hit.face.normal.clone();
  normal.transformDirection(hit.object.matrixWorld);
+
  const pos=hit.object.position.clone().add(normal);
 
  const x=Math.round(pos.x);
@@ -774,6 +927,7 @@ document.addEventListener("mousedown",event=>{
  if(event.button===2){
   const normal=hit.face.normal.clone();
   normal.transformDirection(hit.object.matrixWorld);
+
   const pos=hit.object.position.clone().add(normal);
 
   const x=Math.round(pos.x);
@@ -821,19 +975,32 @@ const handle=new THREE.Mesh(
  new THREE.CylinderGeometry(.09,.13,1.9,7),
  new THREE.MeshStandardMaterial({color:0x986039,roughness:.85})
 );
+
 handle.rotation.z=-.55;
 handle.position.set(-.2,-.15,0);
 pickaxe.add(handle);
 
-const stoneMaterial=new THREE.MeshStandardMaterial({color:0x555b61,roughness:1,flatShading:true});
+const stoneMaterial=new THREE.MeshStandardMaterial({
+ color:0x555b61,
+ roughness:1,
+ flatShading:true
+});
 
-const stoneHead=new THREE.Mesh(new THREE.IcosahedronGeometry(.52,0),stoneMaterial);
+const stoneHead=new THREE.Mesh(
+ new THREE.IcosahedronGeometry(.52,0),
+ stoneMaterial
+);
+
 stoneHead.scale.set(1.65,.65,.7);
 stoneHead.rotation.z=-.35;
 stoneHead.position.set(.45,.72,0);
 pickaxe.add(stoneHead);
 
-const stoneTip=new THREE.Mesh(new THREE.ConeGeometry(.28,.65,5),stoneMaterial);
+const stoneTip=new THREE.Mesh(
+ new THREE.ConeGeometry(.28,.65,5),
+ stoneMaterial
+);
+
 stoneTip.rotation.z=-1.15;
 stoneTip.position.set(1.05,.88,0);
 pickaxe.add(stoneTip);
@@ -842,6 +1009,7 @@ const binding=new THREE.Mesh(
  new THREE.CylinderGeometry(.15,.15,.22,8),
  new THREE.MeshStandardMaterial({color:0xb47743})
 );
+
 binding.position.set(-.05,.15,0);
 binding.rotation.z=-.55;
 pickaxe.add(binding);
@@ -853,12 +1021,15 @@ let pickaxeTime=0;
 
 function animatePickaxe(){
  requestAnimationFrame(animatePickaxe);
+
  pickaxeTime+=.018;
  pickaxe.rotation.y+=.018;
  pickaxe.rotation.x=Math.sin(pickaxeTime)*.12;
  pickaxe.position.y=Math.sin(pickaxeTime*1.5)*.08;
+
  pickRenderer.render(pickScene,pickCamera);
 }
+
 animatePickaxe();
 
 // =====================
@@ -870,7 +1041,10 @@ document.getElementById("saveBtn").addEventListener("click",()=>{
   showMessage("Hub world cannot be saved!");
   return;
  }
- if(saveWorld())showMessage("World saved successfully!");
+
+ if(saveWorld()){
+  showMessage("World saved successfully!");
+ }
 });
 
 document.getElementById("resetBtn").addEventListener("click",()=>{
@@ -883,14 +1057,17 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
 
  localStorage.removeItem(SAVE_KEY);
  generateWorld();
+
  camera.position.set(0,2.6,5);
  velocityY=0;
  canJump=false;
  yaw=0;
  pitch=0;
+
  updateCameraRotation();
  selectBlock("grass");
  saveWorld();
+
  showMessage("New world created!");
 });
 
@@ -916,15 +1093,18 @@ requestAnimationFrame(animate);
 addEventListener("resize",()=>{
  camera.aspect=innerWidth/innerHeight;
  camera.updateProjectionMatrix();
+
  renderer.setSize(innerWidth,innerHeight);
 
  pickCamera.aspect=1;
  pickCamera.updateProjectionMatrix();
+
  pickRenderer.setSize(pickaxeHud.clientWidth,pickaxeHud.clientHeight);
 });
 
 addEventListener("beforeunload",()=>{
  clearTimeout(saveTimer);
+
  if(!hubMode)saveWorld();
 });
 </script>
