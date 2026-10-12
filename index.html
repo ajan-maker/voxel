@@ -1108,5 +1108,148 @@ addEventListener("beforeunload",()=>{
  if(!hubMode)saveWorld();
 });
 </script>
+ ```html
+<!-- EVENT BUTTON -->
+<button id="eventButton">EVENT</button>
+
+<!-- EVENT SCREEN -->
+<div id="eventScreen">
+  <button id="eventClose">X</button>
+
+  <div id="eventContent">
+    <img id="eventImage" src="verity.block" alt="Event">
+
+    <button id="claimButton">CLAIM!</button>
+  </div>
+</div>
+
+<style>
+#eventButton {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 15;
+  min-width: 100px;
+  min-height: 45px;
+  background: #24bd45;
+  color: white;
+  border: 2px solid #16832c;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+#eventScreen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #ffd900;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#eventClose {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  background: #222;
+  color: white;
+  border: 2px solid white;
+  font-size: 23px;
+  z-index: 2;
+}
+
+#eventContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+  width: 90%;
+  max-width: 420px;
+}
+
+#eventImage {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  max-height: 50vh;
+  object-fit: contain;
+  cursor: pointer;
+}
+
+#claimButton {
+  width: 100%;
+  min-height: 75px;
+  background: #fff000;
+  color: black;
+  border: 4px solid black;
+  border-radius: 0;
+  font-size: 32px;
+  font-weight: 900;
+}
+
+#eventScreen.claimed {
+  background: black;
+}
+
+#eventScreen.claimed #eventContent {
+  display: none;
+}
+
+@media (pointer: coarse), (max-width: 800px) {
+  #eventButton {
+    top: 10px;
+    right: 10px;
+    min-width: 90px;
+    min-height: 42px;
+  }
+
+  #eventContent {
+    width: 88%;
+  }
+
+  #eventImage {
+    max-height: 45vh;
+  }
+
+  #claimButton {
+    min-height: 70px;
+    font-size: 28px;
+  }
+}
+</style>
+
+<script>
+
+  const eventButton = document.getElementById("eventButton");
+  const eventScreen = document.getElementById("eventScreen");
+  const eventClose = document.getElementById("eventClose");
+  const eventImage = document.getElementById("eventImage");
+  const claimButton = document.getElementById("claimButton");
+
+  function openEvent() {
+    eventScreen.style.display = "flex";
+  }
+
+  function closeEvent() {
+    eventScreen.style.display = "none";
+  }
+
+  function claimEvent() {
+    eventScreen.classList.add("claimed");
+  }
+
+  eventButton.addEventListener("click", openEvent);
+  eventClose.addEventListener("click", closeEvent);
+  eventImage.addEventListener("click", claimEvent);
+  claimButton.addEventListener("click", claimEvent);
+})();
+</script>
+
 </body>
 </html>
