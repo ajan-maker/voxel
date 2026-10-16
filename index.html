@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,26 +10,61 @@
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif;background:#87ceeb;color:white;touch-action:none}
 canvas{display:block}
+
 #crosshair{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:25px;font-weight:bold;pointer-events:none;text-shadow:1px 1px 3px black;z-index:5}
 #top{position:fixed;top:15px;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none;text-shadow:2px 2px 4px black;z-index:5}
 #logo{font-size:32px;font-weight:900;letter-spacing:5px}
 #status{margin-top:7px;font-size:12px;color:#e8ffe8}
+
 #hotbar{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:12}
 .slot{width:58px;height:58px;border:3px solid #777;background:#222b;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:11px;cursor:pointer;touch-action:manipulation}
 .slot.selected{border-color:white;background:#ffffff44;transform:translateY(-5px)}
 .swatch{width:25px;height:25px;margin-bottom:4px;border:2px solid #0005}
+
 #help{position:fixed;left:15px;bottom:15px;font-size:12px;line-height:1.8;background:#0009;padding:10px 14px;border-radius:8px;pointer-events:none;z-index:5}
 #buttons{position:fixed;top:15px;right:15px;display:flex;gap:7px;z-index:6}
+
 button{padding:10px 13px;background:#222d;border:1px solid #ffffff66;color:white;border-radius:6px;cursor:pointer;font-weight:bold;touch-action:manipulation}
 button:hover{background:#555e}
-#overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background-color:#777;background-image:linear-gradient(#0002 1px,transparent 1px),linear-gradient(90deg,#0002 1px,transparent 1px);background-size:32px 32px}
+
+#overlay{
+ position:fixed;
+ inset:0;
+ z-index:20;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ background-color:#777;
+ background-image:linear-gradient(#0002 1px,transparent 1px),linear-gradient(90deg,#0002 1px,transparent 1px);
+ background-size:32px 32px
+}
+
 #panel{width:min(700px,95%);padding:20px;text-align:center;background:transparent;border:none;box-shadow:none}
 #panel h1{display:block;color:black;font-size:clamp(55px,9vw,100px);font-weight:900;letter-spacing:10px;margin:0 0 35px;text-shadow:2px 2px 0 #aaa}
 #panel p{display:none}
-#panel .menu-button{display:block;width:100%;min-height:115px;margin:0 auto 34px;padding:15px;color:black;background-color:#a66d48;background-image:linear-gradient(#ffffff0c 1px,transparent 1px),linear-gradient(90deg,#00000018 1px,transparent 1px);background-size:16px 16px;border:3px solid #805132;border-radius:0;font-size:clamp(25px,5vw,48px);font-weight:400;cursor:pointer}
+
+#panel .menu-button{
+ display:block;
+ width:100%;
+ min-height:115px;
+ margin:0 auto 34px;
+ padding:15px;
+ color:black;
+ background-color:#a66d48;
+ background-image:linear-gradient(#ffffff0c 1px,transparent 1px),linear-gradient(90deg,#00000018 1px,transparent 1px);
+ background-size:16px 16px;
+ border:3px solid #805132;
+ border-radius:0;
+ font-size:clamp(25px,5vw,48px);
+ font-weight:400;
+ cursor:pointer
+}
+
 #panel .menu-button:hover{background-color:#bd8259}
+
 #pickaxe-hud{position:fixed;right:25px;bottom:25px;width:190px;height:190px;pointer-events:none;z-index:11}
 #pickaxe-hud canvas{width:100%;height:100%}
+
 #message{position:fixed;top:100px;left:50%;transform:translateX(-50%);padding:8px 15px;background:#0009;border-radius:6px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30;white-space:nowrap}
 
 /* MOBILE CONTROLS */
@@ -40,6 +76,7 @@ button:hover{background:#555e}
  pointer-events:none;
  touch-action:none
 }
+
 #mobileReset{
  position:absolute;
  top:10px;
@@ -50,6 +87,7 @@ button:hover{background:#555e}
  min-width:108px;
  min-height:40px
 }
+
 #mobileMenu{
  position:absolute;
  top:58px;
@@ -59,6 +97,7 @@ button:hover{background:#555e}
  min-width:108px;
  min-height:40px
 }
+
 #mobileActions{
  position:absolute;
  top:106px;
@@ -68,14 +107,17 @@ button:hover{background:#555e}
  gap:8px;
  pointer-events:auto
 }
+
 #mobileActions button{
  min-width:108px;
  min-height:44px;
  background:#222d;
  border:2px solid #ffffff88
 }
+
 #mobilePlace{background:#376b32!important}
 #mobileJump{background:#265b91!important}
+
 #mobileMove{
  position:absolute;
  left:10px;
@@ -84,6 +126,7 @@ button:hover{background:#555e}
  height:150px;
  pointer-events:auto
 }
+
 .moveBtn{
  position:absolute;
  width:48px;
@@ -98,11 +141,98 @@ button:hover{background:#555e}
  user-select:none;
  -webkit-user-select:none
 }
+
 .moveBtn.active{background:#777e}
 #moveForward{top:0;left:51px}
 #moveLeft{top:51px;left:0}
 #moveBack{top:51px;left:51px}
 #moveRight{top:51px;left:102px}
+
+/* CODE MACHINE */
+#operatorMachine{
+ position:fixed;
+ left:50%;
+ top:50%;
+ transform:translate(-50%,-50%);
+ width:min(420px,calc(100vw - 30px));
+ padding:22px;
+ background:#080808;
+ border:3px solid #444;
+ box-shadow:0 0 0 100vmax #0008;
+ color:white;
+ text-align:left;
+ z-index:100;
+ display:none
+}
+
+#operatorHeader{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:12px;
+ margin-bottom:22px;
+ font-size:20px;
+ font-weight:900;
+ letter-spacing:3px
+}
+
+#operatorClose{
+ width:38px;
+ min-width:38px;
+ height:38px;
+ padding:0;
+ background:#222;
+ border:2px solid #666;
+ border-radius:0;
+ color:white;
+ font-size:23px
+}
+
+#operatorRow{display:flex;gap:8px}
+
+#operatorInput{
+ flex:1;
+ min-width:0;
+ height:46px;
+ padding:0 12px;
+ background:#111;
+ border:2px solid #555;
+ border-radius:0;
+ outline:none;
+ color:white;
+ font-size:16px;
+ user-select:text;
+ -webkit-user-select:text;
+ touch-action:auto
+}
+
+#operatorInput:focus{border-color:white}
+
+#operatorCheck{
+ width:48px;
+ min-width:48px;
+ height:46px;
+ padding:0;
+ border:2px solid #555;
+ border-radius:0;
+ background:#222;
+ color:white;
+ font-size:25px
+}
+
+#operatorCheck:hover,#operatorClose:hover{background:#444}
+
+#operatorResult{
+ margin-top:12px;
+ min-height:18px;
+ font-size:13px;
+ color:#ff7777
+}
+
+#operatorCheck:active{
+ background:#387b35;
+ border-color:#6b9561
+}
 
 @media(pointer:coarse),(max-width:800px){
  #help,#buttons{display:none}
@@ -114,65 +244,6 @@ button:hover{background:#555e}
  #pickaxe-hud{right:5px;bottom:5px;width:110px;height:110px}
  #panel .menu-button{min-height:75px;margin-bottom:18px}
  #panel h1{margin-bottom:25px}
-}
-
-/* CODE MACHINE — visible only inside the main menu */
-#codeMachine{
- position:fixed;
- right:18px;
- bottom:18px;
- width:min(330px,calc(100vw - 24px));
- padding:12px;
- background:#242424ee;
- border:2px solid #111;
- box-shadow:4px 4px 0 #0005;
- color:white;
- text-align:left;
- z-index:25
-}
-#codeMachineTitle{
- margin-bottom:9px;
- font-size:14px;
- font-weight:900;
- letter-spacing:2px
-}
-#codeMachineRow{display:flex;gap:7px}
-#codeMachineInput{
- flex:1;
- min-width:0;
- height:40px;
- padding:0 10px;
- background:#111;
- color:white;
- border:2px solid #777;
- border-radius:0;
- outline:none;
- font-size:15px;
- touch-action:auto;
- user-select:text;
- -webkit-user-select:text
-}
-#codeMachineInput:focus{border-color:#ddd}
-#codeMachineCheck{
- width:44px;
- min-width:44px;
- height:40px;
- padding:0;
- border:2px solid #6b9561;
- border-radius:0;
- background:#387b35;
- color:white;
- font-size:25px;
- cursor:pointer
-}
-#codeMachineCheck:hover{background:#489544}
-
-@media(pointer:coarse),(max-width:800px){
- #codeMachine{
-  right:8px;
-  bottom:8px;
-  width:min(290px,calc(100vw - 16px))
- }
 }
 </style>
 
@@ -231,26 +302,28 @@ button:hover{background:#555e}
   <button id="play" class="menu-button">JOIN WORLD</button>
   <button id="joinHub" class="menu-button">JOIN HUB</button>
  </div>
+</div>
 
- <!-- CODE MACHINE: no code execution is connected -->
- <div id="codeMachine">
-  <div id="codeMachineTitle">CODE MACHINE</div>
-  <div id="codeMachineRow">
-   <input
-    id="codeMachineInput"
-    type="text"
-    placeholder="Enter code..."
-    autocomplete="off"
-    spellcheck="false"
-    aria-label="Enter code"
-   >
-   <button
-    id="codeMachineCheck"
-    type="button"
-    aria-label="Check code"
-   >✓</button>
-  </div>
+<!-- CODE MACHINE -->
+<div id="operatorMachine">
+ <div id="operatorHeader">
+  <span>CODE MACHINE</span>
+  <button id="operatorClose" type="button" aria-label="Close">X</button>
  </div>
+
+ <div id="operatorRow">
+  <input
+   id="operatorInput"
+   type="text"
+   placeholder="ENTER CODE"
+   autocomplete="off"
+   spellcheck="false"
+   aria-label="Enter code"
+  >
+  <button id="operatorCheck" type="button" aria-label="Check code">✓</button>
+ </div>
+
+ <div id="operatorResult" role="status"></div>
 </div>
 
 <script type="module">
@@ -266,6 +339,7 @@ scene.fog = new THREE.Fog(0x87ceeb,25,65);
 
 const camera = new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1000);
 const renderer = new THREE.WebGLRenderer({antialias:true});
+
 renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.shadowMap.enabled=true;
@@ -275,6 +349,7 @@ renderer.domElement.style.position="fixed";
 renderer.domElement.style.inset="0";
 renderer.domElement.style.zIndex="0";
 renderer.domElement.style.touchAction="none";
+
 document.body.prepend(renderer.domElement);
 
 scene.add(new THREE.HemisphereLight(0xffffff,0x667755,2));
@@ -309,17 +384,20 @@ let normalYaw=0,normalPitch=0;
 function addBlock(x,y,z,type){
  const k=key(x,y,z);
  if(blocks.has(k))return;
+
  const mesh=new THREE.Mesh(geometry,materials[type]||materials.grass);
  mesh.position.set(x,y,z);
  mesh.castShadow=true;
  mesh.receiveShadow=true;
  mesh.userData={x,y,z,type};
+
  scene.add(mesh);
  blocks.set(k,mesh);
 }
 
 function removeBlock(mesh){
  if(hubMode||mobileDevice.matches)return;
+
  const {x,y,z}=mesh.userData;
  scene.remove(mesh);
  blocks.delete(key(x,y,z));
@@ -368,6 +446,7 @@ function showMessage(text){
  const el=document.getElementById("message");
  el.textContent=text;
  el.style.opacity="1";
+
  clearTimeout(messageTimeout);
  messageTimeout=setTimeout(()=>el.style.opacity="0",1800);
 }
@@ -451,6 +530,7 @@ const keys={};
 const playerRadius=.3;
 const playerHeight=1.8;
 const raycaster=new THREE.Raycaster();
+
 raycaster.far=6;
 
 const mobileDevice=window.matchMedia("(pointer: coarse), (max-width: 800px)");
@@ -621,8 +701,6 @@ function enterHub(){
  normalPitch=pitch;
 
  hubMode=true;
-
- // RESET is hidden while inside HUB.
  mobileReset.style.display="none";
 
  clearWorld();
@@ -682,8 +760,6 @@ function leaveHub(){
  for(const code in keys)keys[code]=false;
 
  hubMode=false;
-
- // Restore RESET after leaving HUB.
  mobileReset.style.display="block";
 
  normalWorldSnapshot=null;
@@ -704,8 +780,6 @@ function startMobileGame(){
  pickaxeHud.style.display="none";
 
  mobileControls.style.display=mobileDevice.matches?"block":"none";
-
- // Make sure RESET visibility matches the current world.
  mobileReset.style.display=hubMode?"none":"block";
 
  updateCameraRotation();
@@ -757,6 +831,14 @@ document.addEventListener("mousemove",event=>{
 // =====================
 
 document.addEventListener("keydown",event=>{
+ if(operatorMachine.style.display==="block"){
+  if(event.key==="Escape"){
+   event.preventDefault();
+   closeOperatorMachine();
+  }
+  return;
+ }
+
  keys[event.code]=true;
 
  if(event.code==="Space"){
@@ -800,7 +882,7 @@ function mobileButton(id,keyCode){
   btn.classList.add("active");
  });
 
- function release(event){
+ function release(){
   keys[keyCode]=false;
   btn.classList.remove("active");
  }
@@ -844,7 +926,6 @@ document.getElementById("mobileMenu").addEventListener("click",()=>{
 });
 
 document.getElementById("mobileReset").addEventListener("click",()=>{
- // RESET is only for mobile gameplay outside HUB.
  if(!mobileDevice.matches||!isLocked||hubMode)return;
 
  clearTimeout(saveTimer);
@@ -984,8 +1065,7 @@ function placeBlockAtCrosshair(){
 }
 
 document.addEventListener("mousedown",event=>{
- if(!isLocked||hubMode)return;
- if(mobileDevice.matches)return;
+ if(!isLocked||hubMode||mobileDevice.matches)return;
  if(event.button!==0&&event.button!==2)return;
 
  const hit=getTargetBlock();
@@ -1026,6 +1106,7 @@ document.addEventListener("mousedown",event=>{
 
 const pickScene=new THREE.Scene();
 const pickCamera=new THREE.PerspectiveCamera(35,1,.1,100);
+
 pickCamera.position.set(0,0,7);
 
 const pickRenderer=new THREE.WebGLRenderer({alpha:true,antialias:true});
@@ -1140,6 +1221,102 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
  saveWorld();
 
  showMessage("New world created!");
+});
+
+// =====================
+// CODE MACHINE
+// =====================
+
+const operatorMachine=document.getElementById("operatorMachine");
+const operatorInput=document.getElementById("operatorInput");
+const operatorClose=document.getElementById("operatorClose");
+const operatorCheck=document.getElementById("operatorCheck");
+const operatorResult=document.getElementById("operatorResult");
+
+let operatorBuffer="";
+let operatorBufferTimer=null;
+
+function openOperatorMachine(){
+ if(overlay.style.display==="none")return;
+
+ operatorMachine.style.display="block";
+ operatorInput.value="";
+ operatorInput.placeholder="ENTER CODE";
+ operatorResult.textContent="";
+ operatorInput.focus();
+}
+
+function closeOperatorMachine(){
+ operatorMachine.style.display="none";
+ operatorInput.value="";
+ operatorInput.placeholder="ENTER CODE";
+ operatorResult.textContent="";
+ operatorBuffer="";
+ clearTimeout(operatorBufferTimer);
+}
+
+// Type OP or OPERATOR in the main menu to open CODE MACHINE.
+document.addEventListener("keydown",event=>{
+ if(operatorMachine.style.display==="block")return;
+ if(overlay.style.display==="none")return;
+ if(event.ctrlKey||event.altKey||event.metaKey)return;
+
+ if(event.target instanceof HTMLInputElement||
+    event.target instanceof HTMLTextAreaElement)return;
+
+ if(event.key==="Escape"||event.key.length!==1)return;
+
+ operatorBuffer+=event.key.toUpperCase();
+ operatorBuffer=operatorBuffer.slice(-8);
+
+ clearTimeout(operatorBufferTimer);
+
+ operatorBufferTimer=setTimeout(()=>{
+  const command=operatorBuffer;
+  operatorBuffer="";
+
+  if(command==="OP"||command==="OPERATOR"){
+   openOperatorMachine();
+  }
+ },700);
+});
+
+// Close button
+operatorClose.addEventListener("click",closeOperatorMachine);
+
+// Check button
+function checkOperatorCode(){
+ const code=operatorInput.value.trim().toUpperCase();
+
+ if(!code){
+  operatorResult.textContent="PLEASE ENTER A CODE.";
+  return;
+ }
+
+ // No valid codes are configured yet.
+ operatorResult.textContent="INVALID CODE.";
+}
+
+operatorCheck.addEventListener("click",checkOperatorCode);
+
+// Press Enter to check the entered code.
+operatorInput.addEventListener("keydown",event=>{
+ if(event.key==="Enter"){
+  event.preventDefault();
+  checkOperatorCode();
+ }
+
+ if(event.key==="Escape"){
+  event.preventDefault();
+  closeOperatorMachine();
+ }
+});
+
+// Clicking outside the window closes CODE MACHINE.
+operatorMachine.addEventListener("click",event=>{
+ if(event.target===operatorMachine){
+  closeOperatorMachine();
+ }
 });
 
 // =====================
