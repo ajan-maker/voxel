@@ -299,8 +299,9 @@ button:hover{background:#555e}
 <div id="overlay">
  <div id="panel">
   <h1>VOXEL</h1>
-  <button id="play" class="menu-button">JOIN WORLD</button>
-  <button id="joinHub" class="menu-button">JOIN HUB</button>
+ <button id="play" class="menu-button">JOIN WORLD</button>
+<button id="joinHub" class="menu-button">JOIN HUB</button>
+<button id="openCodeMachine" class="menu-button">CODE MACHINE</button>
  </div>
 </div>
 
@@ -311,6 +312,8 @@ button:hover{background:#555e}
   <button id="operatorClose" type="button" aria-label="Close">X</button>
  </div>
 
+
+ 
  <div id="operatorRow">
   <input
    id="operatorInput"
@@ -1355,6 +1358,22 @@ addEventListener("beforeunload",()=>{
 
  if(!hubMode)saveWorld();
 });
+
+ 
+document.getElementById("openCodeMachine").addEventListener("click", () => {
+    const machine = document.getElementById("operatorMachine");
+    const input = document.getElementById("operatorInput");
+    const result = document.getElementById("operatorResult");
+
+    if (!machine || !input || !result) return;
+
+    machine.style.display = "block";
+    input.value = "";
+    input.placeholder = "ENTER CODE";
+    result.textContent = "";
+    input.focus();
+});
+
 </script>
 </body>
 </html>
