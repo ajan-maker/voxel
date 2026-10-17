@@ -25,7 +25,7 @@ button:hover{background:#555e}
 #panel{width:min(700px,95%);padding:20px;text-align:center;background:transparent;border:none;box-shadow:none}
 #panel h1{display:block;color:black;font-size:clamp(55px,9vw,100px);font-weight:900;letter-spacing:10px;margin:0 0 35px;text-shadow:2px 2px 0 #aaa}
 #panel p{display:none}
-#panel .menu-button{display:block;width:100%;min-height:115px;margin:0 auto 24px;padding:15px;color:black;background-color:#a66d48;background-image:linear-gradient(#ffffff0c 1px,transparent 1px),linear-gradient(90deg,#00000018 1px,transparent 1px);background-size:16px 16px;border:3px solid #805132;border-radius:0;font-size:clamp(25px,5vw,48px);font-weight:400;cursor:pointer}
+#panel .menu-button{display:block;width:100%;min-height:115px;margin:0 auto 34px;padding:15px;color:black;background-color:#a66d48;background-image:linear-gradient(#ffffff0c 1px,transparent 1px),linear-gradient(90deg,#00000018 1px,transparent 1px);background-size:16px 16px;border:3px solid #805132;border-radius:0;font-size:clamp(25px,5vw,48px);font-weight:400;cursor:pointer}
 #panel .menu-button:hover{background-color:#bd8259}
 #pickaxe-hud{position:fixed;right:25px;bottom:25px;width:190px;height:190px;pointer-events:none;z-index:11}
 #pickaxe-hud canvas{width:100%;height:100%}
@@ -174,6 +174,74 @@ button:hover{background:#555e}
   width:min(290px,calc(100vw - 16px))
  }
 }
+
+/* OPERATOR BLACK MENU */
+#operatorMenu{
+ display:none;
+ position:fixed;
+ top:50%;
+ left:50%;
+ transform:translate(-50%,-50%);
+ width:min(400px,calc(100vw - 30px));
+ padding:22px;
+ background:#000;
+ border:2px solid #444;
+ box-shadow:0 0 30px #000;
+ color:white;
+ z-index:1000;
+ text-align:left
+}
+#operatorHeader{
+ margin-bottom:22px;
+ font-size:20px;
+ font-weight:900;
+ letter-spacing:3px
+}
+#operatorClose{
+ position:absolute;
+ top:8px;
+ right:8px;
+ width:32px;
+ height:32px;
+ padding:0;
+ background:#222;
+ border:1px solid #555;
+ border-radius:0;
+ font-size:18px
+}
+#operatorRow{display:flex;gap:8px}
+#operatorInput{
+ flex:1;
+ min-width:0;
+ height:42px;
+ padding:0 10px;
+ background:#111;
+ color:white;
+ border:2px solid #555;
+ border-radius:0;
+ outline:none;
+ font-size:15px;
+ touch-action:auto;
+ user-select:text;
+ -webkit-user-select:text
+}
+#operatorInput:focus{border-color:white}
+#operatorCheck{
+ width:44px;
+ min-width:44px;
+ height:42px;
+ padding:0;
+ background:#222;
+ color:white;
+ border:2px solid #555;
+ border-radius:0;
+ font-size:24px
+}
+#operatorMessage{
+ margin-top:12px;
+ color:#aaa;
+ font-size:12px
+}
 </style>
 
 <script type="importmap">
@@ -200,7 +268,7 @@ button:hover{background:#555e}
  SPACE — Jump<br>
  LEFT CLICK — Break block<br>
  RIGHT CLICK — Place block<br>
- 1 / 2 / 3 — Select block<br>
+ 1 / 2 — Select block<br>
  ESC — Return to menu
 </div>
 
@@ -229,7 +297,7 @@ button:hover{background:#555e}
  <div id="panel">
   <h1>VOXEL</h1>
   <button id="play" class="menu-button">JOIN WORLD</button>
-  <button id="backBtn" class="menu-button">BACK</button>
+  <button id="joinHub" class="menu-button">JOIN HUB</button>
  </div>
 
  <div id="codeMachine">
@@ -243,9 +311,33 @@ button:hover{background:#555e}
     spellcheck="false"
     aria-label="Enter code"
    >
-   <button id="codeMachineCheck" type="button" aria-label="Check code">✓</button>
+   <button
+    id="codeMachineCheck"
+    type="button"
+    aria-label="Check code"
+   >✓</button>
   </div>
  </div>
+</div>
+
+<!-- OPERATOR BLACK MENU -->
+<div id="operatorMenu">
+ <button id="operatorClose" type="button" aria-label="Close">X</button>
+ <div id="operatorHeader">OPERATOR</div>
+
+ <div id="operatorRow">
+  <input
+   id="operatorInput"
+   type="text"
+   placeholder="ENTER CODE"
+   autocomplete="off"
+   spellcheck="false"
+   aria-label="Enter code"
+  >
+  <button id="operatorCheck" type="button" aria-label="Check code">✓</button>
+ </div>
+
+ <div id="operatorMessage"></div>
 </div>
 
 <script type="module">
@@ -290,11 +382,17 @@ const materials={
  stone:new THREE.MeshLambertMaterial({color:0x858585})
 };
 
-const blockNames=["grass","dirt","stone"];
-const blockColors=["#55ad43","#80502e","#858585"];
+// Only GRASS and DIRT can be selected in the normal world.
+const blockNames=["grass","dirt"];
+const blockColors=["#55ad43","#80502e"];
 const geometry=new THREE.BoxGeometry(1,1,1);
 const blocks=new Map();
 const key=(x,y,z)=>`${x},${y},${z}`;
+
+let hubMode=false;
+let normalWorldSnapshot=null;
+let normalPlayerPosition=null;
+let normalYaw=0,normalPitch=0;
 
 function addBlock(x,y,z,type){
  const k=key(x,y,z);
@@ -310,7 +408,7 @@ function addBlock(x,y,z,type){
 }
 
 function removeBlock(mesh){
- if(mobileDevice.matches)return;
+ if(hubMode||mobileDevice.matches)return;
 
  const {x,y,z}=mesh.userData;
  scene.remove(mesh);
@@ -326,19 +424,39 @@ function clearWorld(){
 function generateWorld(){
  clearWorld();
 
- for(let x=-12;x<12;x++){
-  for(let z=-12;z<12;z++){
+ // Main world ground: exactly 20 x 20 blocks.
+ for(let x=-10;x<10;x++){
+  for(let z=-10;z<10;z++){
    addBlock(x,0,z,"grass");
    addBlock(x,-1,z,"dirt");
-   addBlock(x,-2,z,"stone");
   }
  }
 
- const trees=[[-7,-6],[6,-8],[-8,5],[8,6],[3,9]];
+ // Generate 14 random trees and keep the spawn area clear.
+ const trees=[];
+ const wantedTrees=14;
+ let attempts=0;
+
+ while(trees.length<wantedTrees&&attempts<500){
+  attempts++;
+
+  const x=Math.floor(Math.random()*17)-8;
+  const z=Math.floor(Math.random()*17)-8;
+
+  // Leave room around the spawn point.
+  if(Math.abs(x)<=2&&Math.abs(z)<=2)continue;
+
+  // Keep trees apart so their canopies do not pile up.
+  if(trees.some(([tx,tz])=>Math.abs(tx-x)<3&&Math.abs(tz-z)<3))continue;
+
+  trees.push([x,z]);
+ }
 
  for(const [x,z] of trees){
+  // Tree trunk.
   for(let y=1;y<=3;y++)addBlock(x,y,z,"dirt");
 
+  // Leaves.
   for(let dx=-1;dx<=1;dx++){
    for(let dz=-1;dz<=1;dz++){
     for(let y=3;y<=4;y++)addBlock(x+dx,y,z+dz,"grass");
@@ -360,11 +478,14 @@ function showMessage(text){
  const el=document.getElementById("message");
  el.textContent=text;
  el.style.opacity="1";
+
  clearTimeout(messageTimeout);
  messageTimeout=setTimeout(()=>el.style.opacity="0",1800);
 }
 
 function saveWorld(){
+ if(hubMode)return false;
+
  try{
   const data=[...blocks.values()].map(m=>{
    const {x,y,z,type}=m.userData;
@@ -382,6 +503,8 @@ function saveWorld(){
 }
 
 function scheduleSave(){
+ if(hubMode)return;
+
  document.getElementById("status").textContent="UNSAVED CHANGES";
  clearTimeout(saveTimer);
  saveTimer=setTimeout(saveWorld,400);
@@ -403,13 +526,18 @@ function loadWorld(){
      const [x,y,z,type]=item;
 
      if(!Number.isInteger(x)||!Number.isInteger(y)||!Number.isInteger(z)||
-       !blockNames.includes(type)||Math.abs(x)>100||Math.abs(y)>100||Math.abs(z)>100)continue;
+       !blockNames.includes(type)||Math.abs(y)>100)continue;
+
+     // Remove blocks outside the new 20 x 20 world.
+     // Old stone blocks are discarded because stone is not in blockNames.
+     if(x < -10 || x > 9 || z < -10 || z > 9)continue;
 
      addBlock(x,y,z,type);
     }
 
     if(blocks.size>0){
      document.getElementById("status").textContent="WORLD LOADED ✓";
+     saveWorld();
      return;
     }
    }
@@ -575,6 +703,8 @@ blockNames.forEach((type,i)=>{
 });
 
 function selectBlock(type){
+ if(!blockNames.includes(type))return;
+
  selectedBlock=type;
 
  [...hotbar.children].forEach((slot,i)=>{
@@ -593,6 +723,93 @@ pickaxeHud.id="pickaxe-hud";
 document.body.appendChild(pickaxeHud);
 
 // =====================
+// HUB WORLD
+// =====================
+
+function enterHub(){
+ if(hubMode)return;
+
+ normalWorldSnapshot=[...blocks.values()].map(m=>{
+  const {x,y,z,type}=m.userData;
+  return [x,y,z,type];
+ });
+
+ normalPlayerPosition=camera.position.clone();
+ normalYaw=yaw;
+ normalPitch=pitch;
+
+ hubMode=true;
+ mobileReset.style.display="none";
+
+ clearWorld();
+
+ // The hub keeps its stone floor and walls.
+ for(let x=-12;x<=12;x++){
+  for(let z=-12;z<=12;z++){
+   addBlock(x,0,z,"stone");
+  }
+ }
+
+ for(let y=1;y<=4;y++){
+  for(let i=-12;i<=12;i++){
+   addBlock(i,y,-12,"stone");
+   addBlock(i,y,12,"stone");
+   addBlock(-12,y,i,"stone");
+   addBlock(12,y,i,"stone");
+  }
+ }
+
+ camera.position.set(0,2.6,0);
+ yaw=0;
+ pitch=0;
+ velocityY=0;
+ canJump=false;
+
+ for(const code in keys)keys[code]=false;
+
+ updateCameraRotation();
+
+ document.getElementById("status").textContent="HUB WORLD — NOT SAVED";
+
+ if(!mobileDevice.matches)renderer.domElement.requestPointerLock();
+}
+
+function leaveHub(){
+ if(!hubMode)return;
+
+ clearWorld();
+
+ if(normalWorldSnapshot){
+  for(const [x,y,z,type] of normalWorldSnapshot){
+   addBlock(x,y,z,type);
+  }
+ }
+
+ if(normalPlayerPosition){
+  camera.position.copy(normalPlayerPosition);
+ }else{
+  camera.position.set(0,2.6,5);
+ }
+
+ yaw=normalYaw;
+ pitch=normalPitch;
+ velocityY=0;
+ canJump=false;
+
+ for(const code in keys)keys[code]=false;
+
+ hubMode=false;
+ mobileReset.style.display="block";
+
+ normalWorldSnapshot=null;
+ normalPlayerPosition=null;
+
+ updateCameraRotation();
+
+ document.getElementById("status").textContent="WORLD RESTORED";
+}
+
+// =====================
 // START / STOP GAME
 // =====================
 
@@ -602,12 +819,14 @@ function startMobileGame(){
  pickaxeHud.style.display="none";
 
  mobileControls.style.display=mobileDevice.matches?"block":"none";
- mobileReset.style.display="block";
+ mobileReset.style.display=hubMode?"none":"block";
 
  updateCameraRotation();
 }
 
 document.getElementById("play").addEventListener("click",()=>{
+ if(hubMode)leaveHub();
+
  if(mobileDevice.matches){
   startMobileGame();
  }else{
@@ -615,9 +834,12 @@ document.getElementById("play").addEventListener("click",()=>{
  }
 });
 
-// BACK BUTTON
-document.getElementById("backBtn").addEventListener("click",()=>{
- window.location.href="index.html";
+document.getElementById("joinHub").addEventListener("click",()=>{
+ enterHub();
+
+ if(mobileDevice.matches){
+  startMobileGame();
+ }
 });
 
 document.addEventListener("pointerlockchange",()=>{
@@ -629,6 +851,8 @@ document.addEventListener("pointerlockchange",()=>{
  mobileControls.style.display="none";
 
  for(const code in keys)keys[code]=false;
+
+ if(!isLocked&&hubMode)leaveHub();
 });
 
 document.addEventListener("mousemove",event=>{
@@ -659,7 +883,6 @@ document.addEventListener("keydown",event=>{
 
  if(event.code==="Digit1")selectBlock("grass");
  if(event.code==="Digit2")selectBlock("dirt");
- if(event.code==="Digit3")selectBlock("stone");
 
  if(event.code==="Escape"&&mobileDevice.matches&&isLocked){
   event.preventDefault();
@@ -711,6 +934,8 @@ function stopMobileGame(){
 
  for(const code in keys)keys[code]=false;
 
+ if(hubMode)leaveHub();
+
  overlay.style.display="flex";
  pickaxeHud.style.display="block";
  mobileControls.style.display="none";
@@ -731,7 +956,7 @@ document.getElementById("mobileMenu").addEventListener("click",()=>{
 });
 
 document.getElementById("mobileReset").addEventListener("click",()=>{
- if(!mobileDevice.matches||!isLocked)return;
+ if(!mobileDevice.matches||!isLocked||hubMode)return;
 
  clearTimeout(saveTimer);
 
@@ -807,7 +1032,7 @@ renderer.domElement.addEventListener("pointermove",event=>{
 renderer.domElement.addEventListener("pointerup",event=>{
  if(!mobileDevice.matches||event.pointerId!==lookPointerId)return;
 
- if(!touchMoved&&isLocked){
+ if(!touchMoved&&isLocked&&!hubMode){
   placeBlockAtCrosshair();
  }
 
@@ -823,7 +1048,7 @@ renderer.domElement.addEventListener("pointercancel",()=>{
 document.getElementById("mobilePlace").addEventListener("pointerdown",event=>{
  event.preventDefault();
 
- if(isLocked){
+ if(isLocked&&!hubMode){
   placeBlockAtCrosshair();
  }
 });
@@ -841,7 +1066,7 @@ function getTargetBlock(){
 }
 
 function placeBlockAtCrosshair(){
- if(!isLocked)return;
+ if(!isLocked||hubMode)return;
 
  const hit=getTargetBlock();
  if(!hit)return;
@@ -870,7 +1095,8 @@ function placeBlockAtCrosshair(){
 }
 
 document.addEventListener("mousedown",event=>{
- if(!isLocked||mobileDevice.matches)return;
+ if(!isLocked||hubMode)return;
+ if(mobileDevice.matches)return;
  if(event.button!==0&&event.button!==2)return;
 
  const hit=getTargetBlock();
@@ -993,12 +1219,22 @@ animatePickaxe();
 // =====================
 
 document.getElementById("saveBtn").addEventListener("click",()=>{
+ if(hubMode){
+  showMessage("Hub world cannot be saved!");
+  return;
+ }
+
  if(saveWorld()){
   showMessage("World saved successfully!");
  }
 });
 
 document.getElementById("resetBtn").addEventListener("click",()=>{
+ if(hubMode){
+  showMessage("Leave the hub before creating a new world.");
+  return;
+ }
+
  if(!confirm("Are you sure you want to create a new world?"))return;
 
  localStorage.removeItem(SAVE_KEY);
@@ -1018,27 +1254,58 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
 });
 
 // =====================
-// CODE MACHINE
-// OPERATOR CODES DO NOTHING
+// CODE MACHINE — OPERATOR
 // =====================
 
 const codeMachineInput=document.getElementById("codeMachineInput");
 const codeMachineCheck=document.getElementById("codeMachineCheck");
 
+const operatorMenu=document.getElementById("operatorMenu");
+const operatorClose=document.getElementById("operatorClose");
+const operatorInput=document.getElementById("operatorInput");
+const operatorCheck=document.getElementById("operatorCheck");
+const operatorMessage=document.getElementById("operatorMessage");
+
+function openOperatorMenu(){
+ operatorMenu.style.display="block";
+ operatorInput.value="";
+ operatorMessage.textContent="";
+ operatorInput.focus();
+}
+
+function closeOperatorMenu(){
+ operatorMenu.style.display="none";
+}
+
 codeMachineCheck.addEventListener("click",()=>{
  const code=codeMachineInput.value.trim().toUpperCase();
 
  if(code==="OP"||code==="OPERATOR"){
-  showMessage("INVALID CODE");
+  openOperatorMenu();
  }else{
   showMessage("INVALID CODE");
  }
 });
 
 codeMachineInput.addEventListener("keydown",event=>{
- if(event.key==="Enter"){
-  codeMachineCheck.click();
+ if(event.key==="Enter")codeMachineCheck.click();
+});
+
+operatorClose.addEventListener("click",closeOperatorMenu);
+
+operatorCheck.addEventListener("click",()=>{
+ const code=operatorInput.value;
+
+ if(code==="/voxelTRY"){
+  window.location.href="voxel.html";
+ }else{
+  operatorMessage.textContent="INVALID CODE";
  }
+});
+
+operatorInput.addEventListener("keydown",event=>{
+ if(event.key==="Enter")operatorCheck.click();
+ if(event.key==="Escape")closeOperatorMenu();
 });
 
 // =====================
@@ -1074,7 +1341,8 @@ addEventListener("resize",()=>{
 
 addEventListener("beforeunload",()=>{
  clearTimeout(saveTimer);
- saveWorld();
+
+ if(!hubMode)saveWorld();
 });
 </script>
 </body>
