@@ -1258,7 +1258,14 @@ codeMachineCheck.addEventListener("click",()=>{
 operatorClose.addEventListener("click",closeOperatorMenu);
 
 operatorCheck.addEventListener("click",()=>{
- operatorMessage.textContent="INVALID CODE";
+ const code = operatorInput.value;
+
+ if(code === "/voxelTRY"){
+  window.location.href = "voxel.html";
+ }else{
+  operatorMessage.textContent = "INVALID CODE";
+ }
+});
 });
 
 operatorInput.addEventListener("keydown",event=>{
