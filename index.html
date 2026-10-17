@@ -1244,16 +1244,16 @@ function openOperatorMenu(){
 }
 
 function closeOperatorMenu(){
- operatorMenu.style.display="none";
-}
+codeMachineCheck.addEventListener("click", () => {
+  const code = codeMachineInput.value.trim().toUpperCase();
 
-codeMachineCheck.addEventListener("click",()=>{
- const code=codeMachineInput.value.trim().toUpperCase();
-
- if(code==="OP"||code==="OPERATOR"){
-  openOperatorMenu();
- }
+  if (code === "OP" || code === "OPERATOR") {
+    openOperatorMenu();
+  } else {
+    showMessage("INVALID CODE");
+  }
 });
+
 
 operatorClose.addEventListener("click",closeOperatorMenu);
 
