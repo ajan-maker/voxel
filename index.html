@@ -1227,57 +1227,54 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
 // CODE MACHINE — OPERATOR
 // =====================
 
-const codeMachineInput=document.getElementById("codeMachineInput");
-const codeMachineCheck=document.getElementById("codeMachineCheck");
+const codeMachineInput = document.getElementById("codeMachineInput");
+const codeMachineCheck = document.getElementById("codeMachineCheck");
 
-const operatorMenu=document.getElementById("operatorMenu");
-const operatorClose=document.getElementById("operatorClose");
-const operatorInput=document.getElementById("operatorInput");
-const operatorCheck=document.getElementById("operatorCheck");
-const operatorMessage=document.getElementById("operatorMessage");
+const operatorMenu = document.getElementById("operatorMenu");
+const operatorClose = document.getElementById("operatorClose");
+const operatorInput = document.getElementById("operatorInput");
+const operatorCheck = document.getElementById("operatorCheck");
+const operatorMessage = document.getElementById("operatorMessage");
 
 function openOperatorMenu(){
- operatorMenu.style.display="block";
- operatorInput.value="";
- operatorMessage.textContent="";
- operatorInput.focus();
+  operatorMenu.style.display = "block";
+  operatorInput.value = "";
+  operatorMessage.textContent = "";
+  operatorInput.focus();
 }
 
 function closeOperatorMenu(){
+  operatorMenu.style.display = "none";
+}
+
 codeMachineCheck.addEventListener("click", () => {
   const code = codeMachineInput.value.trim().toUpperCase();
 
-  if (code === "OP" || code === "OPERATOR") {
+  if(code === "OP" || code === "OPERATOR"){
     openOperatorMenu();
-  } else {
+  }else{
     showMessage("INVALID CODE");
   }
 });
 
-
-operatorClose.addEventListener("click",closeOperatorMenu);
-
-operatorCheck.addEventListener("click",()=>{
- const code = operatorInput.value;
-
- if(code === "/voxelTRY"){
-  window.location.href = "voxel.html";
- }else{
-  operatorMessage.textContent = "INVALID CODE";
- }
-});
+codeMachineInput.addEventListener("keydown", event => {
+  if(event.key === "Enter"){
+    codeMachineCheck.click();
+  }
 });
 
-operatorInput.addEventListener("keydown",event=>{
- if(event.key==="Enter"){
-  operatorCheck.click();
- }
+operatorClose.addEventListener("click", closeOperatorMenu);
 
- if(event.key==="Escape"){
-  closeOperatorMenu();
- }
+operatorCheck.addEventListener("click", () => {
+  const code = operatorInput.value;
+
+  if(code === "/voxelTRY"){
+    window.location.href = "voxel.html";
+  }else{
+    operatorMessage.textContent = "INVALID CODE";
+  }
 });
-
+ 
 // =====================
 // GAME LOOP
 // =====================
