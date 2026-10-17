@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,7 +32,6 @@ button:hover{background:#555e}
 #pickaxe-hud canvas{width:100%;height:100%}
 #message{position:fixed;top:100px;left:50%;transform:translateX(-50%);padding:8px 15px;background:#0009;border-radius:6px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30;white-space:nowrap}
 
-/* MOBILE CONTROLS */
 #mobileControls{
  display:none;
  position:fixed;
@@ -116,7 +116,6 @@ button:hover{background:#555e}
  #panel h1{margin-bottom:25px}
 }
 
-/* CODE MACHINE */
 #codeMachine{
  position:fixed;
  right:18px;
@@ -200,13 +199,12 @@ button:hover{background:#555e}
  SPACE — Jump<br>
  LEFT CLICK — Break block<br>
  RIGHT CLICK — Place block<br>
- 1 / 2 / 3 — Select block<br>
+ 1 / 2 — Select block<br>
  ESC — Return to menu
 </div>
 
 <div id="message"></div>
 
-<!-- MOBILE CONTROLS -->
 <div id="mobileControls" style="display:none">
  <button id="mobileReset">RESET</button>
  <button id="mobileMenu">MENU</button>
@@ -224,7 +222,6 @@ button:hover{background:#555e}
  </div>
 </div>
 
-<!-- MAIN MENU -->
 <div id="overlay">
  <div id="panel">
   <h1>VOXEL</h1>
@@ -282,25 +279,28 @@ scene.add(sun);
 
 // =====================
 // BLOCK SYSTEM
+// ONLY GRASS AND DIRT
 // =====================
 
 const materials={
  grass:new THREE.MeshLambertMaterial({color:0x55ad43}),
- dirt:new THREE.MeshLambertMaterial({color:0x80502e}),
- stone:new THREE.MeshLambertMaterial({color:0x858585})
+ dirt:new THREE.MeshLambertMaterial({color:0x80502e})
 };
 
-const blockNames=["grass","dirt","stone"];
-const blockColors=["#55ad43","#80502e","#858585"];
+const blockNames=["grass","dirt"];
+const blockColors=["#55ad43","#80502e"];
 const geometry=new THREE.BoxGeometry(1,1,1);
 const blocks=new Map();
 const key=(x,y,z)=>`${x},${y},${z}`;
 
 function addBlock(x,y,z,type){
+ if(type==="stone")return;
+ if(!materials[type])return;
+
  const k=key(x,y,z);
  if(blocks.has(k))return;
 
- const mesh=new THREE.Mesh(geometry,materials[type]||materials.grass);
+ const mesh=new THREE.Mesh(geometry,materials[type]);
  mesh.position.set(x,y,z);
  mesh.castShadow=true;
  mesh.receiveShadow=true;
@@ -330,7 +330,6 @@ function generateWorld(){
   for(let z=-12;z<12;z++){
    addBlock(x,0,z,"grass");
    addBlock(x,-1,z,"dirt");
-   addBlock(x,-2,z,"stone");
   }
  }
 
@@ -351,6 +350,7 @@ function generateWorld(){
 
 // =====================
 // SAVE / LOAD
+// OLD STONE BLOCKS ARE FILTERED OUT
 // =====================
 
 const SAVE_KEY="voxel-world-v1";
@@ -403,13 +403,17 @@ function loadWorld(){
      const [x,y,z,type]=item;
 
      if(!Number.isInteger(x)||!Number.isInteger(y)||!Number.isInteger(z)||
-       !blockNames.includes(type)||Math.abs(x)>100||Math.abs(y)>100||Math.abs(z)>100)continue;
+       !["grass","dirt"].includes(type)||
+       Math.abs(x)>100||Math.abs(y)>100||Math.abs(z)>100)continue;
 
      addBlock(x,y,z,type);
     }
 
     if(blocks.size>0){
      document.getElementById("status").textContent="WORLD LOADED ✓";
+
+     // Save the filtered world so removed stone blocks stay removed.
+     saveWorld();
      return;
     }
    }
@@ -575,6 +579,8 @@ blockNames.forEach((type,i)=>{
 });
 
 function selectBlock(type){
+ if(!blockNames.includes(type))return;
+
  selectedBlock=type;
 
  [...hotbar.children].forEach((slot,i)=>{
@@ -615,7 +621,6 @@ document.getElementById("play").addEventListener("click",()=>{
  }
 });
 
-// BACK BUTTON
 document.getElementById("backBtn").addEventListener("click",()=>{
  window.location.href="index.html";
 });
@@ -659,7 +664,6 @@ document.addEventListener("keydown",event=>{
 
  if(event.code==="Digit1")selectBlock("grass");
  if(event.code==="Digit2")selectBlock("dirt");
- if(event.code==="Digit3")selectBlock("stone");
 
  if(event.code==="Escape"&&mobileDevice.matches&&isLocked){
   event.preventDefault();
@@ -907,6 +911,7 @@ document.addEventListener("mousedown",event=>{
 
 // =====================
 // 3D STONE PICKAXE
+// KEPT IN THE MENU
 // =====================
 
 const pickScene=new THREE.Scene();
@@ -1019,20 +1024,13 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
 
 // =====================
 // CODE MACHINE
-// OPERATOR CODES DO NOTHING
 // =====================
 
 const codeMachineInput=document.getElementById("codeMachineInput");
 const codeMachineCheck=document.getElementById("codeMachineCheck");
 
 codeMachineCheck.addEventListener("click",()=>{
- const code=codeMachineInput.value.trim().toUpperCase();
-
- if(code==="OP"||code==="OPERATOR"){
-  showMessage("INVALID CODE");
- }else{
-  showMessage("INVALID CODE");
- }
+ showMessage("INVALID CODE");
 });
 
 codeMachineInput.addEventListener("keydown",event=>{
