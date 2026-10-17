@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,79 +29,113 @@ button:hover{background:#555e}
 #panel .menu-button:hover{background-color:#bd8259}
 #pickaxe-hud{position:fixed;right:25px;bottom:25px;width:190px;height:190px;pointer-events:none;z-index:11}
 #pickaxe-hud canvas{width:100%;height:100%}
-#message{position:fixed;top:100px;left:50%;transform:translateX(-50%);padding:8px 15px;background:#0009;border-radius:6px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:40;white-space:nowrap}
+#message{position:fixed;top:100px;left:50%;transform:translateX(-50%);padding:8px 15px;background:#0009;border-radius:6px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:60;white-space:nowrap}
 
 #mobileControls{
- display:none;
- position:fixed;
- inset:0;
- z-index:25;
- pointer-events:none;
- touch-action:none
+ display:none;position:fixed;inset:0;z-index:25;pointer-events:none;touch-action:none
 }
-#mobileReset{
- position:absolute;
- top:10px;
- left:10px;
- pointer-events:auto;
- background:#8b3030;
- border:2px solid #ffffffaa;
- min-width:108px;
- min-height:40px
-}
-#mobileMenu{
- position:absolute;
- top:58px;
- left:10px;
- pointer-events:auto;
- background:#222d;
- min-width:108px;
- min-height:40px
-}
-#mobileActions{
- position:absolute;
- top:106px;
- left:10px;
- display:flex;
- flex-direction:column;
- gap:8px;
- pointer-events:auto
-}
-#mobileActions button{
- min-width:108px;
- min-height:44px;
- background:#222d;
- border:2px solid #ffffff88
-}
+#mobileReset{position:absolute;top:10px;left:10px;pointer-events:auto;background:#8b3030;border:2px solid #ffffffaa;min-width:108px;min-height:40px}
+#mobileMenu{position:absolute;top:58px;left:10px;pointer-events:auto;background:#222d;min-width:108px;min-height:40px}
+#mobileActions{position:absolute;top:106px;left:10px;display:flex;flex-direction:column;gap:8px;pointer-events:auto}
+#mobileActions button{min-width:108px;min-height:44px;background:#222d;border:2px solid #ffffff88}
 #mobilePlace{background:#376b32!important}
 #mobileJump{background:#265b91!important}
-#mobileMove{
- position:absolute;
- left:10px;
- top:210px;
- width:150px;
- height:150px;
- pointer-events:auto
-}
-.moveBtn{
- position:absolute;
- width:48px;
- height:48px;
- padding:0;
- border:2px solid #ffffffaa;
- border-radius:10px;
- background:#222c;
- color:white;
- font-size:24px;
- touch-action:none;
- user-select:none;
- -webkit-user-select:none
-}
+#mobileMove{position:absolute;left:10px;top:210px;width:150px;height:150px;pointer-events:auto}
+.moveBtn{position:absolute;width:48px;height:48px;padding:0;border:2px solid #ffffffaa;border-radius:10px;background:#222c;color:white;font-size:24px;touch-action:none;user-select:none;-webkit-user-select:none}
 .moveBtn.active{background:#777e}
 #moveForward{top:0;left:51px}
 #moveLeft{top:51px;left:0}
 #moveBack{top:51px;left:51px}
 #moveRight{top:51px;left:102px}
+
+#codeMachine{
+ position:absolute;right:18px;bottom:18px;width:min(330px,calc(100vw - 24px));
+ padding:12px;background:#242424ee;border:2px solid #111;box-shadow:4px 4px 0 #0005;
+ color:white;text-align:left;z-index:25
+}
+#codeMachineTitle{margin-bottom:9px;font-size:14px;font-weight:900;letter-spacing:2px}
+#codeMachineRow{display:flex;gap:7px}
+#codeMachineInput{
+ flex:1;min-width:0;height:40px;padding:0 10px;background:#111;color:white;
+ border:2px solid #777;border-radius:0;outline:none;font-size:15px;
+ touch-action:auto;user-select:text;-webkit-user-select:text
+}
+#codeMachineInput:focus{border-color:#ddd}
+#codeMachineCheck{width:44px;min-width:44px;height:40px;padding:0;border:2px solid #6b9561;border-radius:0;background:#387b35;color:white;font-size:25px;cursor:pointer}
+#codeMachineCheck:hover{background:#489544}
+
+/* NORMAL VERITY */
+#verityButton{
+ position:absolute;top:18px;right:18px;display:none;padding:14px 25px;
+ background:#ffdf32;color:#171717;border:3px solid #b99b00;border-radius:0;
+ font-size:20px;font-weight:900;letter-spacing:2px;z-index:30
+}
+#verityButton:hover{background:#ffed70}
+#verityPanel{
+ display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+ width:min(440px,90vw);padding:22px;background:#ffdf32;border:4px solid #b99b00;
+ box-shadow:8px 8px 0 #0005;color:#171717;text-align:left;z-index:31
+}
+#verityHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;font-size:25px;font-weight:900;letter-spacing:3px}
+#verityClose{width:40px;height:40px;padding:0;background:#222;color:white;border:2px solid #111;border-radius:0;font-size:22px}
+#verityRow{display:flex;gap:8px}
+#verityInput{flex:1;min-width:0;height:44px;padding:0 10px;background:#fff7bd;color:#171717;border:3px solid #b99b00;border-radius:0;outline:none;font-size:15px;user-select:text;-webkit-user-select:text;touch-action:auto}
+#verityInput:focus{border-color:#171717}
+#veritySend{width:48px;min-width:48px;height:44px;padding:0;background:#222;color:white;border:2px solid #111;border-radius:0;font-size:24px}
+#verityResponse{min-height:42px;margin-top:16px;padding:10px;background:#f7d52a;border:2px solid #b99b00;font-weight:900;overflow-wrap:anywhere}
+
+/* ADMIN LOGIN */
+#adminPanel{
+ display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+ width:min(390px,92vw);padding:22px;background:#080808;color:white;
+ border:3px solid #555;box-shadow:8px 8px 0 #0007;z-index:45
+}
+#adminTitle{font-size:22px;font-weight:900;letter-spacing:3px;margin-bottom:18px}
+.adminLabel{display:block;font-size:12px;letter-spacing:2px;font-weight:bold;margin:12px 0 6px}
+.adminInput{
+ width:100%;height:42px;padding:0 10px;background:#171717;color:white;
+ border:2px solid #555;border-radius:0;outline:none;font-size:15px;
+ touch-action:auto;user-select:text;-webkit-user-select:text
+}
+.adminInput:focus{border-color:white}
+#adminLoginButton,#adminCodeButton{
+ width:100%;height:42px;margin-top:14px;background:#eee;color:#111;
+ border:2px solid #999;border-radius:0;font-weight:900
+}
+#adminError{min-height:20px;margin-top:12px;color:#ff5b5b;font-size:12px;font-weight:bold;overflow-wrap:anywhere}
+#adminCodeSection{display:none;margin-top:20px;padding-top:18px;border-top:1px solid #555}
+#adminClose{position:absolute;top:10px;right:10px;width:30px;height:30px;padding:0;background:#222;border:1px solid #777;border-radius:0}
+#adminCodeInput{width:100%;height:42px;padding:0 10px;background:#171717;color:white;border:2px solid #555;border-radius:0;font-size:15px;outline:none;touch-action:auto;user-select:text;-webkit-user-select:text}
+#adminCodeInput:focus{border-color:white}
+#adminCodeMessage{min-height:20px;margin-top:10px;color:#ff6464;font-size:12px;font-weight:bold;overflow-wrap:anywhere}
+
+/* SPECIAL VERITY — ADMIN ONLY */
+#adminVerityPanel{
+ display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+ width:min(470px,92vw);padding:22px;background:#ffdf32;color:#171717;
+ border:4px solid #b99b00;box-shadow:8px 8px 0 #0005;z-index:46
+}
+#adminVerityHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;font-size:25px;font-weight:900;letter-spacing:3px}
+#adminVerityClose{width:40px;height:40px;padding:0;background:#222;color:white;border:2px solid #111;border-radius:0;font-size:22px}
+#commandsButton{width:100%;min-height:44px;background:#222;color:white;border:2px solid #111;border-radius:0;font-weight:900;letter-spacing:2px}
+#commandsButton:hover{background:#444}
+#adminVerityStatus{margin-top:15px;padding:10px;min-height:42px;background:#f7d52a;border:2px solid #b99b00;font-weight:900;overflow-wrap:anywhere}
+
+/* VERITY COMMANDS */
+#commandsPanel{
+ display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+ width:min(470px,92vw);padding:22px;background:#ffdf32;color:#171717;
+ border:4px solid #b99b00;box-shadow:8px 8px 0 #0005;z-index:47
+}
+#commandsHeader{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;font-size:22px;font-weight:900;letter-spacing:2px}
+#commandsClose{width:38px;height:38px;padding:0;background:#222;color:white;border:2px solid #111;border-radius:0;font-size:21px}
+#commandList{padding:12px;background:#f7d52a;border:2px solid #b99b00;font-weight:900}
+#commandList div{margin:5px 0}
+#commandInputRow{display:flex;gap:8px;margin-top:12px}
+#commandInput{flex:1;min-width:0;height:42px;padding:0 10px;background:#fff7bd;color:#171717;border:3px solid #b99b00;border-radius:0;font-size:15px;outline:none;touch-action:auto;user-select:text;-webkit-user-select:text}
+#commandCheck{width:48px;min-width:48px;height:42px;padding:0;background:#222;color:white;border:2px solid #111;border-radius:0;font-size:22px}
+#commandResponse{margin-top:12px;padding:10px;min-height:40px;background:#f7d52a;border:2px solid #b99b00;font-weight:900;overflow-wrap:anywhere}
+#moreComing{margin-top:15px;text-align:center;font-size:13px;font-weight:900;letter-spacing:2px}
 
 @media(pointer:coarse),(max-width:800px){
  #help,#buttons{display:none}
@@ -114,161 +147,9 @@ button:hover{background:#555e}
  #pickaxe-hud{right:5px;bottom:5px;width:110px;height:110px}
  #panel .menu-button{min-height:75px;margin-bottom:18px}
  #panel h1{margin-bottom:25px}
-}
-
-#codeMachine{
- position:absolute;
- right:18px;
- bottom:18px;
- width:min(330px,calc(100vw - 24px));
- padding:12px;
- background:#242424ee;
- border:2px solid #111;
- box-shadow:4px 4px 0 #0005;
- color:white;
- text-align:left;
- z-index:25
-}
-#codeMachineTitle{
- margin-bottom:9px;
- font-size:14px;
- font-weight:900;
- letter-spacing:2px
-}
-#codeMachineRow{display:flex;gap:7px}
-#codeMachineInput{
- flex:1;
- min-width:0;
- height:40px;
- padding:0 10px;
- background:#111;
- color:white;
- border:2px solid #777;
- border-radius:0;
- outline:none;
- font-size:15px;
- touch-action:auto;
- user-select:text;
- -webkit-user-select:text
-}
-#codeMachineInput:focus{border-color:#ddd}
-#codeMachineCheck{
- width:44px;
- min-width:44px;
- height:40px;
- padding:0;
- border:2px solid #6b9561;
- border-radius:0;
- background:#387b35;
- color:white;
- font-size:25px;
- cursor:pointer
-}
-#codeMachineCheck:hover{background:#489544}
-
-/* VERITY BUTTON — ONLY ON THE MENU */
-#verityButton{
- position:absolute;
- top:18px;
- right:18px;
- display:none;
- padding:14px 25px;
- background:#ffdf32;
- color:#171717;
- border:3px solid #b99b00;
- border-radius:0;
- font-size:20px;
- font-weight:900;
- letter-spacing:2px;
- z-index:30
-}
-#verityButton:hover{background:#ffed70}
-
-/* VERITY YELLOW PANEL */
-#verityPanel{
- display:none;
- position:absolute;
- top:50%;
- left:50%;
- transform:translate(-50%,-50%);
- width:min(440px,90vw);
- padding:22px;
- background:#ffdf32;
- border:4px solid #b99b00;
- box-shadow:8px 8px 0 #0005;
- color:#171717;
- text-align:left;
- z-index:31
-}
-#verityHeader{
- display:flex;
- justify-content:space-between;
- align-items:center;
- margin-bottom:18px;
- font-size:25px;
- font-weight:900;
- letter-spacing:3px
-}
-#verityClose{
- width:40px;
- height:40px;
- padding:0;
- background:#222;
- color:white;
- border:2px solid #111;
- border-radius:0;
- font-size:22px
-}
-#verityRow{display:flex;gap:8px}
-#verityInput{
- flex:1;
- min-width:0;
- height:44px;
- padding:0 10px;
- background:#fff7bd;
- color:#171717;
- border:3px solid #b99b00;
- border-radius:0;
- outline:none;
- font-size:15px;
- user-select:text;
- -webkit-user-select:text;
- touch-action:auto
-}
-#verityInput:focus{border-color:#171717}
-#veritySend{
- width:48px;
- min-width:48px;
- height:44px;
- padding:0;
- background:#222;
- color:white;
- border:2px solid #111;
- border-radius:0;
- font-size:24px
-}
-#verityResponse{
- min-height:42px;
- margin-top:16px;
- padding:10px;
- background:#f7d52a;
- border:2px solid #b99b00;
- font-weight:900;
- overflow-wrap:anywhere
-}
-
-@media(pointer:coarse),(max-width:800px){
- #codeMachine{
-  right:8px;
-  bottom:8px;
-  width:min(290px,calc(100vw - 16px))
- }
- #verityButton{
-  top:10px;
-  right:10px;
-  padding:10px 14px;
-  font-size:15px
- }
+ #codeMachine{right:8px;bottom:8px;width:min(290px,calc(100vw - 16px))}
+ #verityButton{top:10px;right:10px;padding:10px 14px;font-size:15px}
+ #adminPanel,#adminVerityPanel,#commandsPanel{padding:17px}
 }
 </style>
 
@@ -305,12 +186,10 @@ button:hover{background:#555e}
 <div id="mobileControls" style="display:none">
  <button id="mobileReset">RESET</button>
  <button id="mobileMenu">MENU</button>
-
  <div id="mobileActions">
   <button id="mobileJump">JUMP ↑</button>
   <button id="mobilePlace">PLACE BLOCK</button>
  </div>
-
  <div id="mobileMove">
   <button class="moveBtn" id="moveForward">▲</button>
   <button class="moveBtn" id="moveLeft">◀</button>
@@ -329,39 +208,76 @@ button:hover{background:#555e}
  <div id="codeMachine">
   <div id="codeMachineTitle">CODE MACHINE</div>
   <div id="codeMachineRow">
-   <input
-    id="codeMachineInput"
-    type="text"
-    placeholder="Enter code..."
-    autocomplete="off"
-    spellcheck="false"
-    aria-label="Enter code"
-   >
+   <input id="codeMachineInput" type="text" placeholder="Enter code..." autocomplete="off" spellcheck="false" aria-label="Enter code">
    <button id="codeMachineCheck" type="button" aria-label="Check code">✓</button>
   </div>
  </div>
 
  <button id="verityButton" type="button">VERITY</button>
 
+ <!-- Normal Verity screen: no COMMANDS button here -->
  <div id="verityPanel">
   <div id="verityHeader">
    <span>VERITY</span>
    <button id="verityClose" type="button">X</button>
   </div>
-
   <div id="verityRow">
-   <input
-    id="verityInput"
-    type="text"
-    placeholder="Type something..."
-    autocomplete="off"
-    spellcheck="false"
-    aria-label="Message to Verity"
-   >
+   <input id="verityInput" type="text" placeholder="Type something..." autocomplete="off" spellcheck="false" aria-label="Message to Verity">
    <button id="veritySend" type="button" aria-label="Check message">✓</button>
   </div>
-
   <div id="verityResponse">VERITY IS LISTENING...</div>
+ </div>
+
+ <!-- ADMIN LOGIN -->
+ <div id="adminPanel">
+  <button id="adminClose" type="button">X</button>
+  <div id="adminTitle">ADMIN LOGIN</div>
+
+  <label class="adminLabel" for="adminUser">USER</label>
+  <input class="adminInput" id="adminUser" type="text" placeholder="Enter user" autocomplete="off" spellcheck="false">
+
+  <label class="adminLabel" for="adminPassword">PASSWORD</label>
+  <input class="adminInput" id="adminPassword" type="password" placeholder="Enter password" autocomplete="off">
+
+  <button id="adminLoginButton" type="button">LOGIN</button>
+  <div id="adminError" aria-live="polite"></div>
+
+  <div id="adminCodeSection">
+   <label class="adminLabel" for="adminCodeInput">ENTER CODE</label>
+   <input id="adminCodeInput" type="text" placeholder="Enter code..." autocomplete="off" spellcheck="false">
+   <button id="adminCodeButton" type="button">ENTER / CODE</button>
+   <div id="adminCodeMessage" aria-live="polite"></div>
+  </div>
+ </div>
+
+ <!-- VERITY SCREEN THAT REQUIRES ADMIN ACCESS -->
+ <div id="adminVerityPanel">
+  <div id="adminVerityHeader">
+   <span>VERITY</span>
+   <button id="adminVerityClose" type="button">X</button>
+  </div>
+  <button id="commandsButton" type="button">COMMANDS</button>
+  <div id="adminVerityStatus">VERITY IS LISTENING...</div>
+ </div>
+
+ <!-- COMMANDS SCREEN -->
+ <div id="commandsPanel">
+  <div id="commandsHeader">
+   <span>VERITY COMMANDS</span>
+   <button id="commandsClose" type="button">X</button>
+  </div>
+
+  <div id="commandList">
+   <div>/SAY.HI</div>
+  </div>
+
+  <div id="commandInputRow">
+   <input id="commandInput" type="text" placeholder="Enter command..." autocomplete="off" spellcheck="false">
+   <button id="commandCheck" type="button">✓</button>
+  </div>
+
+  <div id="commandResponse">ENTER A COMMAND</div>
+  <div id="moreComing">MORE COMING SOON...</div>
  </div>
 </div>
 
@@ -376,9 +292,7 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87ceeb);
 scene.fog = new THREE.Fog(0x87ceeb,25,65);
 
-const camera = new THREE.PerspectiveCamera(
- 75,innerWidth/innerHeight,.1,1000
-);
+const camera = new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1000);
 
 const renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(innerWidth,innerHeight);
@@ -402,7 +316,6 @@ scene.add(sun);
 
 // =====================
 // BLOCK SYSTEM
-// ONLY GRASS AND DIRT
 // =====================
 
 const materials={
@@ -419,10 +332,8 @@ const key=(x,y,z)=>`${x},${y},${z}`;
 function addBlock(x,y,z,type){
  if(type==="stone")return;
  if(!materials[type])return;
-
  const k=key(x,y,z);
  if(blocks.has(k))return;
-
  const mesh=new THREE.Mesh(geometry,materials[type]);
  mesh.position.set(x,y,z);
  mesh.castShadow=true;
@@ -434,7 +345,6 @@ function addBlock(x,y,z,type){
 
 function removeBlock(mesh){
  if(mobileDevice.matches)return;
-
  const {x,y,z}=mesh.userData;
  scene.remove(mesh);
  blocks.delete(key(x,y,z));
@@ -448,27 +358,20 @@ function clearWorld(){
 
 function generateWorld(){
  clearWorld();
-
  for(let x=-12;x<12;x++){
   for(let z=-12;z<12;z++){
    addBlock(x,0,z,"grass");
    addBlock(x,-1,z,"dirt");
   }
  }
-
  const trees=[[-7,-6],[6,-8],[-8,5],[8,6],[3,9]];
-
  for(const [x,z] of trees){
   for(let y=1;y<=3;y++)addBlock(x,y,z,"dirt");
-
   for(let dx=-1;dx<=1;dx++){
    for(let dz=-1;dz<=1;dz++){
-    for(let y=3;y<=4;y++){
-     addBlock(x+dx,y,z+dz,"grass");
-    }
+    for(let y=3;y<=4;y++)addBlock(x+dx,y,z+dz,"grass");
    }
   }
-
   addBlock(x,5,z,"grass");
  }
 }
@@ -494,7 +397,6 @@ function saveWorld(){
    const {x,y,z,type}=m.userData;
    return [x,y,z,type];
   });
-
   localStorage.setItem(SAVE_KEY,JSON.stringify(data));
   document.getElementById("status").textContent="WORLD SAVED ✓";
   return true;
@@ -514,25 +416,18 @@ function scheduleSave(){
 function loadWorld(){
  try{
   const raw=localStorage.getItem(SAVE_KEY);
-
   if(raw){
    const data=JSON.parse(raw);
-
    if(Array.isArray(data)&&data.length>0&&data.length<10000){
     clearWorld();
-
     for(const item of data){
      if(!Array.isArray(item)||item.length!==4)continue;
-
      const [x,y,z,type]=item;
-
      if(!Number.isInteger(x)||!Number.isInteger(y)||!Number.isInteger(z)||
        !["grass","dirt"].includes(type)||
        Math.abs(x)>100||Math.abs(y)>100||Math.abs(z)>100)continue;
-
      addBlock(x,y,z,type);
     }
-
     if(blocks.size>0){
      document.getElementById("status").textContent="WORLD LOADED ✓";
      saveWorld();
@@ -543,7 +438,6 @@ function loadWorld(){
  }catch(e){
   console.warn("Could not load saved world.",e);
  }
-
  generateWorld();
  saveWorld();
 }
@@ -555,12 +449,10 @@ loadWorld();
 // =====================
 
 camera.position.set(0,2.6,5);
-
 let yaw=0,pitch=0;
 let selectedBlock="grass";
 let isLocked=false;
 let velocityY=0,canJump=false;
-
 const keys={};
 const playerRadius=.3;
 const playerHeight=1.8;
@@ -581,84 +473,57 @@ function collidesAt(px,py,pz){
  const minX=px-playerRadius,maxX=px+playerRadius;
  const minY=py-playerHeight,maxY=py;
  const minZ=pz-playerRadius,maxZ=pz+playerRadius;
-
  for(let x=Math.floor(minX-.5);x<=Math.ceil(maxX+.5);x++){
   for(let y=Math.floor(minY-.5);y<=Math.ceil(maxY+.5);y++){
    for(let z=Math.floor(minZ-.5);z<=Math.ceil(maxZ+.5);z++){
     if(!blocks.has(key(x,y,z)))continue;
-
-    if(maxX>x-.499&&minX<x+.499&&
-       maxY>y-.499&&minY<y+.499&&
-       maxZ>z-.499&&minZ<z+.499)return true;
+    if(maxX>x-.499&&minX<x+.499&&maxY>y-.499&&minY<y+.499&&maxZ>z-.499&&minZ<z+.499)return true;
    }
   }
  }
-
  return false;
 }
 
 function findLandingHeight(px,currentY,nextY,pz){
  const currentFeet=currentY-playerHeight;
  const nextFeet=nextY-playerHeight;
-
  if(nextFeet>=currentFeet)return null;
-
  let landingTop=-Infinity;
-
  for(let x=Math.floor(px-playerRadius-.5);x<=Math.ceil(px+playerRadius+.5);x++){
   for(let z=Math.floor(pz-playerRadius-.5);z<=Math.ceil(pz+playerRadius+.5);z++){
    for(let y=Math.floor(nextFeet-.5);y<=Math.ceil(currentFeet+.5);y++){
     if(!blocks.has(key(x,y,z)))continue;
-
     const overlapsX=px+playerRadius>x-.499&&px-playerRadius<x+.499;
     const overlapsZ=pz+playerRadius>z-.499&&pz-playerRadius<z+.499;
     const top=y+.5;
-
-    if(overlapsX&&overlapsZ&&currentFeet>=top-.01&&nextFeet<=top&&top>landingTop){
-     landingTop=top;
-    }
+    if(overlapsX&&overlapsZ&&currentFeet>=top-.01&&nextFeet<=top&&top>landingTop)landingTop=top;
    }
   }
  }
-
  return landingTop===-Infinity?null:landingTop;
 }
 
 function updatePlayer(delta){
  const speed=5.5;
-
  const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
  const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
  const direction=new THREE.Vector3();
-
  if(keys.KeyW)direction.add(forward);
  if(keys.KeyS)direction.sub(forward);
  if(keys.KeyD)direction.add(right);
  if(keys.KeyA)direction.sub(right);
-
  if(direction.lengthSq()>0){
   direction.normalize().multiplyScalar(speed*delta);
-
   const nextX=camera.position.x+direction.x;
-
-  if(!collidesAt(nextX,camera.position.y,camera.position.z)){
-   camera.position.x=nextX;
-  }
-
+  if(!collidesAt(nextX,camera.position.y,camera.position.z))camera.position.x=nextX;
   const nextZ=camera.position.z+direction.z;
-
-  if(!collidesAt(camera.position.x,camera.position.y,nextZ)){
-   camera.position.z=nextZ;
-  }
+  if(!collidesAt(camera.position.x,camera.position.y,nextZ))camera.position.z=nextZ;
  }
-
  const oldY=camera.position.y;
  velocityY=Math.max(velocityY-20*delta,-35);
  const nextY=oldY+velocityY*delta;
-
  if(velocityY<=0){
   const top=findLandingHeight(camera.position.x,oldY,nextY,camera.position.z);
-
   if(top!==null){
    camera.position.y=top+playerHeight;
    velocityY=0;
@@ -668,15 +533,10 @@ function updatePlayer(delta){
    canJump=false;
   }
  }else{
-  if(collidesAt(camera.position.x,nextY,camera.position.z)){
-   velocityY=0;
-  }else{
-   camera.position.y=nextY;
-  }
-
+  if(collidesAt(camera.position.x,nextY,camera.position.z))velocityY=0;
+  else camera.position.y=nextY;
   canJump=false;
  }
-
  if(camera.position.y < -20){
   camera.position.set(0,2.6,5);
   velocityY=0;
@@ -689,25 +549,18 @@ function updatePlayer(delta){
 // =====================
 
 const hotbar=document.getElementById("hotbar");
-
 blockNames.forEach((type,i)=>{
  const slot=document.createElement("div");
-
  slot.className="slot"+(i===0?" selected":"");
  slot.innerHTML=`<div class="swatch" style="background:${blockColors[i]}"></div>${i+1}: ${type.toUpperCase()}`;
  slot.addEventListener("click",()=>selectBlock(type));
-
  hotbar.appendChild(slot);
 });
 
 function selectBlock(type){
  if(!blockNames.includes(type))return;
-
  selectedBlock=type;
-
- [...hotbar.children].forEach((slot,i)=>{
-  slot.classList.toggle("selected",blockNames[i]===type);
- });
+ [...hotbar.children].forEach((slot,i)=>slot.classList.toggle("selected",blockNames[i]===type));
 }
 
 // =====================
@@ -716,7 +569,6 @@ function selectBlock(type){
 
 const overlay=document.getElementById("overlay");
 const pickaxeHud=document.createElement("div");
-
 pickaxeHud.id="pickaxe-hud";
 document.body.appendChild(pickaxeHud);
 
@@ -728,10 +580,9 @@ function startMobileGame(){
  isLocked=true;
  overlay.style.display="none";
  pickaxeHud.style.display="none";
-
  mobileControls.style.display=mobileDevice.matches?"block":"none";
  mobileReset.style.display="block";
-
+ closeAllSecretPanels();
  updateCameraRotation();
 }
 
@@ -749,22 +600,19 @@ document.getElementById("backBtn").addEventListener("click",()=>{
 
 document.addEventListener("pointerlockchange",()=>{
  if(mobileDevice.matches)return;
-
  isLocked=document.pointerLockElement===renderer.domElement;
  overlay.style.display=isLocked?"none":"flex";
  pickaxeHud.style.display=isLocked?"none":"block";
  mobileControls.style.display="none";
-
+ if(isLocked)closeAllSecretPanels();
  for(const code in keys)keys[code]=false;
 });
 
 document.addEventListener("mousemove",event=>{
  if(!isLocked||mobileDevice.matches)return;
-
  yaw-=event.movementX*.002;
  pitch-=event.movementY*.002;
  pitch=Math.max(-Math.PI/2+.01,Math.min(Math.PI/2-.01,pitch));
-
  updateCameraRotation();
 });
 
@@ -773,20 +621,20 @@ document.addEventListener("mousemove",event=>{
 // =====================
 
 document.addEventListener("keydown",event=>{
- keys[event.code]=true;
+ const active=document.activeElement;
+ const typing=active&&(active.tagName==="INPUT"||active.tagName==="TEXTAREA");
+ if(typing)return;
 
+ keys[event.code]=true;
  if(event.code==="Space"){
   event.preventDefault();
-
   if(canJump&&isLocked){
    velocityY=7;
    canJump=false;
   }
  }
-
  if(event.code==="Digit1")selectBlock("grass");
  if(event.code==="Digit2")selectBlock("dirt");
-
  if(event.code==="Escape"&&mobileDevice.matches&&isLocked){
   event.preventDefault();
   stopMobileGame();
@@ -805,21 +653,17 @@ document.addEventListener("contextmenu",event=>event.preventDefault());
 
 function mobileButton(id,keyCode){
  const btn=document.getElementById(id);
-
  btn.addEventListener("pointerdown",event=>{
   event.preventDefault();
   event.stopPropagation();
-
   btn.setPointerCapture(event.pointerId);
   keys[keyCode]=true;
   btn.classList.add("active");
  });
-
  function release(){
   keys[keyCode]=false;
   btn.classList.remove("active");
  }
-
  btn.addEventListener("pointerup",release);
  btn.addEventListener("pointercancel",release);
  btn.addEventListener("lostpointercapture",release);
@@ -834,12 +678,11 @@ function stopMobileGame(){
  isLocked=false;
  mobileLooking=false;
  lookPointerId=null;
-
  for(const code in keys)keys[code]=false;
-
  overlay.style.display="flex";
  pickaxeHud.style.display="block";
  mobileControls.style.display="none";
+ closeAllSecretPanels();
 }
 
 // =====================
@@ -848,40 +691,29 @@ function stopMobileGame(){
 
 document.getElementById("mobileMenu").addEventListener("click",()=>{
  if(!mobileDevice.matches)return;
-
- if(isLocked){
-  stopMobileGame();
- }else{
-  overlay.style.display="flex";
- }
+ if(isLocked)stopMobileGame();
+ else overlay.style.display="flex";
 });
 
 document.getElementById("mobileReset").addEventListener("click",()=>{
  if(!mobileDevice.matches||!isLocked)return;
-
  clearTimeout(saveTimer);
-
  localStorage.removeItem(SAVE_KEY);
  generateWorld();
-
  camera.position.set(0,2.6,5);
  yaw=0;
  pitch=0;
  velocityY=0;
  canJump=false;
-
  for(const code in keys)keys[code]=false;
-
  selectBlock("grass");
  updateCameraRotation();
-
  saveWorld();
  showMessage("World reset!");
 });
 
 document.getElementById("mobileJump").addEventListener("pointerdown",event=>{
  event.preventDefault();
-
  if(isLocked&&canJump){
   velocityY=7;
   canJump=false;
@@ -900,43 +732,29 @@ let touchMoved=false;
 
 renderer.domElement.addEventListener("pointerdown",event=>{
  if(!mobileDevice.matches||!isLocked||event.pointerType==="mouse")return;
-
  mobileLooking=true;
  lookPointerId=event.pointerId;
-
  lastTouchX=touchStartX=event.clientX;
  lastTouchY=touchStartY=event.clientY;
-
  touchMoved=false;
 });
 
 renderer.domElement.addEventListener("pointermove",event=>{
  if(!mobileDevice.matches||!mobileLooking||event.pointerId!==lookPointerId)return;
-
  const dx=event.clientX-lastTouchX;
  const dy=event.clientY-lastTouchY;
-
- if(Math.abs(event.clientX-touchStartX)>7||Math.abs(event.clientY-touchStartY)>7){
-  touchMoved=true;
- }
-
+ if(Math.abs(event.clientX-touchStartX)>7||Math.abs(event.clientY-touchStartY)>7)touchMoved=true;
  lastTouchX=event.clientX;
  lastTouchY=event.clientY;
-
  yaw-=dx*.006;
  pitch-=dy*.006;
  pitch=Math.max(-Math.PI/2+.01,Math.min(Math.PI/2-.01,pitch));
-
  updateCameraRotation();
 });
 
 renderer.domElement.addEventListener("pointerup",event=>{
  if(!mobileDevice.matches||event.pointerId!==lookPointerId)return;
-
- if(!touchMoved&&isLocked){
-  placeBlockAtCrosshair();
- }
-
+ if(!touchMoved&&isLocked)placeBlockAtCrosshair();
  mobileLooking=false;
  lookPointerId=null;
 });
@@ -948,10 +766,7 @@ renderer.domElement.addEventListener("pointercancel",()=>{
 
 document.getElementById("mobilePlace").addEventListener("pointerdown",event=>{
  event.preventDefault();
-
- if(isLocked){
-  placeBlockAtCrosshair();
- }
+ if(isLocked)placeBlockAtCrosshair();
 });
 
 // =====================
@@ -960,37 +775,25 @@ document.getElementById("mobilePlace").addEventListener("pointerdown",event=>{
 
 function getTargetBlock(){
  raycaster.setFromCamera(new THREE.Vector2(0,0),camera);
-
  const hits=raycaster.intersectObjects([...blocks.values()],false);
-
  return hits.length?hits[0]:null;
 }
 
 function placeBlockAtCrosshair(){
  if(!isLocked)return;
-
  const hit=getTargetBlock();
  if(!hit)return;
-
  const normal=hit.face.normal.clone();
  normal.transformDirection(hit.object.matrixWorld);
-
  const pos=hit.object.position.clone().add(normal);
-
- const x=Math.round(pos.x);
- const y=Math.round(pos.y);
- const z=Math.round(pos.z);
-
+ const x=Math.round(pos.x),y=Math.round(pos.y),z=Math.round(pos.z);
  if(blocks.has(key(x,y,z)))return;
-
  const overlapsPlayer=
   Math.abs(x-camera.position.x)<.5+playerRadius&&
   Math.abs(z-camera.position.z)<.5+playerRadius&&
   y+.5>camera.position.y-playerHeight&&
   y-.5<camera.position.y;
-
  if(overlapsPlayer)return;
-
  addBlock(x,y,z,selectedBlock);
  scheduleSave();
 }
@@ -998,34 +801,21 @@ function placeBlockAtCrosshair(){
 document.addEventListener("mousedown",event=>{
  if(!isLocked||mobileDevice.matches)return;
  if(event.button!==0&&event.button!==2)return;
-
  const hit=getTargetBlock();
  if(!hit)return;
-
- if(event.button===0){
-  removeBlock(hit.object);
- }
-
+ if(event.button===0)removeBlock(hit.object);
  if(event.button===2){
   const normal=hit.face.normal.clone();
   normal.transformDirection(hit.object.matrixWorld);
-
   const pos=hit.object.position.clone().add(normal);
-
-  const x=Math.round(pos.x);
-  const y=Math.round(pos.y);
-  const z=Math.round(pos.z);
-
+  const x=Math.round(pos.x),y=Math.round(pos.y),z=Math.round(pos.z);
   if(blocks.has(key(x,y,z)))return;
-
   const overlapsPlayer=
    Math.abs(x-camera.position.x)<.5+playerRadius&&
    Math.abs(z-camera.position.z)<.5+playerRadius&&
    y+.5>camera.position.y-playerHeight&&
    y-.5<camera.position.y;
-
   if(overlapsPlayer)return;
-
   addBlock(x,y,z,selectedBlock);
   scheduleSave();
  }
@@ -1033,7 +823,6 @@ document.addEventListener("mousedown",event=>{
 
 // =====================
 // 3D STONE PICKAXE
-// KEPT IN THE MENU
 // =====================
 
 const pickScene=new THREE.Scene();
@@ -1046,7 +835,6 @@ pickRenderer.setSize(190,190);
 pickaxeHud.appendChild(pickRenderer.domElement);
 
 pickScene.add(new THREE.HemisphereLight(0xffffff,0x49413a,2));
-
 const pickLight=new THREE.DirectionalLight(0xffffff,3);
 pickLight.position.set(3,5,6);
 pickScene.add(pickLight);
@@ -1058,32 +846,18 @@ const handle=new THREE.Mesh(
  new THREE.CylinderGeometry(.09,.13,1.9,7),
  new THREE.MeshStandardMaterial({color:0x986039,roughness:.85})
 );
-
 handle.rotation.z=-.55;
 handle.position.set(-.2,-.15,0);
 pickaxe.add(handle);
 
-const stoneMaterial=new THREE.MeshStandardMaterial({
- color:0x555b61,
- roughness:1,
- flatShading:true
-});
-
-const stoneHead=new THREE.Mesh(
- new THREE.IcosahedronGeometry(.52,0),
- stoneMaterial
-);
-
+const stoneMaterial=new THREE.MeshStandardMaterial({color:0x555b61,roughness:1,flatShading:true});
+const stoneHead=new THREE.Mesh(new THREE.IcosahedronGeometry(.52,0),stoneMaterial);
 stoneHead.scale.set(1.65,.65,.7);
 stoneHead.rotation.z=-.35;
 stoneHead.position.set(.45,.72,0);
 pickaxe.add(stoneHead);
 
-const stoneTip=new THREE.Mesh(
- new THREE.ConeGeometry(.28,.65,5),
- stoneMaterial
-);
-
+const stoneTip=new THREE.Mesh(new THREE.ConeGeometry(.28,.65,5),stoneMaterial);
 stoneTip.rotation.z=-1.15;
 stoneTip.position.set(1.05,.88,0);
 pickaxe.add(stoneTip);
@@ -1092,27 +866,22 @@ const binding=new THREE.Mesh(
  new THREE.CylinderGeometry(.15,.15,.22,8),
  new THREE.MeshStandardMaterial({color:0xb47743})
 );
-
 binding.position.set(-.05,.15,0);
 binding.rotation.z=-.55;
 pickaxe.add(binding);
 
 pickaxe.rotation.z=-.25;
 pickaxe.scale.setScalar(.85);
-
 let pickaxeTime=0;
 
 function animatePickaxe(){
  requestAnimationFrame(animatePickaxe);
-
  pickaxeTime+=.018;
  pickaxe.rotation.y+=.018;
  pickaxe.rotation.x=Math.sin(pickaxeTime)*.12;
  pickaxe.position.y=Math.sin(pickaxeTime*1.5)*.08;
-
  pickRenderer.render(pickScene,pickCamera);
 }
-
 animatePickaxe();
 
 // =====================
@@ -1120,32 +889,26 @@ animatePickaxe();
 // =====================
 
 document.getElementById("saveBtn").addEventListener("click",()=>{
- if(saveWorld()){
-  showMessage("World saved successfully!");
- }
+ if(saveWorld())showMessage("World saved successfully!");
 });
 
 document.getElementById("resetBtn").addEventListener("click",()=>{
  if(!confirm("Are you sure you want to create a new world?"))return;
-
  localStorage.removeItem(SAVE_KEY);
  generateWorld();
-
  camera.position.set(0,2.6,5);
  velocityY=0;
  canJump=false;
  yaw=0;
  pitch=0;
-
  updateCameraRotation();
  selectBlock("grass");
  saveWorld();
-
  showMessage("New world created!");
 });
 
 // =====================
-// CODE MACHINE + VERITY
+// CODE MACHINE + VERITY + ADMIN
 // =====================
 
 const codeMachineInput=document.getElementById("codeMachineInput");
@@ -1158,11 +921,58 @@ const verityInput=document.getElementById("verityInput");
 const veritySend=document.getElementById("veritySend");
 const verityResponse=document.getElementById("verityResponse");
 
-// Check the CODE MACHINE code.
-function checkCode(){
- const enteredCode=codeMachineInput.value.trim();
+const adminPanel=document.getElementById("adminPanel");
+const adminClose=document.getElementById("adminClose");
+const adminUser=document.getElementById("adminUser");
+const adminPassword=document.getElementById("adminPassword");
+const adminLoginButton=document.getElementById("adminLoginButton");
+const adminError=document.getElementById("adminError");
+const adminCodeSection=document.getElementById("adminCodeSection");
+const adminCodeInput=document.getElementById("adminCodeInput");
+const adminCodeButton=document.getElementById("adminCodeButton");
+const adminCodeMessage=document.getElementById("adminCodeMessage");
 
- if(enteredCode.toUpperCase()==="VERITY.UNMODED"){
+const adminVerityPanel=document.getElementById("adminVerityPanel");
+const adminVerityClose=document.getElementById("adminVerityClose");
+const commandsButton=document.getElementById("commandsButton");
+const adminVerityStatus=document.getElementById("adminVerityStatus");
+
+const commandsPanel=document.getElementById("commandsPanel");
+const commandsClose=document.getElementById("commandsClose");
+const commandInput=document.getElementById("commandInput");
+const commandCheck=document.getElementById("commandCheck");
+const commandResponse=document.getElementById("commandResponse");
+
+function closeAllSecretPanels(){
+ verityPanel.style.display="none";
+ adminPanel.style.display="none";
+ adminVerityPanel.style.display="none";
+ commandsPanel.style.display="none";
+}
+
+function openAdminPanel(){
+ if(overlay.style.display==="none")return;
+ closeAllSecretPanels();
+ adminPanel.style.display="block";
+ adminError.textContent="";
+ adminCodeMessage.textContent="";
+ adminCodeSection.style.display="none";
+ adminUser.value="";
+ adminPassword.value="";
+ adminCodeInput.value="";
+ adminUser.focus();
+}
+
+function checkCode(){
+ const enteredCode=codeMachineInput.value.trim().toUpperCase();
+
+ if(enteredCode==="ADMIN"||enteredCode==="OPERATOR"){
+  codeMachineInput.value="";
+  openAdminPanel();
+  return;
+ }
+
+ if(enteredCode==="VERITY.UNMODED"){
   verityButton.style.display="block";
   verityPanel.style.display="none";
   codeMachineInput.value="";
@@ -1173,46 +983,141 @@ function checkCode(){
 }
 
 codeMachineCheck.addEventListener("click",checkCode);
-
 codeMachineInput.addEventListener("keydown",event=>{
  if(event.key==="Enter"){
+  event.preventDefault();
   checkCode();
  }
 });
 
-// Open VERITY only while the menu is visible.
+// ADMIN LOGIN
+function checkAdminLogin(){
+ const user=adminUser.value.trim();
+ const password=adminPassword.value;
+
+ if(user==="COOLEST-Q45K0"&&password==="#4TZ/OP/COOLEST-Q45K0"){
+  adminError.textContent="";
+  adminCodeSection.style.display="block";
+  adminCodeMessage.textContent="";
+  adminCodeInput.value="";
+  adminCodeInput.focus();
+ }else{
+  adminError.textContent="PASSWORD AND USER INCORRECT";
+  adminCodeSection.style.display="none";
+ }
+}
+
+adminLoginButton.addEventListener("click",checkAdminLogin);
+
+adminUser.addEventListener("keydown",event=>{
+ if(event.key==="Enter"){
+  event.preventDefault();
+  adminPassword.focus();
+ }
+});
+
+adminPassword.addEventListener("keydown",event=>{
+ if(event.key==="Enter"){
+  event.preventDefault();
+  checkAdminLogin();
+ }
+});
+
+adminClose.addEventListener("click",()=>{
+ adminPanel.style.display="none";
+});
+
+function checkAdminCode(){
+ const code=adminCodeInput.value.trim().toUpperCase();
+
+ if(code==="VERITY.MODED"){
+  adminPanel.style.display="none";
+  adminVerityPanel.style.display="block";
+  commandsPanel.style.display="none";
+  adminVerityStatus.textContent="VERITY IS LISTENING...";
+  adminCodeMessage.textContent="";
+  adminCodeInput.value="";
+ }else{
+  adminCodeMessage.textContent="UNKNOWN CODE";
+ }
+}
+
+adminCodeButton.addEventListener("click",checkAdminCode);
+adminCodeInput.addEventListener("keydown",event=>{
+ if(event.key==="Enter"){
+  event.preventDefault();
+  checkAdminCode();
+ }
+});
+
+// NORMAL VERITY — UNLOCKED BY CODE MACHINE
 verityButton.addEventListener("click",()=>{
  if(overlay.style.display==="none")return;
-
+ closeAllSecretPanels();
  verityPanel.style.display="block";
  verityInput.value="";
  verityResponse.textContent="VERITY IS LISTENING...";
  verityInput.focus();
 });
 
-// Close VERITY.
 verityClose.addEventListener("click",()=>{
  verityPanel.style.display="none";
 });
 
-// Check the command when the check button is clicked.
 function sendVerityMessage(){
  const message=verityInput.value.trim();
 
  if(message==="/say.hi"||message==="/SAY.HI"){
   verityResponse.textContent="HI ITS ME ITS VERITY";
  }else{
-  verityResponse.textContent="VERITY COULDNT THINK";
+  verityResponse.textContent="verity couldnt think";
  }
 }
 
 veritySend.addEventListener("click",sendVerityMessage);
-
-// Enter also checks the command.
 verityInput.addEventListener("keydown",event=>{
  if(event.key==="Enter"){
   event.preventDefault();
   sendVerityMessage();
+ }
+});
+
+// ADMIN VERITY SCREEN
+adminVerityClose.addEventListener("click",()=>{
+ adminVerityPanel.style.display="none";
+ commandsPanel.style.display="none";
+});
+
+// Open the COMMANDS screen only from the admin-unlocked Verity screen.
+commandsButton.addEventListener("click",()=>{
+ adminVerityPanel.style.display="none";
+ commandsPanel.style.display="block";
+ commandInput.value="";
+ commandResponse.textContent="ENTER A COMMAND";
+ commandInput.focus();
+});
+
+commandsClose.addEventListener("click",()=>{
+ commandsPanel.style.display="none";
+ adminVerityPanel.style.display="block";
+});
+
+// Command behavior
+function runVerityCommand(){
+ const command=commandInput.value.trim();
+
+ if(command==="/SAY.HI"||command==="/say.hi"){
+  commandResponse.textContent="HI ITS ME ITS VERITY";
+ }else{
+  commandResponse.textContent="UNKNOWN COMMAND";
+ }
+}
+
+commandCheck.addEventListener("click",runVerityCommand);
+commandInput.addEventListener("keydown",event=>{
+ if(event.key==="Enter"){
+  event.preventDefault();
+  runVerityCommand();
  }
 });
 
@@ -1224,26 +1129,19 @@ let lastTime=performance.now();
 
 function animate(now){
  requestAnimationFrame(animate);
-
  const delta=Math.min((now-lastTime)/1000,.05);
  lastTime=now;
-
  if(isLocked)updatePlayer(delta);
-
  renderer.render(scene,camera);
 }
-
 requestAnimationFrame(animate);
 
 addEventListener("resize",()=>{
  camera.aspect=innerWidth/innerHeight;
  camera.updateProjectionMatrix();
-
  renderer.setSize(innerWidth,innerHeight);
-
  pickCamera.aspect=1;
  pickCamera.updateProjectionMatrix();
-
  pickRenderer.setSize(pickaxeHud.clientWidth,pickaxeHud.clientHeight);
 });
 
