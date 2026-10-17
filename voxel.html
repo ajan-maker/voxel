@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>VOXEL</title>
+
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif;background:#87ceeb;color:white;touch-action:none}
+canvas{display:block}
+#crosshair{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:25px;font-weight:bold;pointer-events:none;text-shadow:1px 1px 3px black;z-index:5}
+#top{position:fixed;top:15px;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none;text-shadow:2px 2px 4px black;z-index:5}
+#logo{font-size:32px;font-weight:900;letter-spacing:5px}
+#status{margin-top:7px;font-size:12px;color:#e8ffe8}
+#hotbar{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:12}
+.slot{width:58px;height:58px;border:3px solid #777;background:#222b;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:11px;cursor:pointer;touch-action:manipulation}
+.slot.selected{border-color:white;background:#ffffff44;transform:translateY(-5px)}
+.swatch{width:25px;height:25px;margin-bottom:4px;border:2px solid #0005}
+#help{position:fixed;left:15px;bottom:15px;font-size:12px;line-height:1.8;background:#0009;padding:10px 14px;border-radius:8px;pointer-events:none;z-index:5}
+#buttons{position:fixed;top:15px;right:15px;display:flex;gap:7px;z-index:6}
+button{padding:10px 13px;background:#222d;border:1px solid #ffffff66;color:white;border-radius:6px;cursor:pointer;font-weight:bold;touch-action:manipulation}
+button:hover{background:#555e}
+#overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background-color:#777;background-image:linear-gradient(#0002 1px,transparent 1px),linear-gradient(90deg,#0002 1px,transparent 1px);background-size:32px 32px}
+#panel{width:min(700px,95%);padding:20px;text-align:center;background:transparent;border:none;box-shadow:none}
+#panel h1{display:block;color:black;font-size:clamp(55px,9vw,100px);font-weight:900;letter-spacing:10px;margin:0 0 35px;text-shadow:2px 2px 0 #aaa}
+#panel p{display:none}
+#panel .menu-button{display:block;width:100%;min-height:115px;margin:0 auto 24px;padding:15px;color:black;background-color:#a66d48;background-image:linear-gradient(#ffffff0c 1px,transparent 1px),linear-gradient(90deg,#00000018 1px,transparent 1px);background-size:16px 16px;border:3px solid #805132;border-radius:0;font-size:clamp(25px,5vw,48px);font-weight:400;cursor:pointer}
+#panel .menu-button:hover{background-color:#bd8259}
+#pickaxe-hud{position:fixed;right:25px;bottom:25px;width:190px;height:190px;pointer-events:none;z-index:11}
+#pickaxe-hud canvas{width:100%;height:100%}
+#message{position:fixed;top:100px;left:50%;transform:translateX(-50%);padding:8px 15px;background:#0009;border-radius:6px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30;white-space:nowrap}
+
+/* MOBILE CONTROLS */
+#mobileControls{
+ display:none;
+ position:fixed;
+ inset:0;
+ z-index:25;
+ pointer-events:none;
+ touch-action:none
+}
+#mobileReset{
+ position:absolute;
+ top:10px;
+ left:10px;
+ pointer-events:auto;
+ background:#8b3030;
+ border:2px solid #ffffffaa;
+ min-width:108px;
+ min-height:40px
+}
+#mobileMenu{
+ position:absolute;
+ top:58px;
+ left:10px;
+ pointer-events:auto;
+ background:#222d;
+ min-width:108px;
+ min-height:40px
+}
+#mobileActions{
+ position:absolute;
+ top:106px;
+ left:10px;
+ display:flex;
+ flex-direction:column;
+ gap:8px;
+ pointer-events:auto
+}
+#mobileActions button{
+ min-width:108px;
+ min-height:44px;
+ background:#222d;
+ border:2px solid #ffffff88
+}
+#mobilePlace{background:#376b32!important}
+#mobileJump{background:#265b91!important}
+#mobileMove{
+ position:absolute;
+ left:10px;
+ top:210px;
+ width:150px;
+ height:150px;
+ pointer-events:auto
+}
+.moveBtn{
+ position:absolute;
+ width:48px;
+ height:48px;
+ padding:0;
+ border:2px solid #ffffffaa;
+ border-radius:10px;
+ background:#222c;
+ color:white;
+ font-size:24px;
+ touch-action:none;
+ user-select:none;
+ -webkit-user-select:none
+}
+.moveBtn.active{background:#777e}
+#moveForward{top:0;left:51px}
+#moveLeft{top:51px;left:0}
+#moveBack{top:51px;left:51px}
+#moveRight{top:51px;left:102px}
+
+@media(pointer:coarse),(max-width:800px){
+ #help,#buttons{display:none}
+ #hotbar{bottom:5px;gap:3px}
+ .slot{width:48px;height:52px;font-size:9px}
+ .swatch{width:21px;height:21px}
+ #logo{font-size:25px}
+ #top{top:8px}
+ #pickaxe-hud{right:5px;bottom:5px;width:110px;height:110px}
+ #panel .menu-button{min-height:75px;margin-bottom:18px}
+ #panel h1{margin-bottom:25px}
+}
+
+/* CODE MACHINE */
+#codeMachine{
+ position:fixed;
+ right:18px;
+ bottom:18px;
+ width:min(330px,calc(100vw - 24px));
+ padding:12px;
+ background:#242424ee;
+ border:2px solid #111;
+ box-shadow:4px 4px 0 #0005;
+ color:white;
+ text-align:left;
+ z-index:25
+}
+#codeMachineTitle{
+ margin-bottom:9px;
+ font-size:14px;
+ font-weight:900;
+ letter-spacing:2px
+}
+#codeMachineRow{display:flex;gap:7px}
+#codeMachineInput{
+ flex:1;
+ min-width:0;
+ height:40px;
+ padding:0 10px;
+ background:#111;
+ color:white;
+ border:2px solid #777;
+ border-radius:0;
+ outline:none;
+ font-size:15px;
+ touch-action:auto;
+ user-select:text;
+ -webkit-user-select:text
+}
+#codeMachineInput:focus{border-color:#ddd}
+#codeMachineCheck{
+ width:44px;
+ min-width:44px;
+ height:40px;
+ padding:0;
+ border:2px solid #6b9561;
+ border-radius:0;
+ background:#387b35;
+ color:white;
+ font-size:25px;
+ cursor:pointer
+}
+#codeMachineCheck:hover{background:#489544}
+
+@media(pointer:coarse),(max-width:800px){
+ #codeMachine{
+  right:8px;
+  bottom:8px;
+  width:min(290px,calc(100vw - 16px))
+ }
+}
+</style>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}
+</script>
+</head>
+<body>
+
+<div id="top">
+ <div id="logo">voxel</div>
+ <div id="status">LOADING WORLD...</div>
+</div>
+
+<div id="buttons">
+ <button id="saveBtn">SAVE WORLD</button>
+ <button id="resetBtn">NEW WORLD</button>
+</div>
+
+<div id="crosshair">+</div>
+<div id="hotbar"></div>
+
+<div id="help">
+ WASD — Move<br>
+ SPACE — Jump<br>
+ LEFT CLICK — Break block<br>
+ RIGHT CLICK — Place block<br>
+ 1 / 2 / 3 — Select block<br>
+ ESC — Return to menu
+</div>
+
+<div id="message"></div>
+
+<!-- MOBILE CONTROLS -->
+<div id="mobileControls" style="display:none">
+ <button id="mobileReset">RESET</button>
+ <button id="mobileMenu">MENU</button>
+
+ <div id="mobileActions">
+  <button id="mobileJump">JUMP ↑</button>
+  <button id="mobilePlace">PLACE BLOCK</button>
+ </div>
+
+ <div id="mobileMove">
+  <button class="moveBtn" id="moveForward">▲</button>
+  <button class="moveBtn" id="moveLeft">◀</button>
+  <button class="moveBtn" id="moveBack">▼</button>
+  <button class="moveBtn" id="moveRight">▶</button>
+ </div>
+</div>
+
+<!-- MAIN MENU -->
+<div id="overlay">
+ <div id="panel">
+  <h1>VOXEL</h1>
+  <button id="play" class="menu-button">JOIN WORLD</button>
+  <button id="backBtn" class="menu-button">BACK</button>
+ </div>
+
+ <div id="codeMachine">
+  <div id="codeMachineTitle">CODE MACHINE</div>
+  <div id="codeMachineRow">
+   <input
+    id="codeMachineInput"
+    type="text"
+    placeholder="Enter code..."
+    autocomplete="off"
+    spellcheck="false"
+    aria-label="Enter code"
+   >
+   <button id="codeMachineCheck" type="button" aria-label="Check code">✓</button>
+  </div>
+ </div>
+</div>
+
+<script type="module">
+import * as THREE from "three";
+
+// =====================
+// GAME SETUP
+// =====================
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87ceeb);
+scene.fog = new THREE.Fog(0x87ceeb,25,65);
+
+const camera = new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1000);
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.domElement.style.position="fixed";
+renderer.domElement.style.inset="0";
+renderer.domElement.style.zIndex="0";
+renderer.domElement.style.touchAction="none";
+document.body.prepend(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xffffff,0x667755,2));
+
+const sun=new THREE.DirectionalLight(0xffffff,2);
+sun.position.set(15,30,10);
+sun.castShadow=true;
+sun.shadow.mapSize.set(1024,1024);
+scene.add(sun);
+
+// =====================
+// BLOCK SYSTEM
+// =====================
+
+const materials={
+ grass:new THREE.MeshLambertMaterial({color:0x55ad43}),
+ dirt:new THREE.MeshLambertMaterial({color:0x80502e}),
+ stone:new THREE.MeshLambertMaterial({color:0x858585})
+};
+
+const blockNames=["grass","dirt","stone"];
+const blockColors=["#55ad43","#80502e","#858585"];
+const geometry=new THREE.BoxGeometry(1,1,1);
+const blocks=new Map();
+const key=(x,y,z)=>`${x},${y},${z}`;
+
+function addBlock(x,y,z,type){
+ const k=key(x,y,z);
+ if(blocks.has(k))return;
+
+ const mesh=new THREE.Mesh(geometry,materials[type]||materials.grass);
+ mesh.position.set(x,y,z);
+ mesh.castShadow=true;
+ mesh.receiveShadow=true;
+ mesh.userData={x,y,z,type};
+ scene.add(mesh);
+ blocks.set(k,mesh);
+}
+
+function removeBlock(mesh){
+ if(mobileDevice.matches)return;
+
+ const {x,y,z}=mesh.userData;
+ scene.remove(mesh);
+ blocks.delete(key(x,y,z));
+ scheduleSave();
+}
+
+function clearWorld(){
+ for(const mesh of blocks.values())scene.remove(mesh);
+ blocks.clear();
+}
+
+function generateWorld(){
+ clearWorld();
+
+ for(let x=-12;x<12;x++){
+  for(let z=-12;z<12;z++){
+   addBlock(x,0,z,"grass");
+   addBlock(x,-1,z,"dirt");
+   addBlock(x,-2,z,"stone");
+  }
+ }
+
+ const trees=[[-7,-6],[6,-8],[-8,5],[8,6],[3,9]];
+
+ for(const [x,z] of trees){
+  for(let y=1;y<=3;y++)addBlock(x,y,z,"dirt");
+
+  for(let dx=-1;dx<=1;dx++){
+   for(let dz=-1;dz<=1;dz++){
+    for(let y=3;y<=4;y++)addBlock(x+dx,y,z+dz,"grass");
+   }
+  }
+
+  addBlock(x,5,z,"grass");
+ }
+}
+
+// =====================
+// SAVE / LOAD
+// =====================
+
+const SAVE_KEY="voxel-world-v1";
+let saveTimer,messageTimeout;
+
+function showMessage(text){
+ const el=document.getElementById("message");
+ el.textContent=text;
+ el.style.opacity="1";
+ clearTimeout(messageTimeout);
+ messageTimeout=setTimeout(()=>el.style.opacity="0",1800);
+}
+
+function saveWorld(){
+ try{
+  const data=[...blocks.values()].map(m=>{
+   const {x,y,z,type}=m.userData;
+   return [x,y,z,type];
+  });
+
+  localStorage.setItem(SAVE_KEY,JSON.stringify(data));
+  document.getElementById("status").textContent="WORLD SAVED ✓";
+  return true;
+ }catch(e){
+  document.getElementById("status").textContent="SAVE FAILED";
+  showMessage("Could not save world!");
+  return false;
+ }
+}
+
+function scheduleSave(){
+ document.getElementById("status").textContent="UNSAVED CHANGES";
+ clearTimeout(saveTimer);
+ saveTimer=setTimeout(saveWorld,400);
+}
+
+function loadWorld(){
+ try{
+  const raw=localStorage.getItem(SAVE_KEY);
+
+  if(raw){
+   const data=JSON.parse(raw);
+
+   if(Array.isArray(data)&&data.length>0&&data.length<10000){
+    clearWorld();
+
+    for(const item of data){
+     if(!Array.isArray(item)||item.length!==4)continue;
+
+     const [x,y,z,type]=item;
+
+     if(!Number.isInteger(x)||!Number.isInteger(y)||!Number.isInteger(z)||
+       !blockNames.includes(type)||Math.abs(x)>100||Math.abs(y)>100||Math.abs(z)>100)continue;
+
+     addBlock(x,y,z,type);
+    }
+
+    if(blocks.size>0){
+     document.getElementById("status").textContent="WORLD LOADED ✓";
+     return;
+    }
+   }
+  }
+ }catch(e){
+  console.warn("Could not load saved world.",e);
+ }
+
+ generateWorld();
+ saveWorld();
+}
+
+loadWorld();
+
+// =====================
+// PLAYER / COLLISIONS
+// =====================
+
+camera.position.set(0,2.6,5);
+
+let yaw=0,pitch=0;
+let selectedBlock="grass";
+let isLocked=false;
+let velocityY=0,canJump=false;
+
+const keys={};
+const playerRadius=.3;
+const playerHeight=1.8;
+const raycaster=new THREE.Raycaster();
+raycaster.far=6;
+
+const mobileDevice=window.matchMedia("(pointer: coarse), (max-width: 800px)");
+const mobileControls=document.getElementById("mobileControls");
+const mobileReset=document.getElementById("mobileReset");
+
+function updateCameraRotation(){
+ camera.rotation.order="YXZ";
+ camera.rotation.y=yaw;
+ camera.rotation.x=pitch;
+}
+
+function collidesAt(px,py,pz){
+ const minX=px-playerRadius,maxX=px+playerRadius;
+ const minY=py-playerHeight,maxY=py;
+ const minZ=pz-playerRadius,maxZ=pz+playerRadius;
+
+ for(let x=Math.floor(minX-.5);x<=Math.ceil(maxX+.5);x++){
+  for(let y=Math.floor(minY-.5);y<=Math.ceil(maxY+.5);y++){
+   for(let z=Math.floor(minZ-.5);z<=Math.ceil(maxZ+.5);z++){
+    if(!blocks.has(key(x,y,z)))continue;
+
+    if(maxX>x-.499&&minX<x+.499&&
+       maxY>y-.499&&minY<y+.499&&
+       maxZ>z-.499&&minZ<z+.499)return true;
+   }
+  }
+ }
+
+ return false;
+}
+
+function findLandingHeight(px,currentY,nextY,pz){
+ const currentFeet=currentY-playerHeight;
+ const nextFeet=nextY-playerHeight;
+
+ if(nextFeet>=currentFeet)return null;
+
+ let landingTop=-Infinity;
+
+ for(let x=Math.floor(px-playerRadius-.5);x<=Math.ceil(px+playerRadius+.5);x++){
+  for(let z=Math.floor(pz-playerRadius-.5);z<=Math.ceil(pz+playerRadius+.5);z++){
+   for(let y=Math.floor(nextFeet-.5);y<=Math.ceil(currentFeet+.5);y++){
+    if(!blocks.has(key(x,y,z)))continue;
+
+    const overlapsX=px+playerRadius>x-.499&&px-playerRadius<x+.499;
+    const overlapsZ=pz+playerRadius>z-.499&&pz-playerRadius<z+.499;
+    const top=y+.5;
+
+    if(overlapsX&&overlapsZ&&currentFeet>=top-.01&&nextFeet<=top&&top>landingTop){
+     landingTop=top;
+    }
+   }
+  }
+ }
+
+ return landingTop===-Infinity?null:landingTop;
+}
+
+function updatePlayer(delta){
+ const speed=5.5;
+
+ const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
+ const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
+ const direction=new THREE.Vector3();
+
+ if(keys.KeyW)direction.add(forward);
+ if(keys.KeyS)direction.sub(forward);
+ if(keys.KeyD)direction.add(right);
+ if(keys.KeyA)direction.sub(right);
+
+ if(direction.lengthSq()>0){
+  direction.normalize().multiplyScalar(speed*delta);
+
+  const nextX=camera.position.x+direction.x;
+
+  if(!collidesAt(nextX,camera.position.y,camera.position.z)){
+   camera.position.x=nextX;
+  }
+
+  const nextZ=camera.position.z+direction.z;
+
+  if(!collidesAt(camera.position.x,camera.position.y,nextZ)){
+   camera.position.z=nextZ;
+  }
+ }
+
+ const oldY=camera.position.y;
+ velocityY=Math.max(velocityY-20*delta,-35);
+ const nextY=oldY+velocityY*delta;
+
+ if(velocityY<=0){
+  const top=findLandingHeight(camera.position.x,oldY,nextY,camera.position.z);
+
+  if(top!==null){
+   camera.position.y=top+playerHeight;
+   velocityY=0;
+   canJump=true;
+  }else{
+   camera.position.y=nextY;
+   canJump=false;
+  }
+ }else{
+  if(collidesAt(camera.position.x,nextY,camera.position.z)){
+   velocityY=0;
+  }else{
+   camera.position.y=nextY;
+  }
+
+  canJump=false;
+ }
+
+ if(camera.position.y < -20){
+  camera.position.set(0,2.6,5);
+  velocityY=0;
+  canJump=false;
+ }
+}
+
+// =====================
+// HOTBAR
+// =====================
+
+const hotbar=document.getElementById("hotbar");
+
+blockNames.forEach((type,i)=>{
+ const slot=document.createElement("div");
+
+ slot.className="slot"+(i===0?" selected":"");
+ slot.innerHTML=`<div class="swatch" style="background:${blockColors[i]}"></div>${i+1}: ${type.toUpperCase()}`;
+ slot.addEventListener("click",()=>selectBlock(type));
+
+ hotbar.appendChild(slot);
+});
+
+function selectBlock(type){
+ selectedBlock=type;
+
+ [...hotbar.children].forEach((slot,i)=>{
+  slot.classList.toggle("selected",blockNames[i]===type);
+ });
+}
+
+// =====================
+// MENU / PICKAXE
+// =====================
+
+const overlay=document.getElementById("overlay");
+const pickaxeHud=document.createElement("div");
+
+pickaxeHud.id="pickaxe-hud";
+document.body.appendChild(pickaxeHud);
+
+// =====================
+// START / STOP GAME
+// =====================
+
+function startMobileGame(){
+ isLocked=true;
+ overlay.style.display="none";
+ pickaxeHud.style.display="none";
+
+ mobileControls.style.display=mobileDevice.matches?"block":"none";
+ mobileReset.style.display="block";
+
+ updateCameraRotation();
+}
+
+document.getElementById("play").addEventListener("click",()=>{
+ if(mobileDevice.matches){
+  startMobileGame();
+ }else{
+  renderer.domElement.requestPointerLock();
+ }
+});
+
+// BACK BUTTON
+document.getElementById("backBtn").addEventListener("click",()=>{
+ window.location.href="index.html";
+});
+
+document.addEventListener("pointerlockchange",()=>{
+ if(mobileDevice.matches)return;
+
+ isLocked=document.pointerLockElement===renderer.domElement;
+ overlay.style.display=isLocked?"none":"flex";
+ pickaxeHud.style.display=isLocked?"none":"block";
+ mobileControls.style.display="none";
+
+ for(const code in keys)keys[code]=false;
+});
+
+document.addEventListener("mousemove",event=>{
+ if(!isLocked||mobileDevice.matches)return;
+
+ yaw-=event.movementX*.002;
+ pitch-=event.movementY*.002;
+ pitch=Math.max(-Math.PI/2+.01,Math.min(Math.PI/2-.01,pitch));
+
+ updateCameraRotation();
+});
+
+// =====================
+// KEYBOARD
+// =====================
+
+document.addEventListener("keydown",event=>{
+ keys[event.code]=true;
+
+ if(event.code==="Space"){
+  event.preventDefault();
+
+  if(canJump&&isLocked){
+   velocityY=7;
+   canJump=false;
+  }
+ }
+
+ if(event.code==="Digit1")selectBlock("grass");
+ if(event.code==="Digit2")selectBlock("dirt");
+ if(event.code==="Digit3")selectBlock("stone");
+
+ if(event.code==="Escape"&&mobileDevice.matches&&isLocked){
+  event.preventDefault();
+  stopMobileGame();
+ }
+});
+
+document.addEventListener("keyup",event=>{
+ keys[event.code]=false;
+});
+
+document.addEventListener("contextmenu",event=>event.preventDefault());
+
+// =====================
+// MOBILE MOVEMENT BUTTONS
+// =====================
+
+function mobileButton(id,keyCode){
+ const btn=document.getElementById(id);
+
+ btn.addEventListener("pointerdown",event=>{
+  event.preventDefault();
+  event.stopPropagation();
+
+  btn.setPointerCapture(event.pointerId);
+  keys[keyCode]=true;
+  btn.classList.add("active");
+ });
+
+ function release(){
+  keys[keyCode]=false;
+  btn.classList.remove("active");
+ }
+
+ btn.addEventListener("pointerup",release);
+ btn.addEventListener("pointercancel",release);
+ btn.addEventListener("lostpointercapture",release);
+}
+
+mobileButton("moveForward","KeyW");
+mobileButton("moveBack","KeyS");
+mobileButton("moveLeft","KeyA");
+mobileButton("moveRight","KeyD");
+
+function stopMobileGame(){
+ isLocked=false;
+ mobileLooking=false;
+ lookPointerId=null;
+
+ for(const code in keys)keys[code]=false;
+
+ overlay.style.display="flex";
+ pickaxeHud.style.display="block";
+ mobileControls.style.display="none";
+}
+
+// =====================
+// MOBILE MENU + RESET
+// =====================
+
+document.getElementById("mobileMenu").addEventListener("click",()=>{
+ if(!mobileDevice.matches)return;
+
+ if(isLocked){
+  stopMobileGame();
+ }else{
+  overlay.style.display="flex";
+ }
+});
+
+document.getElementById("mobileReset").addEventListener("click",()=>{
+ if(!mobileDevice.matches||!isLocked)return;
+
+ clearTimeout(saveTimer);
+
+ localStorage.removeItem(SAVE_KEY);
+ generateWorld();
+
+ camera.position.set(0,2.6,5);
+ yaw=0;
+ pitch=0;
+ velocityY=0;
+ canJump=false;
+
+ for(const code in keys)keys[code]=false;
+
+ selectBlock("grass");
+ updateCameraRotation();
+
+ saveWorld();
+ showMessage("World reset!");
+});
+
+document.getElementById("mobileJump").addEventListener("pointerdown",event=>{
+ event.preventDefault();
+
+ if(isLocked&&canJump){
+  velocityY=7;
+  canJump=false;
+ }
+});
+
+// =====================
+// MOBILE LOOK + TAP TO PLACE
+// =====================
+
+let mobileLooking=false;
+let lookPointerId=null;
+let lastTouchX=0,lastTouchY=0;
+let touchStartX=0,touchStartY=0;
+let touchMoved=false;
+
+renderer.domElement.addEventListener("pointerdown",event=>{
+ if(!mobileDevice.matches||!isLocked||event.pointerType==="mouse")return;
+
+ mobileLooking=true;
+ lookPointerId=event.pointerId;
+
+ lastTouchX=touchStartX=event.clientX;
+ lastTouchY=touchStartY=event.clientY;
+
+ touchMoved=false;
+});
+
+renderer.domElement.addEventListener("pointermove",event=>{
+ if(!mobileDevice.matches||!mobileLooking||event.pointerId!==lookPointerId)return;
+
+ const dx=event.clientX-lastTouchX;
+ const dy=event.clientY-lastTouchY;
+
+ if(Math.abs(event.clientX-touchStartX)>7||Math.abs(event.clientY-touchStartY)>7){
+  touchMoved=true;
+ }
+
+ lastTouchX=event.clientX;
+ lastTouchY=event.clientY;
+
+ yaw-=dx*.006;
+ pitch-=dy*.006;
+ pitch=Math.max(-Math.PI/2+.01,Math.min(Math.PI/2-.01,pitch));
+
+ updateCameraRotation();
+});
+
+renderer.domElement.addEventListener("pointerup",event=>{
+ if(!mobileDevice.matches||event.pointerId!==lookPointerId)return;
+
+ if(!touchMoved&&isLocked){
+  placeBlockAtCrosshair();
+ }
+
+ mobileLooking=false;
+ lookPointerId=null;
+});
+
+renderer.domElement.addEventListener("pointercancel",()=>{
+ mobileLooking=false;
+ lookPointerId=null;
+});
+
+document.getElementById("mobilePlace").addEventListener("pointerdown",event=>{
+ event.preventDefault();
+
+ if(isLocked){
+  placeBlockAtCrosshair();
+ }
+});
+
+// =====================
+// BLOCK BREAKING / PLACING
+// =====================
+
+function getTargetBlock(){
+ raycaster.setFromCamera(new THREE.Vector2(0,0),camera);
+
+ const hits=raycaster.intersectObjects([...blocks.values()],false);
+
+ return hits.length?hits[0]:null;
+}
+
+function placeBlockAtCrosshair(){
+ if(!isLocked)return;
+
+ const hit=getTargetBlock();
+ if(!hit)return;
+
+ const normal=hit.face.normal.clone();
+ normal.transformDirection(hit.object.matrixWorld);
+
+ const pos=hit.object.position.clone().add(normal);
+
+ const x=Math.round(pos.x);
+ const y=Math.round(pos.y);
+ const z=Math.round(pos.z);
+
+ if(blocks.has(key(x,y,z)))return;
+
+ const overlapsPlayer=
+  Math.abs(x-camera.position.x)<.5+playerRadius&&
+  Math.abs(z-camera.position.z)<.5+playerRadius&&
+  y+.5>camera.position.y-playerHeight&&
+  y-.5<camera.position.y;
+
+ if(overlapsPlayer)return;
+
+ addBlock(x,y,z,selectedBlock);
+ scheduleSave();
+}
+
+document.addEventListener("mousedown",event=>{
+ if(!isLocked||mobileDevice.matches)return;
+ if(event.button!==0&&event.button!==2)return;
+
+ const hit=getTargetBlock();
+ if(!hit)return;
+
+ if(event.button===0){
+  removeBlock(hit.object);
+ }
+
+ if(event.button===2){
+  const normal=hit.face.normal.clone();
+  normal.transformDirection(hit.object.matrixWorld);
+
+  const pos=hit.object.position.clone().add(normal);
+
+  const x=Math.round(pos.x);
+  const y=Math.round(pos.y);
+  const z=Math.round(pos.z);
+
+  if(blocks.has(key(x,y,z)))return;
+
+  const overlapsPlayer=
+   Math.abs(x-camera.position.x)<.5+playerRadius&&
+   Math.abs(z-camera.position.z)<.5+playerRadius&&
+   y+.5>camera.position.y-playerHeight&&
+   y-.5<camera.position.y;
+
+  if(overlapsPlayer)return;
+
+  addBlock(x,y,z,selectedBlock);
+  scheduleSave();
+ }
+});
+
+// =====================
+// 3D STONE PICKAXE
+// =====================
+
+const pickScene=new THREE.Scene();
+const pickCamera=new THREE.PerspectiveCamera(35,1,.1,100);
+pickCamera.position.set(0,0,7);
+
+const pickRenderer=new THREE.WebGLRenderer({alpha:true,antialias:true});
+pickRenderer.setPixelRatio(Math.min(devicePixelRatio,2));
+pickRenderer.setSize(190,190);
+pickaxeHud.appendChild(pickRenderer.domElement);
+
+pickScene.add(new THREE.HemisphereLight(0xffffff,0x49413a,2));
+
+const pickLight=new THREE.DirectionalLight(0xffffff,3);
+pickLight.position.set(3,5,6);
+pickScene.add(pickLight);
+
+const pickaxe=new THREE.Group();
+pickScene.add(pickaxe);
+
+const handle=new THREE.Mesh(
+ new THREE.CylinderGeometry(.09,.13,1.9,7),
+ new THREE.MeshStandardMaterial({color:0x986039,roughness:.85})
+);
+
+handle.rotation.z=-.55;
+handle.position.set(-.2,-.15,0);
+pickaxe.add(handle);
+
+const stoneMaterial=new THREE.MeshStandardMaterial({
+ color:0x555b61,
+ roughness:1,
+ flatShading:true
+});
+
+const stoneHead=new THREE.Mesh(
+ new THREE.IcosahedronGeometry(.52,0),
+ stoneMaterial
+);
+
+stoneHead.scale.set(1.65,.65,.7);
+stoneHead.rotation.z=-.35;
+stoneHead.position.set(.45,.72,0);
+pickaxe.add(stoneHead);
+
+const stoneTip=new THREE.Mesh(
+ new THREE.ConeGeometry(.28,.65,5),
+ stoneMaterial
+);
+
+stoneTip.rotation.z=-1.15;
+stoneTip.position.set(1.05,.88,0);
+pickaxe.add(stoneTip);
+
+const binding=new THREE.Mesh(
+ new THREE.CylinderGeometry(.15,.15,.22,8),
+ new THREE.MeshStandardMaterial({color:0xb47743})
+);
+
+binding.position.set(-.05,.15,0);
+binding.rotation.z=-.55;
+pickaxe.add(binding);
+
+pickaxe.rotation.z=-.25;
+pickaxe.scale.setScalar(.85);
+
+let pickaxeTime=0;
+
+function animatePickaxe(){
+ requestAnimationFrame(animatePickaxe);
+
+ pickaxeTime+=.018;
+ pickaxe.rotation.y+=.018;
+ pickaxe.rotation.x=Math.sin(pickaxeTime)*.12;
+ pickaxe.position.y=Math.sin(pickaxeTime*1.5)*.08;
+
+ pickRenderer.render(pickScene,pickCamera);
+}
+
+animatePickaxe();
+
+// =====================
+// SAVE / RESET BUTTONS
+// =====================
+
+document.getElementById("saveBtn").addEventListener("click",()=>{
+ if(saveWorld()){
+  showMessage("World saved successfully!");
+ }
+});
+
+document.getElementById("resetBtn").addEventListener("click",()=>{
+ if(!confirm("Are you sure you want to create a new world?"))return;
+
+ localStorage.removeItem(SAVE_KEY);
+ generateWorld();
+
+ camera.position.set(0,2.6,5);
+ velocityY=0;
+ canJump=false;
+ yaw=0;
+ pitch=0;
+
+ updateCameraRotation();
+ selectBlock("grass");
+ saveWorld();
+
+ showMessage("New world created!");
+});
+
+// =====================
+// CODE MACHINE
+// OPERATOR CODES DO NOTHING
+// =====================
+
+const codeMachineInput=document.getElementById("codeMachineInput");
+const codeMachineCheck=document.getElementById("codeMachineCheck");
+
+codeMachineCheck.addEventListener("click",()=>{
+ const code=codeMachineInput.value.trim().toUpperCase();
+
+ if(code==="OP"||code==="OPERATOR"){
+  showMessage("INVALID CODE");
+ }else{
+  showMessage("INVALID CODE");
+ }
+});
+
+codeMachineInput.addEventListener("keydown",event=>{
+ if(event.key==="Enter"){
+  codeMachineCheck.click();
+ }
+});
+
+// =====================
+// GAME LOOP
+// =====================
+
+let lastTime=performance.now();
+
+function animate(now){
+ requestAnimationFrame(animate);
+
+ const delta=Math.min((now-lastTime)/1000,.05);
+ lastTime=now;
+
+ if(isLocked)updatePlayer(delta);
+
+ renderer.render(scene,camera);
+}
+
+requestAnimationFrame(animate);
+
+addEventListener("resize",()=>{
+ camera.aspect=innerWidth/innerHeight;
+ camera.updateProjectionMatrix();
+
+ renderer.setSize(innerWidth,innerHeight);
+
+ pickCamera.aspect=1;
+ pickCamera.updateProjectionMatrix();
+
+ pickRenderer.setSize(pickaxeHud.clientWidth,pickaxeHud.clientHeight);
+});
+
+addEventListener("beforeunload",()=>{
+ clearTimeout(saveTimer);
+ saveWorld();
+});
+</script>
+</body>
+</html>
