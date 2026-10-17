@@ -30,7 +30,7 @@ button:hover{background:#555e}
 #panel .menu-button:hover{background-color:#bd8259}
 #pickaxe-hud{position:fixed;right:25px;bottom:25px;width:190px;height:190px;pointer-events:none;z-index:11}
 #pickaxe-hud canvas{width:100%;height:100%}
-#message{position:fixed;top:100px;left:50%;transform:translateX(-50%);padding:8px 15px;background:#0009;border-radius:6px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30;white-space:nowrap}
+#message{position:fixed;top:100px;left:50%;transform:translateX(-50%);padding:8px 15px;background:#0009;border-radius:6px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:40;white-space:nowrap}
 
 #mobileControls{
  display:none;
@@ -117,7 +117,7 @@ button:hover{background:#555e}
 }
 
 #codeMachine{
- position:fixed;
+ position:absolute;
  right:18px;
  bottom:18px;
  width:min(330px,calc(100vw - 24px));
@@ -166,11 +166,108 @@ button:hover{background:#555e}
 }
 #codeMachineCheck:hover{background:#489544}
 
+/* VERITY BUTTON — ONLY ON THE MENU */
+#verityButton{
+ position:absolute;
+ top:18px;
+ right:18px;
+ display:none;
+ padding:14px 25px;
+ background:#ffdf32;
+ color:#171717;
+ border:3px solid #b99b00;
+ border-radius:0;
+ font-size:20px;
+ font-weight:900;
+ letter-spacing:2px;
+ z-index:30
+}
+#verityButton:hover{background:#ffed70}
+
+/* VERITY YELLOW PANEL */
+#verityPanel{
+ display:none;
+ position:absolute;
+ top:50%;
+ left:50%;
+ transform:translate(-50%,-50%);
+ width:min(440px,90vw);
+ padding:22px;
+ background:#ffdf32;
+ border:4px solid #b99b00;
+ box-shadow:8px 8px 0 #0005;
+ color:#171717;
+ text-align:left;
+ z-index:31
+}
+#verityHeader{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:18px;
+ font-size:25px;
+ font-weight:900;
+ letter-spacing:3px
+}
+#verityClose{
+ width:40px;
+ height:40px;
+ padding:0;
+ background:#222;
+ color:white;
+ border:2px solid #111;
+ border-radius:0;
+ font-size:22px
+}
+#verityRow{display:flex;gap:8px}
+#verityInput{
+ flex:1;
+ min-width:0;
+ height:44px;
+ padding:0 10px;
+ background:#fff7bd;
+ color:#171717;
+ border:3px solid #b99b00;
+ border-radius:0;
+ outline:none;
+ font-size:15px;
+ user-select:text;
+ -webkit-user-select:text;
+ touch-action:auto
+}
+#verityInput:focus{border-color:#171717}
+#veritySend{
+ width:48px;
+ min-width:48px;
+ height:44px;
+ padding:0;
+ background:#222;
+ color:white;
+ border:2px solid #111;
+ border-radius:0;
+ font-size:24px
+}
+#verityResponse{
+ min-height:42px;
+ margin-top:16px;
+ padding:10px;
+ background:#f7d52a;
+ border:2px solid #b99b00;
+ font-weight:900;
+ overflow-wrap:anywhere
+}
+
 @media(pointer:coarse),(max-width:800px){
  #codeMachine{
   right:8px;
   bottom:8px;
   width:min(290px,calc(100vw - 16px))
+ }
+ #verityButton{
+  top:10px;
+  right:10px;
+  padding:10px 14px;
+  font-size:15px
  }
 }
 </style>
@@ -243,6 +340,29 @@ button:hover{background:#555e}
    <button id="codeMachineCheck" type="button" aria-label="Check code">✓</button>
   </div>
  </div>
+
+ <button id="verityButton" type="button">VERITY</button>
+
+ <div id="verityPanel">
+  <div id="verityHeader">
+   <span>VERITY</span>
+   <button id="verityClose" type="button">X</button>
+  </div>
+
+  <div id="verityRow">
+   <input
+    id="verityInput"
+    type="text"
+    placeholder="Type something..."
+    autocomplete="off"
+    spellcheck="false"
+    aria-label="Message to Verity"
+   >
+   <button id="veritySend" type="button" aria-label="Check message">✓</button>
+  </div>
+
+  <div id="verityResponse">VERITY IS LISTENING...</div>
+ </div>
 </div>
 
 <script type="module">
@@ -256,7 +376,10 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87ceeb);
 scene.fog = new THREE.Fog(0x87ceeb,25,65);
 
-const camera = new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1000);
+const camera = new THREE.PerspectiveCamera(
+ 75,innerWidth/innerHeight,.1,1000
+);
+
 const renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
@@ -340,7 +463,9 @@ function generateWorld(){
 
   for(let dx=-1;dx<=1;dx++){
    for(let dz=-1;dz<=1;dz++){
-    for(let y=3;y<=4;y++)addBlock(x+dx,y,z+dz,"grass");
+    for(let y=3;y<=4;y++){
+     addBlock(x+dx,y,z+dz,"grass");
+    }
    }
   }
 
@@ -350,7 +475,6 @@ function generateWorld(){
 
 // =====================
 // SAVE / LOAD
-// OLD STONE BLOCKS ARE FILTERED OUT
 // =====================
 
 const SAVE_KEY="voxel-world-v1";
@@ -411,8 +535,6 @@ function loadWorld(){
 
     if(blocks.size>0){
      document.getElementById("status").textContent="WORLD LOADED ✓";
-
-     // Save the filtered world so removed stone blocks stay removed.
      saveWorld();
      return;
     }
@@ -1023,19 +1145,74 @@ document.getElementById("resetBtn").addEventListener("click",()=>{
 });
 
 // =====================
-// CODE MACHINE
+// CODE MACHINE + VERITY
 // =====================
 
 const codeMachineInput=document.getElementById("codeMachineInput");
 const codeMachineCheck=document.getElementById("codeMachineCheck");
 
-codeMachineCheck.addEventListener("click",()=>{
- showMessage("INVALID CODE");
-});
+const verityButton=document.getElementById("verityButton");
+const verityPanel=document.getElementById("verityPanel");
+const verityClose=document.getElementById("verityClose");
+const verityInput=document.getElementById("verityInput");
+const veritySend=document.getElementById("veritySend");
+const verityResponse=document.getElementById("verityResponse");
+
+// Check the CODE MACHINE code.
+function checkCode(){
+ const enteredCode=codeMachineInput.value.trim();
+
+ if(enteredCode.toUpperCase()==="VERITY.UNMODED"){
+  verityButton.style.display="block";
+  verityPanel.style.display="none";
+  codeMachineInput.value="";
+  showMessage("VERITY UNLOCKED!");
+ }else{
+  showMessage("INVALID CODE");
+ }
+}
+
+codeMachineCheck.addEventListener("click",checkCode);
 
 codeMachineInput.addEventListener("keydown",event=>{
  if(event.key==="Enter"){
-  codeMachineCheck.click();
+  checkCode();
+ }
+});
+
+// Open VERITY only while the menu is visible.
+verityButton.addEventListener("click",()=>{
+ if(overlay.style.display==="none")return;
+
+ verityPanel.style.display="block";
+ verityInput.value="";
+ verityResponse.textContent="VERITY IS LISTENING...";
+ verityInput.focus();
+});
+
+// Close VERITY.
+verityClose.addEventListener("click",()=>{
+ verityPanel.style.display="none";
+});
+
+// Check the command when the check button is clicked.
+function sendVerityMessage(){
+ const message=verityInput.value.trim();
+
+ if(message==="/say.hi"||message==="/SAY.HI"){
+  verityResponse.textContent="HI ITS ME ITS VERITY";
+ }else{
+  verityResponse.textContent="VERITY COULDNT THINK";
+ }
+}
+
+veritySend.addEventListener("click",sendVerityMessage);
+
+// Enter also checks the command.
+verityInput.addEventListener("keydown",event=>{
+ if(event.key==="Enter"){
+  event.preventDefault();
+  sendVerityMessage();
  }
 });
 
