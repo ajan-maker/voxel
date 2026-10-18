@@ -292,6 +292,7 @@ button:hover{background:#555e}
  </div>
 
  <!-- HALLOWEEN EVENT — ADMIN ONLY -->
+ <audio id="halloweenMusic" src="./halloween.mp3" preload="auto" loop></audio>
  <div id="halloweenPanel">
   <div id="halloweenTitle">HALLOWEEN</div>
   <button id="summonButton" type="button">SUMMON</button>
@@ -1086,6 +1087,10 @@ adminCodeInput.addEventListener("keydown",event=>{
 // HALLOWEEN EVENT — purple menu background and 30 seconds of music.
 function stopHalloweenEvent(){
  clearTimeout(halloweenTimer);
+ const music=document.getElementById("halloweenMusic");
+
+music.pause();
+music.currentTime=0;
  halloweenTimer=null;
  if(halloweenAudioFrame){
   halloweenAudioFrame.remove();
@@ -1098,19 +1103,37 @@ function stopHalloweenEvent(){
  }
 }
 
+
 function summonHalloween(){
  halloweenPanel.style.display="none";
+
  if(overlay.style.display==="none")return;
- stopHalloweenEvent();
- halloweenOriginalBackground={
-  color:overlay.style.backgroundColor,
-  image:overlay.style.backgroundImage
- };
+
+function stopHalloweenEvent(){
+ // Yeni stopHalloweenEvent kodunun tamamı
+}
+
+function summonHalloween(){
+ // Yeni summonHalloween kodunun tamamı
+}
+
+summonButton.addEventListener("click",summonHalloween);
+
+ // Purple Halloween background
  overlay.style.backgroundColor="#39204f";
- overlay.style.backgroundImage="linear-gradient(#b78ad833 1px,transparent 1px),linear-gradient(90deg,#b78ad833 1px,transparent 1px)";
+ overlay.style.backgroundImage=
+  "linear-gradient(#b78ad833 1px,transparent 1px)," +
+  "linear-gradient(90deg,#b78ad833 1px,transparent 1px)";
 
- // The event starts from a click, so the browser can allow playback.
+ // Play the custom Halloween music
+ const music=document.getElementById("halloweenMusic");
+ music.currentTime=0;
 
+ music.play().catch(error=>{
+  console.warn("Halloween music could not play:",error);
+ });
+
+ // Stop the event after 30 seconds
  halloweenTimer=setTimeout(()=>{
   stopHalloweenEvent();
  },30000);
