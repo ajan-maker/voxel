@@ -450,15 +450,29 @@ function clearWorld(){
 function generateWorld(){
  clearWorld();
 
- // Exactly 5x5 ground blocks.
- // Top layer: grass.
- // Bottom layer: dirt.
+ // EXACTLY 5x5 ground: 25 grass blocks
+ // Ground coordinates: x = -2 to 2, z = -2 to 2
  for(let x=-2;x<=2;x++){
   for(let z=-2;z<=2;z++){
    addBlock(x,0,z,"grass");
    addBlock(x,-1,z,"dirt");
   }
  }
+
+ // ONLY ONE TREE
+ // Tree trunk: 2 blocks tall
+ addBlock(0,1,0,"dirt");
+ addBlock(0,2,0,"dirt");
+
+ // Small tree crown
+ for(let dx=-1;dx<=1;dx++){
+  for(let dz=-1;dz<=1;dz++){
+   addBlock(dx,3,dz,"grass");
+  }
+ }
+
+ addBlock(0,4,0,"grass");
+}
 
  // Exactly ONE tree.
  // Trunk.
