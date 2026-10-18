@@ -97,73 +97,52 @@ button:hover{background:#555e}
 
 /* ADMIN LOGIN */
 #adminPanel{
- display:none;
- position:absolute;
- top:50%;
- left:50%;
- transform:translate(-50%,-50%);
- width:min(430px,94vw);
- padding:26px;
- background:#080808;
- color:white;
- border:3px solid #555;
- box-shadow:8px 8px 0 #0007;
- z-index:45
+ display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+ width:min(460px,94vw);max-height:90vh;overflow-y:auto;padding:25px;
+ background:#080808;color:white;border:3px solid #555;
+ box-shadow:8px 8px 0 #0007;z-index:45;text-align:left
 }
-
+#adminClose{
+ position:absolute;right:8px;top:8px;width:34px;height:34px;
+ padding:0;background:#222;border:2px solid #555;border-radius:0
+}
+#adminTitle{font-size:24px;font-weight:900;letter-spacing:3px;margin:5px 40px 20px 0}
+.adminLabel{display:block;margin:14px 0 6px;font-size:12px;font-weight:900;letter-spacing:2px;color:#ddd}
+.adminInput{
+ display:block;width:100%;height:42px;padding:0 10px;background:#171717;color:white;
+ border:2px solid #777;border-radius:0;font-size:15px;outline:none;
+ touch-action:auto;user-select:text;-webkit-user-select:text
+}
+.adminInput:focus{border-color:white}
+#adminLoginButton,#adminCodeButton{
+ display:block;width:100%;height:44px;margin-top:12px;background:#eee;color:#111;
+ border:2px solid #999;border-radius:0;font-weight:900
+}
+#adminError,#adminCodeMessage{min-height:18px;margin-top:10px;color:#ff6464;font-size:12px;font-weight:bold;overflow-wrap:anywhere}
+#adminCodeSection{display:none;margin-top:20px;padding-top:15px;border-top:2px solid #555}
+#adminCodeInput{
+ display:block;width:100%;height:42px;padding:0 10px;background:#171717;color:white;
+ border:2px solid #777;border-radius:0;font-size:15px;outline:none;
+ touch-action:auto;user-select:text;-webkit-user-select:text
+}
 #quickLoginButton{
- width:100%;
- height:44px;
- margin-bottom:18px;
- background:#b89b42;
- color:#111;
- border:2px solid #e0c66d;
- border-radius:0;
- font-weight:900;
- letter-spacing:1px;
+ width:100%;height:44px;margin-bottom:5px;background:#b89b42;color:#111;
+ border:2px solid #e0c66d;border-radius:0;font-weight:900;letter-spacing:1px
 }
-
-#quickLoginButton:hover{
- background:#e0c66d;
-}
-
-#quickLoginSection{
- display:none;
- margin-top:15px;
- padding:15px;
- border:2px solid #555;
-}
-
+#quickLoginButton:hover{background:#e0c66d}
+#quickLoginSection{display:none;margin-top:12px;padding:14px;border:2px solid #555}
 #quickLoginInput{
- width:100%;
- height:42px;
- padding:0 10px;
- background:#171717;
- color:white;
- border:2px solid #777;
- border-radius:0;
- font-size:15px;
+ display:block;width:100%;height:42px;padding:0 10px;background:#171717;color:white;
+ border:2px solid #777;border-radius:0;font-size:15px;outline:none;
+ touch-action:auto;user-select:text;-webkit-user-select:text
 }
-
 #quickLoginSubmit{
- width:100%;
- height:42px;
- margin-top:10px;
- background:#eee;
- color:#111;
- border:2px solid #999;
- border-radius:0;
- font-weight:900;
+ width:100%;height:42px;margin-top:10px;background:#eee;color:#111;
+ border:2px solid #999;border-radius:0;font-weight:900
 }
+#quickLoginMessage{margin-top:10px;min-height:18px;color:#ff6464;font-size:12px;font-weight:bold}
 
-#quickLoginMessage{
- margin-top:10px;
- min-height:18px;
- color:#ff6464;
- font-size:12px;
- font-weight:bold;
-}
-/* SPECIAL VERITY — ADMIN ONLY */
+/* ADMIN VERITY */
 #adminVerityPanel{
  display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
  width:min(470px,92vw);padding:22px;background:#ffdf32;color:#171717;
@@ -191,7 +170,7 @@ button:hover{background:#555e}
 #commandResponse{margin-top:12px;padding:10px;min-height:40px;background:#f7d52a;border:2px solid #b99b00;font-weight:900;overflow-wrap:anywhere}
 #moreComing{margin-top:15px;text-align:center;font-size:13px;font-weight:900;letter-spacing:2px}
 
-/* HALLOWEEN EVENT */
+/* HALLOWEEN */
 #halloweenPanel{
  display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
  width:min(430px,90vw);padding:26px;text-align:center;color:white;
@@ -330,37 +309,19 @@ button:hover{background:#555e}
   <div id="verityResponse">VERITY IS LISTENING...</div>
  </div>
 
-  <div id="adminPanel">
+ <!-- ADMIN LOGIN: all fields are inside the same panel -->
+ <div id="adminPanel">
   <button id="adminClose" type="button">X</button>
-
   <div id="adminTitle">ADMIN LOGIN</div>
 
-  <!--  -->
   <button id="quickLoginButton" type="button">QUICK LOG IN</button>
 
-  <div id="quickLoginSection" style="display:none">
-    <label class="adminLabel" for="quickLoginInput">LOGIN CODE</label>
-    <input
-      id="quickLoginInput"
-      class="adminInput"
-      type="password"
-      placeholder="Enter login code..."
-      autocomplete="off"
-    >
-    <button id="quickLoginSubmit" type="button">LOGIN</button>
-    <div id="quickLoginMessage"></div>
+  <div id="quickLoginSection">
+   <label class="adminLabel" for="quickLoginInput">LOGIN CODE</label>
+   <input id="quickLoginInput" type="password" placeholder="Enter login code..." autocomplete="off">
+   <button id="quickLoginSubmit" type="button">LOGIN</button>
+   <div id="quickLoginMessage" aria-live="polite"></div>
   </div>
-
-  <!--  -->
-  <label class="adminLabel" for="adminUser">USER</label>
-  <input class="adminInput" id="adminUser" type="text" placeholder="Enter user">
-
-  <label class="adminLabel" for="adminPassword">PASSWORD</label>
-  <input class="adminInput" id="adminPassword" type="password" placeholder="Enter password">
-
-  <!--  -->
-</div>
-  
 
   <label class="adminLabel" for="adminUser">USER</label>
   <input class="adminInput" id="adminUser" type="text" placeholder="Enter user" autocomplete="off" spellcheck="false">
@@ -393,16 +354,11 @@ button:hover{background:#555e}
    <span>VERITY COMMANDS</span>
    <button id="commandsClose" type="button">X</button>
   </div>
-
-  <div id="commandList">
-   <div>/SAY.HI</div>
-  </div>
-
+  <div id="commandList"><div>/SAY.HI</div></div>
   <div id="commandInputRow">
    <input id="commandInput" type="text" placeholder="Enter command..." autocomplete="off" spellcheck="false">
    <button id="commandCheck" type="button">✓</button>
   </div>
-
   <div id="commandResponse">ENTER A COMMAND</div>
   <div id="moreComing">MORE COMING SOON...</div>
  </div>
@@ -419,9 +375,7 @@ button:hover{background:#555e}
    <span>ENTER QUEST USER</span>
    <button id="questsClose" type="button">X</button>
   </div>
-
   <input id="questUserInput" type="text" placeholder="Enter quest user..." autocomplete="off" spellcheck="false" aria-label="Enter quest user">
-
   <button id="checkQuestsButton" type="button">CHECK QUESTS</button>
   <div id="questsMessage" aria-live="polite"></div>
  </div>
@@ -443,14 +397,13 @@ import * as THREE from "three";
 // =====================
 // GAME SETUP
 // =====================
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x87ceeb);
+scene.fog=new THREE.Fog(0x87ceeb,25,65);
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87ceeb);
-scene.fog = new THREE.Fog(0x87ceeb,25,65);
+const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1000);
 
-const camera = new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1000);
-
-const renderer = new THREE.WebGLRenderer({antialias:true});
+const renderer=new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.shadowMap.enabled=true;
@@ -463,7 +416,6 @@ renderer.domElement.style.touchAction="none";
 document.body.prepend(renderer.domElement);
 
 scene.add(new THREE.HemisphereLight(0xffffff,0x667755,2));
-
 const sun=new THREE.DirectionalLight(0xffffff,2);
 sun.position.set(15,30,10);
 sun.castShadow=true;
@@ -473,12 +425,10 @@ scene.add(sun);
 // =====================
 // BLOCK SYSTEM
 // =====================
-
 const materials={
  grass:new THREE.MeshLambertMaterial({color:0x55ad43}),
  dirt:new THREE.MeshLambertMaterial({color:0x80502e})
 };
-
 const blockNames=["grass","dirt"];
 const blockColors=["#55ad43","#80502e"];
 const geometry=new THREE.BoxGeometry(1,1,1);
@@ -486,11 +436,9 @@ const blocks=new Map();
 const key=(x,y,z)=>`${x},${y},${z}`;
 
 function addBlock(x,y,z,type){
- if(type==="stone"||!materials[type])return;
-
+ if(!materials[type])return;
  const k=key(x,y,z);
  if(blocks.has(k))return;
-
  const mesh=new THREE.Mesh(geometry,materials[type]);
  mesh.position.set(x,y,z);
  mesh.castShadow=true;
@@ -502,7 +450,6 @@ function addBlock(x,y,z,type){
 
 function removeBlock(mesh){
  if(mobileDevice.matches)return;
-
  const {x,y,z}=mesh.userData;
  scene.remove(mesh);
  blocks.delete(key(x,y,z));
@@ -515,56 +462,42 @@ function clearWorld(){
 }
 
 // =====================
-// NEW 5x5 WORLD + ONE TREE
+// 5x5 WORLD + ONE TREE
 // =====================
-
-// =====================
-// NEW 5x5 WORLD + ONE TREE
-// =====================
-
 function generateWorld(){
-  clearWorld();
+ clearWorld();
 
-  // Exactly 5x5 ground, with 2 layers
-  for(let x=-2; x<=2; x++){
-    for(let z=-2; z<=2; z++){
-      addBlock(x, 0, z, "grass");
-      addBlock(x, -1, z, "dirt");
-    }
+ for(let x=-2;x<=2;x++){
+  for(let z=-2;z<=2;z++){
+   addBlock(x,0,z,"grass");
+   addBlock(x,-1,z,"dirt");
   }
+ }
 
-  // Exactly ONE tree
-  const treeX = 1;
-  const treeZ = 1;
+ // One tree at (1,1), away from the spawn point
+ const treeX=1,treeZ=1;
+ addBlock(treeX,1,treeZ,"dirt");
+ addBlock(treeX,2,treeZ,"dirt");
 
-  // Two-block trunk
-  addBlock(treeX, 1, treeZ, "dirt");
-  addBlock(treeX, 2, treeZ, "dirt");
-
-  // Leaves
-  for(let dx=-1; dx<=1; dx++){
-    for(let dz=-1; dz<=1; dz++){
-      addBlock(treeX+dx, 3, treeZ+dz, "grass");
-    }
+ for(let dx=-1;dx<=1;dx++){
+  for(let dz=-1;dz<=1;dz++){
+   addBlock(treeX+dx,3,treeZ+dz,"grass");
   }
-
-  addBlock(treeX, 4, treeZ, "grass");
+ }
+ addBlock(treeX,4,treeZ,"grass");
 }
 
 // =====================
 // SAVE / LOAD
 // =====================
-
-// New save key ensures the old larger world is not loaded
-// for this updated 5x5 world.
-const SAVE_KEY="voxel-world-v4";
-let saveTimer,messageTimeout;
+// New key: older world saves will not overwrite this new world.
+const SAVE_KEY="voxel-world-v5-respawn";
+let saveTimer=null,messageTimeout=null;
 
 function showMessage(text){
  const el=document.getElementById("message");
  el.textContent=text;
  el.style.opacity="1";
-
  clearTimeout(messageTimeout);
  messageTimeout=setTimeout(()=>el.style.opacity="0",1800);
 }
@@ -575,7 +508,6 @@ function saveWorld(){
    const {x,y,z,type}=m.userData;
    return [x,y,z,type];
   });
-
   localStorage.setItem(SAVE_KEY,JSON.stringify(data));
   document.getElementById("status").textContent="WORLD SAVED ✓";
   return true;
@@ -595,25 +527,18 @@ function scheduleSave(){
 function loadWorld(){
  try{
   const raw=localStorage.getItem(SAVE_KEY);
-
   if(raw){
    const data=JSON.parse(raw);
-
    if(Array.isArray(data)&&data.length>0&&data.length<10000){
     clearWorld();
-
     for(const item of data){
      if(!Array.isArray(item)||item.length!==4)continue;
-
      const [x,y,z,type]=item;
-
      if(!Number.isInteger(x)||!Number.isInteger(y)||!Number.isInteger(z)||
        !["grass","dirt"].includes(type)||
        Math.abs(x)>100||Math.abs(y)>100||Math.abs(z)>100)continue;
-
      addBlock(x,y,z,type);
     }
-
     if(blocks.size>0){
      document.getElementById("status").textContent="WORLD LOADED ✓";
      return;
@@ -623,18 +548,19 @@ function loadWorld(){
  }catch(e){
   console.warn("Could not load saved world.",e);
  }
-
  generateWorld();
  saveWorld();
 }
-
 loadWorld();
 
 // =====================
-// PLAYER / COLLISIONS
+// PLAYER / RESPAWN
 // =====================
+const SPAWN_X=-1;
+const SPAWN_Y=2.6;
+const SPAWN_Z=0;
 
-camera.position.set(0,2.6,0);
+camera.position.set(SPAWN_X,SPAWN_Y,SPAWN_Z);
 
 let yaw=0,pitch=0;
 let selectedBlock="grass";
@@ -651,6 +577,15 @@ const mobileDevice=window.matchMedia("(pointer: coarse), (max-width: 800px)");
 const mobileControls=document.getElementById("mobileControls");
 const mobileReset=document.getElementById("mobileReset");
 
+function respawnPlayer(){
+ camera.position.set(SPAWN_X,SPAWN_Y,SPAWN_Z);
+ velocityY=0;
+ canJump=false;
+ yaw=0;
+ pitch=0;
+ updateCameraRotation();
+}
+
 function updateCameraRotation(){
  camera.rotation.order="YXZ";
  camera.rotation.y=yaw;
@@ -666,47 +601,39 @@ function collidesAt(px,py,pz){
   for(let y=Math.floor(minY-.5);y<=Math.ceil(maxY+.5);y++){
    for(let z=Math.floor(minZ-.5);z<=Math.ceil(maxZ+.5);z++){
     if(!blocks.has(key(x,y,z)))continue;
-
     if(maxX>x-.499&&minX<x+.499&&
        maxY>y-.499&&minY<y+.499&&
        maxZ>z-.499&&minZ<z+.499)return true;
    }
   }
  }
-
  return false;
 }
 
 function findLandingHeight(px,currentY,nextY,pz){
  const currentFeet=currentY-playerHeight;
  const nextFeet=nextY-playerHeight;
-
  if(nextFeet>=currentFeet)return null;
-
  let landingTop=-Infinity;
 
  for(let x=Math.floor(px-playerRadius-.5);x<=Math.ceil(px+playerRadius+.5);x++){
   for(let z=Math.floor(pz-playerRadius-.5);z<=Math.ceil(pz+playerRadius+.5);z++){
    for(let y=Math.floor(nextFeet-.5);y<=Math.ceil(currentFeet+.5);y++){
     if(!blocks.has(key(x,y,z)))continue;
-
     const overlapsX=px+playerRadius>x-.499&&px-playerRadius<x+.499;
     const overlapsZ=pz+playerRadius>z-.499&&pz-playerRadius<z+.499;
     const top=y+.5;
-
     if(overlapsX&&overlapsZ&&currentFeet>=top-.01&&nextFeet<=top&&top>landingTop){
      landingTop=top;
     }
    }
   }
  }
-
  return landingTop===-Infinity?null:landingTop;
 }
 
 function updatePlayer(delta){
  const speed=5.5;
-
  const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
  const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
  const direction=new THREE.Vector3();
@@ -718,26 +645,18 @@ function updatePlayer(delta){
 
  if(direction.lengthSq()>0){
   direction.normalize().multiplyScalar(speed*delta);
-
   const nextX=camera.position.x+direction.x;
-  if(!collidesAt(nextX,camera.position.y,camera.position.z)){
-   camera.position.x=nextX;
-  }
-
+  if(!collidesAt(nextX,camera.position.y,camera.position.z))camera.position.x=nextX;
   const nextZ=camera.position.z+direction.z;
-  if(!collidesAt(camera.position.x,camera.position.y,nextZ)){
-   camera.position.z=nextZ;
-  }
+  if(!collidesAt(camera.position.x,camera.position.y,nextZ))camera.position.z=nextZ;
  }
 
  const oldY=camera.position.y;
  velocityY=Math.max(velocityY-20*delta,-35);
-
  const nextY=oldY+velocityY*delta;
 
  if(velocityY<=0){
   const top=findLandingHeight(camera.position.x,oldY,nextY,camera.position.z);
-
   if(top!==null){
    camera.position.y=top+playerHeight;
    velocityY=0;
@@ -752,38 +671,32 @@ function updatePlayer(delta){
   }else{
    camera.position.y=nextY;
   }
-
   canJump=false;
  }
 
- if(camera.position.y < -20){
-  camera.position.set(0,2.6,5);
-  velocityY=0;
-  canJump=false;
+ // Falling out of the world returns the player to the new spawn point.
+ if(camera.position.y < -10){
+  respawnPlayer();
+  showMessage("RESPAWNED!");
  }
 }
 
 // =====================
 // HOTBAR
 // =====================
-
 const hotbar=document.getElementById("hotbar");
 
 blockNames.forEach((type,i)=>{
  const slot=document.createElement("div");
-
  slot.className="slot"+(i===0?" selected":"");
  slot.innerHTML=`<div class="swatch" style="background:${blockColors[i]}"></div>${i+1}: ${type.toUpperCase()}`;
-
  slot.addEventListener("click",()=>selectBlock(type));
  hotbar.appendChild(slot);
 });
 
 function selectBlock(type){
  if(!blockNames.includes(type))return;
-
  selectedBlock=type;
-
  [...hotbar.children].forEach((slot,i)=>{
   slot.classList.toggle("selected",blockNames[i]===type);
  });
@@ -792,9 +705,7 @@ function selectBlock(type){
 // =====================
 // MENU / PICKAXE
 // =====================
-
 const overlay=document.getElementById("overlay");
-
 const pickaxeHud=document.createElement("div");
 pickaxeHud.id="pickaxe-hud";
 document.body.appendChild(pickaxeHud);
@@ -802,7 +713,6 @@ document.body.appendChild(pickaxeHud);
 // =====================
 // SECRET PANEL REFERENCES
 // =====================
-
 const questsButton=document.getElementById("questsButton");
 const questsLoginPanel=document.getElementById("questsLoginPanel");
 const questsClose=document.getElementById("questsClose");
@@ -825,16 +735,13 @@ function closeAllSecretPanels(){
 // =====================
 // START / STOP GAME
 // =====================
-
 function startMobileGame(){
  stopHalloweenEvent();
-
  isLocked=true;
  overlay.style.display="none";
  pickaxeHud.style.display="none";
  mobileControls.style.display=mobileDevice.matches?"block":"none";
  mobileReset.style.display="block";
-
  closeAllSecretPanels();
  updateCameraRotation();
 }
@@ -853,52 +760,40 @@ document.getElementById("backBtn").addEventListener("click",()=>{
 
 document.addEventListener("pointerlockchange",()=>{
  if(mobileDevice.matches)return;
-
  isLocked=document.pointerLockElement===renderer.domElement;
-
  if(isLocked)stopHalloweenEvent();
-
  overlay.style.display=isLocked?"none":"flex";
  pickaxeHud.style.display=isLocked?"none":"block";
  mobileControls.style.display="none";
-
  if(isLocked)closeAllSecretPanels();
-
  for(const code in keys)keys[code]=false;
 });
 
 document.addEventListener("mousemove",event=>{
  if(!isLocked||mobileDevice.matches)return;
-
  yaw-=event.movementX*.002;
  pitch-=event.movementY*.002;
-
  pitch=Math.max(-Math.PI/2+.01,Math.min(Math.PI/2-.01,pitch));
-
  updateCameraRotation();
 });
 
 // =====================
 // KEYBOARD
 // =====================
-
 document.addEventListener("keydown",event=>{
  const active=document.activeElement;
  const typing=active&&(active.tagName==="INPUT"||active.tagName==="TEXTAREA");
-
  if(typing)return;
 
  keys[event.code]=true;
 
  if(event.code==="Space"){
   event.preventDefault();
-
   if(canJump&&isLocked){
    velocityY=7;
    canJump=false;
   }
  }
-
  if(event.code==="Digit1")selectBlock("grass");
  if(event.code==="Digit2")selectBlock("dirt");
 
@@ -908,19 +803,14 @@ document.addEventListener("keydown",event=>{
  }
 });
 
-document.addEventListener("keyup",event=>{
- keys[event.code]=false;
-});
-
+document.addEventListener("keyup",event=>{keys[event.code]=false});
 document.addEventListener("contextmenu",event=>event.preventDefault());
 
 // =====================
-// MOBILE MOVEMENT BUTTONS
+// MOBILE MOVEMENT
 // =====================
-
 function mobileButton(id,keyCode){
  const btn=document.getElementById(id);
-
  btn.addEventListener("pointerdown",event=>{
   event.preventDefault();
   event.stopPropagation();
@@ -928,12 +818,10 @@ function mobileButton(id,keyCode){
   keys[keyCode]=true;
   btn.classList.add("active");
  });
-
  function release(){
   keys[keyCode]=false;
   btn.classList.remove("active");
  }
-
  btn.addEventListener("pointerup",release);
  btn.addEventListener("pointercancel",release);
  btn.addEventListener("lostpointercapture",release);
@@ -946,57 +834,40 @@ mobileButton("moveRight","KeyD");
 
 function stopMobileGame(){
  stopHalloweenEvent();
-
  isLocked=false;
  mobileLooking=false;
  lookPointerId=null;
-
  for(const code in keys)keys[code]=false;
-
  overlay.style.display="flex";
  pickaxeHud.style.display="block";
  mobileControls.style.display="none";
-
  closeAllSecretPanels();
 }
 
-// =====================
-// MOBILE MENU + RESET
-// =====================
-
 document.getElementById("mobileMenu").addEventListener("click",()=>{
  if(!mobileDevice.matches)return;
-
  if(isLocked)stopMobileGame();
  else overlay.style.display="flex";
 });
 
-document.getElementById("mobileReset").addEventListener("click",()=>{
- if(!mobileDevice.matches||!isLocked)return;
-
+function resetWorld(){
  clearTimeout(saveTimer);
  localStorage.removeItem(SAVE_KEY);
-
  generateWorld();
-
- camera.position.set(0,2.6,5);
- yaw=0;
- pitch=0;
- velocityY=0;
- canJump=false;
-
+ respawnPlayer();
  for(const code in keys)keys[code]=false;
-
  selectBlock("grass");
- updateCameraRotation();
  saveWorld();
+ showMessage("New world created!");
+}
 
- showMessage("World reset!");
+document.getElementById("mobileReset").addEventListener("click",()=>{
+ if(!mobileDevice.matches||!isLocked)return;
+ resetWorld();
 });
 
 document.getElementById("mobileJump").addEventListener("pointerdown",event=>{
  event.preventDefault();
-
  if(isLocked&&canJump){
   velocityY=7;
   canJump=false;
@@ -1006,7 +877,6 @@ document.getElementById("mobileJump").addEventListener("pointerdown",event=>{
 // =====================
 // MOBILE LOOK + TAP TO PLACE
 // =====================
-
 let mobileLooking=false;
 let lookPointerId=null;
 let lastTouchX=0,lastTouchY=0;
@@ -1015,42 +885,29 @@ let touchMoved=false;
 
 renderer.domElement.addEventListener("pointerdown",event=>{
  if(!mobileDevice.matches||!isLocked||event.pointerType==="mouse")return;
-
  mobileLooking=true;
  lookPointerId=event.pointerId;
-
  lastTouchX=touchStartX=event.clientX;
  lastTouchY=touchStartY=event.clientY;
-
  touchMoved=false;
 });
 
 renderer.domElement.addEventListener("pointermove",event=>{
  if(!mobileDevice.matches||!mobileLooking||event.pointerId!==lookPointerId)return;
-
  const dx=event.clientX-lastTouchX;
  const dy=event.clientY-lastTouchY;
-
- if(Math.abs(event.clientX-touchStartX)>7||Math.abs(event.clientY-touchStartY)>7){
-  touchMoved=true;
- }
-
+ if(Math.abs(event.clientX-touchStartX)>7||Math.abs(event.clientY-touchStartY)>7)touchMoved=true;
  lastTouchX=event.clientX;
  lastTouchY=event.clientY;
-
  yaw-=dx*.006;
  pitch-=dy*.006;
-
  pitch=Math.max(-Math.PI/2+.01,Math.min(Math.PI/2-.01,pitch));
-
  updateCameraRotation();
 });
 
 renderer.domElement.addEventListener("pointerup",event=>{
  if(!mobileDevice.matches||event.pointerId!==lookPointerId)return;
-
  if(!touchMoved&&isLocked)placeBlockAtCrosshair();
-
  mobileLooking=false;
  lookPointerId=null;
 });
@@ -1062,37 +919,27 @@ renderer.domElement.addEventListener("pointercancel",()=>{
 
 document.getElementById("mobilePlace").addEventListener("pointerdown",event=>{
  event.preventDefault();
-
  if(isLocked)placeBlockAtCrosshair();
 });
 
 // =====================
 // BLOCK BREAKING / PLACING
 // =====================
-
 function getTargetBlock(){
  raycaster.setFromCamera(new THREE.Vector2(0,0),camera);
-
  const hits=raycaster.intersectObjects([...blocks.values()],false);
-
  return hits.length?hits[0]:null;
 }
 
 function placeBlockAtCrosshair(){
  if(!isLocked)return;
-
  const hit=getTargetBlock();
  if(!hit)return;
 
  const normal=hit.face.normal.clone();
  normal.transformDirection(hit.object.matrixWorld);
-
  const pos=hit.object.position.clone().add(normal);
-
- const x=Math.round(pos.x);
- const y=Math.round(pos.y);
- const z=Math.round(pos.z);
-
+ const x=Math.round(pos.x),y=Math.round(pos.y),z=Math.round(pos.z);
  if(blocks.has(key(x,y,z)))return;
 
  const overlapsPlayer=
@@ -1100,7 +947,6 @@ function placeBlockAtCrosshair(){
   Math.abs(z-camera.position.z)<.5+playerRadius&&
   y+.5>camera.position.y-playerHeight&&
   y-.5<camera.position.y;
-
  if(overlapsPlayer)return;
 
  addBlock(x,y,z,selectedBlock);
@@ -1110,7 +956,6 @@ function placeBlockAtCrosshair(){
 document.addEventListener("mousedown",event=>{
  if(!isLocked||mobileDevice.matches)return;
  if(event.button!==0&&event.button!==2)return;
-
  const hit=getTargetBlock();
  if(!hit)return;
 
@@ -1121,13 +966,8 @@ document.addEventListener("mousedown",event=>{
  if(event.button===2){
   const normal=hit.face.normal.clone();
   normal.transformDirection(hit.object.matrixWorld);
-
   const pos=hit.object.position.clone().add(normal);
-
-  const x=Math.round(pos.x);
-  const y=Math.round(pos.y);
-  const z=Math.round(pos.z);
-
+  const x=Math.round(pos.x),y=Math.round(pos.y),z=Math.round(pos.z);
   if(blocks.has(key(x,y,z)))return;
 
   const overlapsPlayer=
@@ -1135,7 +975,6 @@ document.addEventListener("mousedown",event=>{
    Math.abs(z-camera.position.z)<.5+playerRadius&&
    y+.5>camera.position.y-playerHeight&&
    y-.5<camera.position.y;
-
   if(overlapsPlayer)return;
 
   addBlock(x,y,z,selectedBlock);
@@ -1144,9 +983,8 @@ document.addEventListener("mousedown",event=>{
 });
 
 // =====================
-// 3D STONE PICKAXE
+// 3D PICKAXE
 // =====================
-
 const pickScene=new THREE.Scene();
 const pickCamera=new THREE.PerspectiveCamera(35,1,.1,100);
 pickCamera.position.set(0,0,7);
@@ -1157,7 +995,6 @@ pickRenderer.setSize(190,190);
 pickaxeHud.appendChild(pickRenderer.domElement);
 
 pickScene.add(new THREE.HemisphereLight(0xffffff,0x49413a,2));
-
 const pickLight=new THREE.DirectionalLight(0xffffff,3);
 pickLight.position.set(3,5,6);
 pickScene.add(pickLight);
@@ -1174,7 +1011,6 @@ handle.position.set(-.2,-.15,0);
 pickaxe.add(handle);
 
 const stoneMaterial=new THREE.MeshStandardMaterial({color:0x555b61,roughness:1,flatShading:true});
-
 const stoneHead=new THREE.Mesh(new THREE.IcosahedronGeometry(.52,0),stoneMaterial);
 stoneHead.scale.set(1.65,.65,.7);
 stoneHead.rotation.z=-.35;
@@ -1196,53 +1032,33 @@ pickaxe.add(binding);
 
 pickaxe.rotation.z=-.25;
 pickaxe.scale.setScalar(.85);
-
 let pickaxeTime=0;
 
 function animatePickaxe(){
  requestAnimationFrame(animatePickaxe);
-
  pickaxeTime+=.018;
  pickaxe.rotation.y+=.018;
  pickaxe.rotation.x=Math.sin(pickaxeTime)*.12;
  pickaxe.position.y=Math.sin(pickaxeTime*1.5)*.08;
-
  pickRenderer.render(pickScene,pickCamera);
 }
-
 animatePickaxe();
 
 // =====================
-// SAVE / RESET BUTTONS
+// SAVE / NEW WORLD BUTTONS
 // =====================
-
 document.getElementById("saveBtn").addEventListener("click",()=>{
  if(saveWorld())showMessage("World saved successfully!");
 });
 
 document.getElementById("resetBtn").addEventListener("click",()=>{
  if(!confirm("Are you sure you want to create a new world?"))return;
-
- localStorage.removeItem(SAVE_KEY);
- generateWorld();
-
- camera.position.set(0,2.6,5);
- velocityY=0;
- canJump=false;
- yaw=0;
- pitch=0;
-
- updateCameraRotation();
- selectBlock("grass");
- saveWorld();
-
- showMessage("New world created!");
+ resetWorld();
 });
 
 // =====================
 // CODE MACHINE + VERITY + ADMIN
 // =====================
-
 const codeMachineInput=document.getElementById("codeMachineInput");
 const codeMachineCheck=document.getElementById("codeMachineCheck");
 
@@ -1263,6 +1079,12 @@ const adminCodeSection=document.getElementById("adminCodeSection");
 const adminCodeInput=document.getElementById("adminCodeInput");
 const adminCodeButton=document.getElementById("adminCodeButton");
 const adminCodeMessage=document.getElementById("adminCodeMessage");
+
+const quickLoginButton=document.getElementById("quickLoginButton");
+const quickLoginSection=document.getElementById("quickLoginSection");
+const quickLoginInput=document.getElementById("quickLoginInput");
+const quickLoginSubmit=document.getElementById("quickLoginSubmit");
+const quickLoginMessage=document.getElementById("quickLoginMessage");
 
 const adminVerityPanel=document.getElementById("adminVerityPanel");
 const adminVerityClose=document.getElementById("adminVerityClose");
@@ -1285,19 +1107,17 @@ let halloweenOriginalBackground=null;
 
 function openAdminPanel(){
  if(overlay.style.display==="none")return;
-
  closeAllSecretPanels();
-
  adminPanel.style.display="block";
  adminError.textContent="";
  adminCodeMessage.textContent="";
  adminCodeSection.style.display="none";
-
+ quickLoginSection.style.display="none";
+ quickLoginMessage.textContent="";
  adminUser.value="";
  adminPassword.value="";
  adminCodeInput.value="";
-
- adminUser.focus();
+ quickLoginInput.value="";
 }
 
 function checkCode(){
@@ -1320,7 +1140,6 @@ function checkCode(){
 }
 
 codeMachineCheck.addEventListener("click",checkCode);
-
 codeMachineInput.addEventListener("keydown",event=>{
  if(event.key==="Enter"){
   event.preventDefault();
@@ -1329,53 +1148,40 @@ codeMachineInput.addEventListener("keydown",event=>{
 });
 
 // QUICK LOG IN
-const quickLoginButton = document.getElementById("quickLoginButton");
-const quickLoginSection = document.getElementById("quickLoginSection");
-const quickLoginInput = document.getElementById("quickLoginInput");
-const quickLoginSubmit = document.getElementById("quickLoginSubmit");
-const quickLoginMessage = document.getElementById("quickLoginMessage");
-
-quickLoginButton.addEventListener("click", () => {
-  quickLoginSection.style.display =
-    quickLoginSection.style.display === "block" ? "none" : "block";
-
-  quickLoginMessage.textContent = "";
-  quickLoginInput.value = "";
-
-  if (quickLoginSection.style.display === "block") {
-    quickLoginInput.focus();
-  }
+quickLoginButton.addEventListener("click",()=>{
+ const opening=quickLoginSection.style.display!=="block";
+ quickLoginSection.style.display=opening?"block":"none";
+ quickLoginMessage.textContent="";
+ quickLoginInput.value="";
+ if(opening)quickLoginInput.focus();
 });
 
-function checkQuickLogin() {
-  if (quickLoginInput.value === "#QT/COOLEST") {
-    quickLoginMessage.textContent = "";
-    quickLoginSection.style.display = "none";
-
-    adminError.textContent = "";
-    adminCodeMessage.textContent = "";
-    adminCodeSection.style.display = "block";
-
-    adminUser.value = "";
-    adminPassword.value = "";
-    adminCodeInput.value = "";
-
-    showMessage("QUICK LOGIN SUCCESSFUL!");
-  } else {
-    quickLoginMessage.textContent = "INVALID LOGIN CODE";
-  }
+function checkQuickLogin(){
+ if(quickLoginInput.value==="#QT/COOLEST"){
+  quickLoginMessage.textContent="";
+  quickLoginSection.style.display="none";
+  adminError.textContent="";
+  adminCodeMessage.textContent="";
+  adminCodeSection.style.display="block";
+  adminUser.value="";
+  adminPassword.value="";
+  adminCodeInput.value="";
+  adminCodeInput.focus();
+  showMessage("QUICK LOGIN SUCCESSFUL!");
+ }else{
+  quickLoginMessage.textContent="INVALID LOGIN CODE";
+ }
 }
 
-quickLoginSubmit.addEventListener("click", checkQuickLogin);
-
-quickLoginInput.addEventListener("keydown", event => {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    checkQuickLogin();
-  }
+quickLoginSubmit.addEventListener("click",checkQuickLogin);
+quickLoginInput.addEventListener("keydown",event=>{
+ if(event.key==="Enter"){
+  event.preventDefault();
+  checkQuickLogin();
+ }
 });
- 
-// ADMIN LOGIN
+
+// NORMAL ADMIN LOGIN
 function checkAdminLogin(){
  const user=adminUser.value.trim();
  const password=adminPassword.value;
@@ -1393,25 +1199,23 @@ function checkAdminLogin(){
 }
 
 adminLoginButton.addEventListener("click",checkAdminLogin);
-
 adminUser.addEventListener("keydown",event=>{
  if(event.key==="Enter"){
   event.preventDefault();
   adminPassword.focus();
  }
 });
-
 adminPassword.addEventListener("keydown",event=>{
  if(event.key==="Enter"){
   event.preventDefault();
   checkAdminLogin();
  }
 });
-
 adminClose.addEventListener("click",()=>{
  adminPanel.style.display="none";
 });
 
+// ADMIN CODES
 function checkAdminCode(){
  const code=adminCodeInput.value.trim().toUpperCase();
 
@@ -1420,14 +1224,12 @@ function checkAdminCode(){
   adminVerityPanel.style.display="none";
   commandsPanel.style.display="none";
   halloweenPanel.style.display="block";
-
   adminCodeMessage.textContent="";
   adminCodeInput.value="";
  }else if(code==="VERITY.MODED"){
   adminPanel.style.display="none";
   adminVerityPanel.style.display="block";
   commandsPanel.style.display="none";
-
   adminVerityStatus.textContent="VERITY IS LISTENING...";
   adminCodeMessage.textContent="";
   adminCodeInput.value="";
@@ -1437,7 +1239,6 @@ function checkAdminCode(){
 }
 
 adminCodeButton.addEventListener("click",checkAdminCode);
-
 adminCodeInput.addEventListener("keydown",event=>{
  if(event.key==="Enter"){
   event.preventDefault();
@@ -1448,11 +1249,9 @@ adminCodeInput.addEventListener("keydown",event=>{
 // =====================
 // HALLOWEEN EVENT
 // =====================
-
 function stopHalloweenEvent(){
  clearTimeout(halloweenTimer);
  halloweenTimer=null;
-
  halloweenMusic.pause();
 
  try{
@@ -1475,11 +1274,9 @@ function stopHalloweenEvent(){
 
 function summonHalloween(){
  halloweenPanel.style.display="none";
-
  if(overlay.style.display==="none")return;
 
  stopHalloweenEvent();
-
  halloweenOriginalBackground={
   color:overlay.style.backgroundColor,
   image:overlay.style.backgroundImage
@@ -1491,15 +1288,12 @@ function summonHalloween(){
   "linear-gradient(90deg,#b78ad833 1px,transparent 1px)";
 
  halloweenMusic.currentTime=0;
-
  halloweenMusic.play().catch(error=>{
   console.warn("Halloween video could not play:",error);
   showMessage("Could not play halloween.mp4");
  });
 
- halloweenTimer=setTimeout(()=>{
-  stopHalloweenEvent();
- },30000);
+ halloweenTimer=setTimeout(()=>stopHalloweenEvent(),30000);
 }
 
 summonButton.addEventListener("click",summonHalloween);
@@ -1507,25 +1301,19 @@ summonButton.addEventListener("click",summonHalloween);
 // =====================
 // NORMAL VERITY
 // =====================
-
 verityButton.addEventListener("click",()=>{
  if(overlay.style.display==="none")return;
-
  closeAllSecretPanels();
-
  verityPanel.style.display="block";
  verityInput.value="";
  verityResponse.textContent="VERITY IS LISTENING...";
  verityInput.focus();
 });
 
-verityClose.addEventListener("click",()=>{
- verityPanel.style.display="none";
-});
+verityClose.addEventListener("click",()=>{verityPanel.style.display="none"});
 
 function sendVerityMessage(){
  const message=verityInput.value.trim().toUpperCase();
-
  if(message==="/SAY.HI"){
   verityResponse.textContent="HI ITS ME ITS VERITY";
  }else{
@@ -1534,7 +1322,6 @@ function sendVerityMessage(){
 }
 
 veritySend.addEventListener("click",sendVerityMessage);
-
 verityInput.addEventListener("keydown",event=>{
  if(event.key==="Enter"){
   event.preventDefault();
@@ -1543,9 +1330,8 @@ verityInput.addEventListener("keydown",event=>{
 });
 
 // =====================
-// ADMIN VERITY SCREEN
+// ADMIN VERITY / COMMANDS
 // =====================
-
 adminVerityClose.addEventListener("click",()=>{
  adminVerityPanel.style.display="none";
  commandsPanel.style.display="none";
@@ -1554,7 +1340,6 @@ adminVerityClose.addEventListener("click",()=>{
 commandsButton.addEventListener("click",()=>{
  adminVerityPanel.style.display="none";
  commandsPanel.style.display="block";
-
  commandInput.value="";
  commandResponse.textContent="ENTER A COMMAND";
  commandInput.focus();
@@ -1567,7 +1352,6 @@ commandsClose.addEventListener("click",()=>{
 
 function runVerityCommand(){
  const command=commandInput.value.trim().toUpperCase();
-
  if(command==="/SAY.HI"){
   commandResponse.textContent="HI ITS ME ITS VERITY";
  }else{
@@ -1576,7 +1360,6 @@ function runVerityCommand(){
 }
 
 commandCheck.addEventListener("click",runVerityCommand);
-
 commandInput.addEventListener("keydown",event=>{
  if(event.key==="Enter"){
   event.preventDefault();
@@ -1587,12 +1370,9 @@ commandInput.addEventListener("keydown",event=>{
 // =====================
 // QUESTS SYSTEM
 // =====================
-
 questsButton.addEventListener("click",()=>{
  if(overlay.style.display==="none")return;
-
  closeAllSecretPanels();
-
  questsLoginPanel.style.display="block";
  questUserInput.value="";
  questsMessage.textContent="";
@@ -1602,14 +1382,12 @@ questsButton.addEventListener("click",()=>{
 questsClose.addEventListener("click",()=>{
  questsLoginPanel.style.display="none";
 });
-
 questsResultClose.addEventListener("click",()=>{
  questsResultPanel.style.display="none";
 });
 
 function checkQuests(){
  const username=questUserInput.value.trim().toUpperCase();
-
  if(username==="ROWAN-Q83T0"){
   questsLoginPanel.style.display="none";
   questsResultPanel.style.display="block";
@@ -1620,7 +1398,6 @@ function checkQuests(){
 }
 
 checkQuestsButton.addEventListener("click",checkQuests);
-
 questUserInput.addEventListener("keydown",event=>{
  if(event.key==="Enter"){
   event.preventDefault();
@@ -1631,35 +1408,24 @@ questUserInput.addEventListener("keydown",event=>{
 // =====================
 // GAME LOOP
 // =====================
-
 let lastTime=performance.now();
 
 function animate(now){
  requestAnimationFrame(animate);
-
  const delta=Math.min((now-lastTime)/1000,.05);
  lastTime=now;
-
  if(isLocked)updatePlayer(delta);
-
  renderer.render(scene,camera);
 }
-
 requestAnimationFrame(animate);
 
 addEventListener("resize",()=>{
  camera.aspect=innerWidth/innerHeight;
  camera.updateProjectionMatrix();
-
  renderer.setSize(innerWidth,innerHeight);
-
  pickCamera.aspect=1;
  pickCamera.updateProjectionMatrix();
-
- pickRenderer.setSize(
-  pickaxeHud.clientWidth,
-  pickaxeHud.clientHeight
- );
+ pickRenderer.setSize(pickaxeHud.clientWidth,pickaxeHud.clientHeight);
 });
 
 addEventListener("beforeunload",()=>{
@@ -1667,7 +1433,9 @@ addEventListener("beforeunload",()=>{
  stopHalloweenEvent();
  saveWorld();
 });
+
+// Make sure the camera rotation starts in the correct state.
+updateCameraRotation();
 </script>
 </body>
 </html>
-
