@@ -137,6 +137,17 @@ button:hover{background:#555e}
 #commandResponse{margin-top:12px;padding:10px;min-height:40px;background:#f7d52a;border:2px solid #b99b00;font-weight:900;overflow-wrap:anywhere}
 #moreComing{margin-top:15px;text-align:center;font-size:13px;font-weight:900;letter-spacing:2px}
 
+/* HALLOWEEN EVENT — ADMIN CODE ONLY */
+#halloweenPanel{
+ display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+ width:min(430px,90vw);padding:26px;text-align:center;color:white;
+ background:linear-gradient(135deg,#ff7a00 0%,#ff7a00 48%,#7026a8 52%,#35104f 100%);
+ border:4px solid #ffb14a;box-shadow:9px 9px 0 #0008;z-index:48
+}
+#halloweenTitle{font-size:clamp(27px,6vw,42px);font-weight:900;letter-spacing:4px;margin:4px 0 25px;text-shadow:3px 3px 0 #35104f}
+#summonButton{width:100%;min-height:54px;background:#999;color:#171717;border:3px solid #555;border-radius:0;font-size:20px;font-weight:900;letter-spacing:3px}
+#summonButton:hover{background:#bcbcbc}
+
 @media(pointer:coarse),(max-width:800px){
  #help,#buttons{display:none}
  #hotbar{bottom:5px;gap:3px}
@@ -278,6 +289,12 @@ button:hover{background:#555e}
 
   <div id="commandResponse">ENTER A COMMAND</div>
   <div id="moreComing">MORE COMING SOON...</div>
+ </div>
+
+ <!-- HALLOWEEN EVENT — ADMIN ONLY -->
+ <div id="halloweenPanel">
+  <div id="halloweenTitle">HALLOWEEN</div>
+  <button id="summonButton" type="button">SUMMON</button>
  </div>
 </div>
 
@@ -577,6 +594,7 @@ document.body.appendChild(pickaxeHud);
 // =====================
 
 function startMobileGame(){
+ stopHalloweenEvent();
  isLocked=true;
  overlay.style.display="none";
  pickaxeHud.style.display="none";
@@ -601,6 +619,7 @@ document.getElementById("backBtn").addEventListener("click",()=>{
 document.addEventListener("pointerlockchange",()=>{
  if(mobileDevice.matches)return;
  isLocked=document.pointerLockElement===renderer.domElement;
+ if(isLocked)stopHalloweenEvent();
  overlay.style.display=isLocked?"none":"flex";
  pickaxeHud.style.display=isLocked?"none":"block";
  mobileControls.style.display="none";
@@ -675,6 +694,7 @@ mobileButton("moveLeft","KeyA");
 mobileButton("moveRight","KeyD");
 
 function stopMobileGame(){
+ stopHalloweenEvent();
  isLocked=false;
  mobileLooking=false;
  lookPointerId=null;
@@ -942,12 +962,18 @@ const commandsClose=document.getElementById("commandsClose");
 const commandInput=document.getElementById("commandInput");
 const commandCheck=document.getElementById("commandCheck");
 const commandResponse=document.getElementById("commandResponse");
+const halloweenPanel=document.getElementById("halloweenPanel");
+const summonButton=document.getElementById("summonButton");
+let halloweenTimer=null;
+let halloweenAudioFrame=null;
+let halloweenOriginalBackground=null;
 
 function closeAllSecretPanels(){
  verityPanel.style.display="none";
  adminPanel.style.display="none";
  adminVerityPanel.style.display="none";
  commandsPanel.style.display="none";
+ halloweenPanel.style.display="none";
 }
 
 function openAdminPanel(){
@@ -1030,7 +1056,14 @@ adminClose.addEventListener("click",()=>{
 function checkAdminCode(){
  const code=adminCodeInput.value.trim().toUpperCase();
 
- if(code==="VERITY.MODED"){
+ if(code==="/HALLOWEEN.EVENT"){
+  adminPanel.style.display="none";
+  adminVerityPanel.style.display="none";
+  commandsPanel.style.display="none";
+  halloweenPanel.style.display="block";
+  adminCodeMessage.textContent="";
+  adminCodeInput.value="";
+ }else if(code==="VERITY.MODED"){
   adminPanel.style.display="none";
   adminVerityPanel.style.display="block";
   commandsPanel.style.display="none";
@@ -1049,6 +1082,53 @@ adminCodeInput.addEventListener("keydown",event=>{
   checkAdminCode();
  }
 });
+
+// HALLOWEEN EVENT — purple menu background and 30 seconds of music.
+function stopHalloweenEvent(){
+ clearTimeout(halloweenTimer);
+ halloweenTimer=null;
+ if(halloweenAudioFrame){
+  halloweenAudioFrame.remove();
+  halloweenAudioFrame=null;
+ }
+ if(halloweenOriginalBackground){
+  overlay.style.backgroundColor=halloweenOriginalBackground.color;
+  overlay.style.backgroundImage=halloweenOriginalBackground.image;
+  halloweenOriginalBackground=null;
+ }
+}
+
+function summonHalloween(){
+ halloweenPanel.style.display="none";
+ if(overlay.style.display==="none")return;
+ stopHalloweenEvent();
+ halloweenOriginalBackground={
+  color:overlay.style.backgroundColor,
+  image:overlay.style.backgroundImage
+ };
+ overlay.style.backgroundColor="#39204f";
+ overlay.style.backgroundImage="linear-gradient(#b78ad833 1px,transparent 1px),linear-gradient(90deg,#b78ad833 1px,transparent 1px)";
+
+ // The event starts from a click, so the browser can allow playback.
+ halloweenAudioFrame=document.createElement("iframe");
+ halloweenAudioFrame.src="https://www.youtube-nocookie.com/embed/q6-ZGAGcJrk?autoplay=1&controls=0&start=0&playsinline=1&rel=0";
+ halloweenAudioFrame.title="Spooky Scary Skeletons";
+ halloweenAudioFrame.allow="autoplay; encrypted-media";
+ halloweenAudioFrame.setAttribute("aria-hidden","true");
+ halloweenAudioFrame.style.position="fixed";
+ halloweenAudioFrame.style.width="1px";
+ halloweenAudioFrame.style.height="1px";
+ halloweenAudioFrame.style.left="-10px";
+ halloweenAudioFrame.style.bottom="-10px";
+ halloweenAudioFrame.style.border="0";
+ document.body.appendChild(halloweenAudioFrame);
+
+ halloweenTimer=setTimeout(()=>{
+  stopHalloweenEvent();
+ },30000);
+}
+
+summonButton.addEventListener("click",summonHalloween);
 
 // NORMAL VERITY — UNLOCKED BY CODE MACHINE
 verityButton.addEventListener("click",()=>{
