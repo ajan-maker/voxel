@@ -226,7 +226,6 @@ button:hover{background:#555e}
 
  <button id="verityButton" type="button">VERITY</button>
 
- <!-- Normal Verity screen: no COMMANDS button here -->
  <div id="verityPanel">
   <div id="verityHeader">
    <span>VERITY</span>
@@ -239,7 +238,6 @@ button:hover{background:#555e}
   <div id="verityResponse">VERITY IS LISTENING...</div>
  </div>
 
- <!-- ADMIN LOGIN -->
  <div id="adminPanel">
   <button id="adminClose" type="button">X</button>
   <div id="adminTitle">ADMIN LOGIN</div>
@@ -261,7 +259,6 @@ button:hover{background:#555e}
   </div>
  </div>
 
- <!-- VERITY SCREEN THAT REQUIRES ADMIN ACCESS -->
  <div id="adminVerityPanel">
   <div id="adminVerityHeader">
    <span>VERITY</span>
@@ -271,7 +268,6 @@ button:hover{background:#555e}
   <div id="adminVerityStatus">VERITY IS LISTENING...</div>
  </div>
 
- <!-- COMMANDS SCREEN -->
  <div id="commandsPanel">
   <div id="commandsHeader">
    <span>VERITY COMMANDS</span>
@@ -291,8 +287,16 @@ button:hover{background:#555e}
   <div id="moreComing">MORE COMING SOON...</div>
  </div>
 
- <!-- HALLOWEEN EVENT — ADMIN ONLY -->
- <audio id="halloweenMusic" src="./halloween.mp3" preload="auto" loop></audio>
+ <!-- Hidden video: only its sound is intended to be heard -->
+ <video
+  id="halloweenMusic"
+  src="./halloween.mp4"
+  preload="auto"
+  playsinline
+  loop
+  style="display:none"
+ ></video>
+
  <div id="halloweenPanel">
   <div id="halloweenTitle">HALLOWEEN</div>
   <button id="summonButton" type="button">SUMMON</button>
@@ -963,8 +967,11 @@ const commandsClose=document.getElementById("commandsClose");
 const commandInput=document.getElementById("commandInput");
 const commandCheck=document.getElementById("commandCheck");
 const commandResponse=document.getElementById("commandResponse");
+
 const halloweenPanel=document.getElementById("halloweenPanel");
 const summonButton=document.getElementById("summonButton");
+const halloweenMusic=document.getElementById("halloweenMusic");
+
 let halloweenTimer=null;
 let halloweenAudioFrame=null;
 let halloweenOriginalBackground=null;
@@ -1084,18 +1091,28 @@ adminCodeInput.addEventListener("keydown",event=>{
  }
 });
 
-// HALLOWEEN EVENT — purple menu background and 30 seconds of music.
+// =====================
+// HALLOWEEN EVENT
+// Hidden MP4 video, audio only, 30 seconds
+// =====================
+
 function stopHalloweenEvent(){
  clearTimeout(halloweenTimer);
- const music=document.getElementById("halloweenMusic");
-
-music.pause();
-music.currentTime=0;
  halloweenTimer=null;
+
+ halloweenMusic.pause();
+
+ try{
+  halloweenMusic.currentTime=0;
+ }catch(error){
+  console.warn("Could not reset Halloween video.",error);
+ }
+
  if(halloweenAudioFrame){
   halloweenAudioFrame.remove();
   halloweenAudioFrame=null;
  }
+
  if(halloweenOriginalBackground){
   overlay.style.backgroundColor=halloweenOriginalBackground.color;
   overlay.style.backgroundImage=halloweenOriginalBackground.image;
@@ -1103,37 +1120,35 @@ music.currentTime=0;
  }
 }
 
-
 function summonHalloween(){
  halloweenPanel.style.display="none";
 
  if(overlay.style.display==="none")return;
 
-function stopHalloweenEvent(){
- // Yeni stopHalloweenEvent kodunun tamamı
-}
+ // Stop any previous Halloween event before starting another.
+ stopHalloweenEvent();
 
-function summonHalloween(){
- // Yeni summonHalloween kodunun tamamı
-}
+ // Remember the original background so it can be restored later.
+ halloweenOriginalBackground={
+  color:overlay.style.backgroundColor,
+  image:overlay.style.backgroundImage
+ };
 
-summonButton.addEventListener("click",summonHalloween);
-
- // Purple Halloween background
+ // Turn the menu background purple.
  overlay.style.backgroundColor="#39204f";
  overlay.style.backgroundImage=
   "linear-gradient(#b78ad833 1px,transparent 1px)," +
   "linear-gradient(90deg,#b78ad833 1px,transparent 1px)";
 
- // Play the custom Halloween music
- const music=document.getElementById("halloweenMusic");
- music.currentTime=0;
+ // The video element is hidden; only its sound plays.
+ halloweenMusic.currentTime=0;
 
- music.play().catch(error=>{
-  console.warn("Halloween music could not play:",error);
+ halloweenMusic.play().catch(error=>{
+  console.warn("Halloween video could not play:",error);
+  showMessage("Could not play halloween.mp4");
  });
 
- // Stop the event after 30 seconds
+ // Stop the video and restore the menu after 30 seconds.
  halloweenTimer=setTimeout(()=>{
   stopHalloweenEvent();
  },30000);
@@ -1141,7 +1156,10 @@ summonButton.addEventListener("click",summonHalloween);
 
 summonButton.addEventListener("click",summonHalloween);
 
+// =====================
 // NORMAL VERITY — UNLOCKED BY CODE MACHINE
+// =====================
+
 verityButton.addEventListener("click",()=>{
  if(overlay.style.display==="none")return;
  closeAllSecretPanels();
@@ -1173,13 +1191,15 @@ verityInput.addEventListener("keydown",event=>{
  }
 });
 
+// =====================
 // ADMIN VERITY SCREEN
+// =====================
+
 adminVerityClose.addEventListener("click",()=>{
  adminVerityPanel.style.display="none";
  commandsPanel.style.display="none";
 });
 
-// Open the COMMANDS screen only from the admin-unlocked Verity screen.
 commandsButton.addEventListener("click",()=>{
  adminVerityPanel.style.display="none";
  commandsPanel.style.display="block";
@@ -1238,6 +1258,7 @@ addEventListener("resize",()=>{
 
 addEventListener("beforeunload",()=>{
  clearTimeout(saveTimer);
+ stopHalloweenEvent();
  saveWorld();
 });
 </script>
