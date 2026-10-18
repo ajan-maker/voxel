@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -125,6 +126,18 @@ button:hover{background:#555e}
  border:2px solid #777;border-radius:0;font-size:15px;outline:none;
  touch-action:auto;user-select:text;-webkit-user-select:text
 }
+
+/* YIN YANG MODE */
+#yinYangButton{
+ display:block;width:100%;min-height:46px;margin:0 0 18px;padding:10px;
+ background:#f0f0f0;color:#111;border:3px solid #888;border-radius:0;
+ font-size:15px;font-weight:900;letter-spacing:1.5px
+}
+#yinYangButton.modeOn{
+ background:#111;color:white;border-color:#eee
+}
+#yinYangButton:hover{filter:brightness(1.15)}
+
 #quickLoginButton{
  width:100%;height:44px;margin-bottom:5px;background:#b89b42;color:#111;
  border:2px solid #e0c66d;border-radius:0;font-weight:900;letter-spacing:1px
@@ -309,7 +322,6 @@ button:hover{background:#555e}
   <div id="verityResponse">VERITY IS LISTENING...</div>
  </div>
 
- <!-- ADMIN LOGIN: all fields are inside the same panel -->
  <div id="adminPanel">
   <button id="adminClose" type="button">X</button>
   <div id="adminTitle">ADMIN LOGIN</div>
@@ -333,6 +345,8 @@ button:hover{background:#555e}
   <div id="adminError" aria-live="polite"></div>
 
   <div id="adminCodeSection">
+   <button id="yinYangButton" type="button">YIN YANG MODE: OFF</button>
+
    <label class="adminLabel" for="adminCodeInput">ENTER CODE</label>
    <input id="adminCodeInput" type="text" placeholder="Enter code..." autocomplete="off" spellcheck="false">
    <button id="adminCodeButton" type="button">ENTER / CODE</button>
@@ -425,15 +439,45 @@ scene.add(sun);
 // =====================
 // BLOCK SYSTEM
 // =====================
-const materials={
- grass:new THREE.MeshLambertMaterial({color:0x55ad43}),
- dirt:new THREE.MeshLambertMaterial({color:0x80502e})
+const NORMAL_COLORS={
+ grass:0x55ad43,
+ dirt:0x80502e
 };
+
+const YIN_YANG_COLORS={
+ grass:0x000000,
+ dirt:0xffffff
+};
+
+// OFF by default. This value is not saved, so refreshing resets it.
+let yinYangMode=false;
+
+const materials={
+ grass:new THREE.MeshLambertMaterial({color:NORMAL_COLORS.grass}),
+ dirt:new THREE.MeshLambertMaterial({color:NORMAL_COLORS.dirt})
+};
+
 const blockNames=["grass","dirt"];
 const blockColors=["#55ad43","#80502e"];
 const geometry=new THREE.BoxGeometry(1,1,1);
 const blocks=new Map();
 const key=(x,y,z)=>`${x},${y},${z}`;
+
+function updateBlockColors(){
+ const colors=yinYangMode?YIN_YANG_COLORS:NORMAL_COLORS;
+
+ materials.grass.color.setHex(colors.grass);
+ materials.dirt.color.setHex(colors.dirt);
+
+ blockColors[0]=yinYangMode?"#000000":"#55ad43";
+ blockColors[1]=yinYangMode?"#ffffff":"#80502e";
+
+ // Update the hotbar previews immediately as well.
+ [...document.querySelectorAll(".swatch")].forEach((swatch,index)=>{
+  if(index===0)swatch.style.background=blockColors[0];
+  if(index===1)swatch.style.background=blockColors[1];
+ });
+}
 
 function addBlock(x,y,z,type){
  if(!materials[type])return;
@@ -474,7 +518,7 @@ function generateWorld(){
   }
  }
 
- // One tree at (1,1), away from the spawn point
+ // One tree at (1,1), away from the spawn point.
  const treeX=1,treeZ=1;
  addBlock(treeX,1,treeZ,"dirt");
  addBlock(treeX,2,treeZ,"dirt");
@@ -490,7 +534,6 @@ function generateWorld(){
 // =====================
 // SAVE / LOAD
 // =====================
-// New key: older world saves will not overwrite this new world.
 const SAVE_KEY="voxel-world-v5-respawn";
 let saveTimer=null,messageTimeout=null;
 
@@ -674,7 +717,6 @@ function updatePlayer(delta){
   canJump=false;
  }
 
- // Falling out of the world returns the player to the new spawn point.
  if(camera.position.y < -10){
   respawnPlayer();
   showMessage("RESPAWNED!");
@@ -693,6 +735,9 @@ blockNames.forEach((type,i)=>{
  slot.addEventListener("click",()=>selectBlock(type));
  hotbar.appendChild(slot);
 });
+
+// Set hotbar colors to match the current mode on startup.
+updateBlockColors();
 
 function selectBlock(type){
  if(!blockNames.includes(type))return;
@@ -1080,6 +1125,8 @@ const adminCodeInput=document.getElementById("adminCodeInput");
 const adminCodeButton=document.getElementById("adminCodeButton");
 const adminCodeMessage=document.getElementById("adminCodeMessage");
 
+const yinYangButton=document.getElementById("yinYangButton");
+
 const quickLoginButton=document.getElementById("quickLoginButton");
 const quickLoginSection=document.getElementById("quickLoginSection");
 const quickLoginInput=document.getElementById("quickLoginInput");
@@ -1104,6 +1151,27 @@ const halloweenMusic=document.getElementById("halloweenMusic");
 let halloweenTimer=null;
 let halloweenAudioFrame=null;
 let halloweenOriginalBackground=null;
+
+// YIN YANG MODE BUTTON
+// The mode is deliberately not saved to localStorage.
+// Reloading the page starts with OFF again.
+function setYinYangMode(enabled){
+ yinYangMode=enabled;
+ updateBlockColors();
+
+ yinYangButton.textContent=
+  "YIN YANG MODE: "+(yinYangMode?"ON":"OFF");
+
+ yinYangButton.classList.toggle("modeOn",yinYangMode);
+
+ showMessage(yinYangMode
+  ?"YIN YANG MODE ON — WHITE DIRT, BLACK GRASS"
+  :"YIN YANG MODE OFF — NORMAL COLORS");
+}
+
+yinYangButton.addEventListener("click",()=>{
+ setYinYangMode(!yinYangMode);
+});
 
 function openAdminPanel(){
  if(overlay.style.display==="none")return;
@@ -1436,6 +1504,9 @@ addEventListener("beforeunload",()=>{
 
 // Make sure the camera rotation starts in the correct state.
 updateCameraRotation();
+
+// Always start with Yin Yang mode OFF when the page loads.
+setYinYangMode(false);
 </script>
 </body>
 </html>
