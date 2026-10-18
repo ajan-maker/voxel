@@ -48,6 +48,39 @@ button:hover{background:#555e}
 #moveBack{top:51px;left:51px}
 #moveRight{top:51px;left:102px}
 
+<button id="questsButton" type="button">QUESTS</button>
+
+<div id="questsLoginPanel">
+ <div id="questsLoginHeader">
+  <span>ENTER QUEST USER</span>
+  <button id="questsClose" type="button">X</button>
+ </div>
+
+ <input
+  id="questUserInput"
+  type="text"
+  placeholder="Enter quest user..."
+  autocomplete="off"
+  spellcheck="false"
+  aria-label="Enter quest user"
+ >
+
+ <button id="checkQuestsButton" type="button">
+  CHECK QUESTS
+ </button>
+
+ <div id="questsMessage" aria-live="polite"></div>
+</div>
+
+<div id="questsResultPanel">
+ <div id="questsResultHeader">
+  <span>QUESTS</span>
+  <button id="questsResultClose" type="button">X</button>
+ </div>
+
+ <div id="questsResultText">NO QUESTS AVAILABLE</div>
+</div>
+ 
 #codeMachine{
  position:absolute;right:18px;bottom:18px;width:min(330px,calc(100vw - 24px));
  padding:12px;background:#242424ee;border:2px solid #111;box-shadow:4px 4px 0 #0005;
@@ -161,6 +194,146 @@ button:hover{background:#555e}
  #codeMachine{right:8px;bottom:8px;width:min(290px,calc(100vw - 16px))}
  #verityButton{top:10px;right:10px;padding:10px 14px;font-size:15px}
  #adminPanel,#adminVerityPanel,#commandsPanel{padding:17px}
+}
+
+ /* QUESTS */
+#questsButton{
+ position:absolute;
+ right:18px;
+ bottom:166px;
+ width:min(330px,calc(100vw - 24px));
+ min-height:44px;
+ padding:10px;
+ background:#a88953;
+ color:#17120a;
+ border:2px solid #6f5730;
+ border-radius:0;
+ font-size:16px;
+ font-weight:900;
+ letter-spacing:2px;
+ z-index:26;
+}
+
+#questsButton:hover{
+ background:#c1a36c;
+}
+
+#questsLoginPanel{
+ display:none;
+ position:absolute;
+ top:50%;
+ left:50%;
+ transform:translate(-50%,-50%);
+ width:min(380px,90vw);
+ padding:22px;
+ background:#c9ad7a;
+ color:#21190d;
+ border:4px solid #8b7045;
+ box-shadow:8px 8px 0 #0005;
+ z-index:50;
+}
+
+#questsLoginHeader{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:10px;
+ margin-bottom:18px;
+ font-size:21px;
+ font-weight:900;
+ letter-spacing:1px;
+}
+
+#questsClose{
+ width:38px;
+ height:38px;
+ padding:0;
+ background:#292319;
+ color:white;
+ border:2px solid #17130d;
+ border-radius:0;
+ font-size:21px;
+}
+
+#questUserInput{
+ width:100%;
+ height:44px;
+ padding:0 10px;
+ background:#f1e2c3;
+ color:#21190d;
+ border:3px solid #8b7045;
+ border-radius:0;
+ outline:none;
+ font-size:15px;
+ touch-action:auto;
+ user-select:text;
+ -webkit-user-select:text;
+}
+
+#checkQuestsButton{
+ width:100%;
+ min-height:46px;
+ margin-top:12px;
+ background:#80643b;
+ color:white;
+ border:3px solid #5e4728;
+ border-radius:0;
+ font-weight:900;
+ letter-spacing:1px;
+}
+
+#checkQuestsButton:hover{
+ background:#9a7948;
+}
+
+#questsMessage{
+ margin-top:12px;
+ min-height:20px;
+ font-size:12px;
+ font-weight:900;
+ overflow-wrap:anywhere;
+}
+
+#questsResultPanel{
+ display:none;
+ position:absolute;
+ top:50%;
+ left:50%;
+ transform:translate(-50%,-50%);
+ width:min(400px,90vw);
+ min-height:180px;
+ padding:22px;
+ background:#c9ad7a;
+ color:#21190d;
+ border:4px solid #8b7045;
+ box-shadow:8px 8px 0 #0005;
+ text-align:center;
+ z-index:51;
+}
+
+#questsResultHeader{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:10px;
+ margin-bottom:35px;
+ font-size:22px;
+ font-weight:900;
+ letter-spacing:2px;
+}
+
+#questsResultText{
+ font-size:19px;
+ font-weight:900;
+ letter-spacing:1px;
+}
+
+@media(pointer:coarse),(max-width:800px){
+ #questsButton{
+  right:8px;
+  bottom:166px;
+  width:min(290px,calc(100vw - 16px));
+ }
 }
 </style>
 
@@ -605,10 +778,14 @@ function startMobileGame(){
  pickaxeHud.style.display="none";
  mobileControls.style.display=mobileDevice.matches?"block":"none";
  mobileReset.style.display="block";
+ questsLoginPanel.style.display = "none";
+questsResultPanel.style.display = "none";
  closeAllSecretPanels();
  updateCameraRotation();
 }
 
+ 
+ 
 document.getElementById("play").addEventListener("click",()=>{
  if(mobileDevice.matches){
   startMobileGame();
@@ -1229,6 +1406,58 @@ commandInput.addEventListener("keydown",event=>{
  if(event.key==="Enter"){
   event.preventDefault();
   runVerityCommand();
+ }
+});
+ // =====================
+// QUESTS SYSTEM
+// =====================
+
+const questsButton = document.getElementById("questsButton");
+const questsLoginPanel = document.getElementById("questsLoginPanel");
+const questsClose = document.getElementById("questsClose");
+const questUserInput = document.getElementById("questUserInput");
+const checkQuestsButton = document.getElementById("checkQuestsButton");
+const questsMessage = document.getElementById("questsMessage");
+const questsResultPanel = document.getElementById("questsResultPanel");
+const questsResultClose = document.getElementById("questsResultClose");
+
+questsButton.addEventListener("click", () => {
+ if (overlay.style.display === "none") return;
+
+ closeAllSecretPanels();
+
+ questsLoginPanel.style.display = "block";
+ questUserInput.value = "";
+ questsMessage.textContent = "";
+ questUserInput.focus();
+});
+
+questsClose.addEventListener("click", () => {
+ questsLoginPanel.style.display = "none";
+});
+
+questsResultClose.addEventListener("click", () => {
+ questsResultPanel.style.display = "none";
+});
+
+function checkQuests() {
+ const username = questUserInput.value.trim().toUpperCase();
+
+ if (username === "ROWAN-Q83T0") {
+  questsLoginPanel.style.display = "none";
+  questsResultPanel.style.display = "block";
+  questsMessage.textContent = "";
+ } else {
+  questsMessage.textContent = "INVALID QUEST USER";
+ }
+}
+
+checkQuestsButton.addEventListener("click", checkQuests);
+
+questUserInput.addEventListener("keydown", event => {
+ if (event.key === "Enter") {
+  event.preventDefault();
+  checkQuests();
  }
 });
 
