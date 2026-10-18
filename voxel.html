@@ -1110,18 +1110,6 @@ function summonHalloween(){
  overlay.style.backgroundImage="linear-gradient(#b78ad833 1px,transparent 1px),linear-gradient(90deg,#b78ad833 1px,transparent 1px)";
 
  // The event starts from a click, so the browser can allow playback.
- halloweenAudioFrame=document.createElement("iframe");
- halloweenAudioFrame.src="https://www.youtube-nocookie.com/embed/q6-ZGAGcJrk?autoplay=1&controls=0&start=0&playsinline=1&rel=0";
- halloweenAudioFrame.title="Spooky Scary Skeletons";
- halloweenAudioFrame.allow="autoplay; encrypted-media";
- halloweenAudioFrame.setAttribute("aria-hidden","true");
- halloweenAudioFrame.style.position="fixed";
- halloweenAudioFrame.style.width="1px";
- halloweenAudioFrame.style.height="1px";
- halloweenAudioFrame.style.left="-10px";
- halloweenAudioFrame.style.bottom="-10px";
- halloweenAudioFrame.style.border="0";
- document.body.appendChild(halloweenAudioFrame);
 
  halloweenTimer=setTimeout(()=>{
   stopHalloweenEvent();
