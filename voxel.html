@@ -1165,8 +1165,8 @@ function setYinYangMode(enabled){
  yinYangButton.classList.toggle("modeOn",yinYangMode);
 
  showMessage(yinYangMode
-  ?"YIN YANG MODE ON — WHITE DIRT, BLACK GRASS"
-  :"YIN YANG MODE OFF — NORMAL COLORS");
+  ? "YIN YANG MODE ON"
+  : "YIN YANG MODE OFF");
 }
 
 yinYangButton.addEventListener("click",()=>{
@@ -1505,8 +1505,11 @@ addEventListener("beforeunload",()=>{
 // Make sure the camera rotation starts in the correct state.
 updateCameraRotation();
 
-// Always start with Yin Yang mode OFF when the page loads.
-setYinYangMode(false);
+// Start OFF silently. Do not show a message when the game loads.
+yinYangMode=false;
+updateBlockColors();
+yinYangButton.textContent="YIN YANG MODE: OFF";
+yinYangButton.classList.remove("modeOn");
 </script>
 </body>
 </html>
