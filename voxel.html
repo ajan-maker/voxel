@@ -97,29 +97,72 @@ button:hover{background:#555e}
 
 /* ADMIN LOGIN */
 #adminPanel{
- display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
- width:min(390px,92vw);padding:22px;background:#080808;color:white;
- border:3px solid #555;box-shadow:8px 8px 0 #0007;z-index:45
+ display:none;
+ position:absolute;
+ top:50%;
+ left:50%;
+ transform:translate(-50%,-50%);
+ width:min(430px,94vw);
+ padding:26px;
+ background:#080808;
+ color:white;
+ border:3px solid #555;
+ box-shadow:8px 8px 0 #0007;
+ z-index:45
 }
-#adminTitle{font-size:22px;font-weight:900;letter-spacing:3px;margin-bottom:18px}
-.adminLabel{display:block;font-size:12px;letter-spacing:2px;font-weight:bold;margin:12px 0 6px}
-.adminInput{
- width:100%;height:42px;padding:0 10px;background:#171717;color:white;
- border:2px solid #555;border-radius:0;outline:none;font-size:15px;
- touch-action:auto;user-select:text;-webkit-user-select:text
-}
-.adminInput:focus{border-color:white}
-#adminLoginButton,#adminCodeButton{
- width:100%;height:42px;margin-top:14px;background:#eee;color:#111;
- border:2px solid #999;border-radius:0;font-weight:900
-}
-#adminError{min-height:20px;margin-top:12px;color:#ff5b5b;font-size:12px;font-weight:bold;overflow-wrap:anywhere}
-#adminCodeSection{display:none;margin-top:20px;padding-top:18px;border-top:1px solid #555}
-#adminClose{position:absolute;top:10px;right:10px;width:30px;height:30px;padding:0;background:#222;border:1px solid #777;border-radius:0}
-#adminCodeInput{width:100%;height:42px;padding:0 10px;background:#171717;color:white;border:2px solid #555;border-radius:0;font-size:15px;outline:none;touch-action:auto;user-select:text;-webkit-user-select:text}
-#adminCodeInput:focus{border-color:white}
-#adminCodeMessage{min-height:20px;margin-top:10px;color:#ff6464;font-size:12px;font-weight:bold;overflow-wrap:anywhere}
 
+#quickLoginButton{
+ width:100%;
+ height:44px;
+ margin-bottom:18px;
+ background:#b89b42;
+ color:#111;
+ border:2px solid #e0c66d;
+ border-radius:0;
+ font-weight:900;
+ letter-spacing:1px;
+}
+
+#quickLoginButton:hover{
+ background:#e0c66d;
+}
+
+#quickLoginSection{
+ display:none;
+ margin-top:15px;
+ padding:15px;
+ border:2px solid #555;
+}
+
+#quickLoginInput{
+ width:100%;
+ height:42px;
+ padding:0 10px;
+ background:#171717;
+ color:white;
+ border:2px solid #777;
+ border-radius:0;
+ font-size:15px;
+}
+
+#quickLoginSubmit{
+ width:100%;
+ height:42px;
+ margin-top:10px;
+ background:#eee;
+ color:#111;
+ border:2px solid #999;
+ border-radius:0;
+ font-weight:900;
+}
+
+#quickLoginMessage{
+ margin-top:10px;
+ min-height:18px;
+ color:#ff6464;
+ font-size:12px;
+ font-weight:bold;
+}
 /* SPECIAL VERITY — ADMIN ONLY */
 #adminVerityPanel{
  display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
@@ -287,9 +330,37 @@ button:hover{background:#555e}
   <div id="verityResponse">VERITY IS LISTENING...</div>
  </div>
 
- <div id="adminPanel">
+  <div id="adminPanel">
   <button id="adminClose" type="button">X</button>
+
   <div id="adminTitle">ADMIN LOGIN</div>
+
+  <!--  -->
+  <button id="quickLoginButton" type="button">QUICK LOG IN</button>
+
+  <div id="quickLoginSection" style="display:none">
+    <label class="adminLabel" for="quickLoginInput">LOGIN CODE</label>
+    <input
+      id="quickLoginInput"
+      class="adminInput"
+      type="password"
+      placeholder="Enter login code..."
+      autocomplete="off"
+    >
+    <button id="quickLoginSubmit" type="button">LOGIN</button>
+    <div id="quickLoginMessage"></div>
+  </div>
+
+  <!--  -->
+  <label class="adminLabel" for="adminUser">USER</label>
+  <input class="adminInput" id="adminUser" type="text" placeholder="Enter user">
+
+  <label class="adminLabel" for="adminPassword">PASSWORD</label>
+  <input class="adminInput" id="adminPassword" type="password" placeholder="Enter password">
+
+  <!--  -->
+</div>
+  
 
   <label class="adminLabel" for="adminUser">USER</label>
   <input class="adminInput" id="adminUser" type="text" placeholder="Enter user" autocomplete="off" spellcheck="false">
@@ -1257,6 +1328,53 @@ codeMachineInput.addEventListener("keydown",event=>{
  }
 });
 
+// QUICK LOG IN
+const quickLoginButton = document.getElementById("quickLoginButton");
+const quickLoginSection = document.getElementById("quickLoginSection");
+const quickLoginInput = document.getElementById("quickLoginInput");
+const quickLoginSubmit = document.getElementById("quickLoginSubmit");
+const quickLoginMessage = document.getElementById("quickLoginMessage");
+
+quickLoginButton.addEventListener("click", () => {
+  quickLoginSection.style.display =
+    quickLoginSection.style.display === "block" ? "none" : "block";
+
+  quickLoginMessage.textContent = "";
+  quickLoginInput.value = "";
+
+  if (quickLoginSection.style.display === "block") {
+    quickLoginInput.focus();
+  }
+});
+
+function checkQuickLogin() {
+  if (quickLoginInput.value === "#QT/COOLEST") {
+    quickLoginMessage.textContent = "";
+    quickLoginSection.style.display = "none";
+
+    adminError.textContent = "";
+    adminCodeMessage.textContent = "";
+    adminCodeSection.style.display = "block";
+
+    adminUser.value = "";
+    adminPassword.value = "";
+    adminCodeInput.value = "";
+
+    showMessage("QUICK LOGIN SUCCESSFUL!");
+  } else {
+    quickLoginMessage.textContent = "INVALID LOGIN CODE";
+  }
+}
+
+quickLoginSubmit.addEventListener("click", checkQuickLogin);
+
+quickLoginInput.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    checkQuickLogin();
+  }
+});
+ 
 // ADMIN LOGIN
 function checkAdminLogin(){
  const user=adminUser.value.trim();
