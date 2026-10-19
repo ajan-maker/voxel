@@ -352,20 +352,9 @@ ground.receiveShadow = true;
 ground.castShadow = true;
 scene.add(ground);
  
- // =====================
+// =====================
 // RED CARPET + GREY WALLS
 // =====================
-
-const mapWidth = ground.geometry.parameters.width;
-const mapDepth = ground.geometry.parameters.depth;
-const mapHeight = ground.geometry.parameters.height || 0;
-
-const groundTop = ground.position.y + mapHeight / 2;
-
-const carpetLength = Math.max(mapWidth, mapDepth);
-const carpetWidth = 4.5;
-const wallHeight = 4;
-const wallThickness = 0.5;
 
 const carpetMaterial = new THREE.MeshStandardMaterial({
   color: 0xff0000,
@@ -374,48 +363,36 @@ const carpetMaterial = new THREE.MeshStandardMaterial({
 
 const wallMaterial = new THREE.MeshStandardMaterial({
   color: 0x858585,
-  roughness: 1
+  roughness: 1,
+  side: THREE.DoubleSide
 });
 
-// Red carpet, centered along the long side
-const carpetGeometry = mapWidth >= mapDepth
-  ? new THREE.BoxGeometry(carpetLength, 0.06, carpetWidth)
-  : new THREE.BoxGeometry(carpetWidth, 0.06, carpetLength);
+// RED CARPET — CENTER OF THE MAP
+const carpet = new THREE.Mesh(
+  new THREE.BoxGeometry(155, 0.12, 5),
+  carpetMaterial
+);
 
-const carpet = new THREE.Mesh(carpetGeometry, carpetMaterial);
-carpet.position.set(ground.position.x, groundTop + 0.035, ground.position.z);
+carpet.position.set(0, 0.12, 0);
 carpet.receiveShadow = true;
 scene.add(carpet);
 
-// Grey walls at both ends of the carpet
-for (const end of [-1, 1]) {
-  const wallGeometry = new THREE.BoxGeometry(
-    mapWidth >= mapDepth ? wallThickness : mapWidth,
-    wallHeight,
-    mapWidth >= mapDepth ? mapDepth : wallThickness
+// GREY WALLS — BOTH SHORT ENDS
+const wallHeight = 5;
+const wallThickness = 1;
+const wallLength = 45;
+
+for (const x of [-77, 77]) {
+  const wall = new THREE.Mesh(
+    new THREE.BoxGeometry(wallThickness, wallHeight, wallLength),
+    wallMaterial
   );
 
-  const wall = new THREE.Mesh(wallGeometry, wallMaterial);
-
-  wall.position.set(
-    ground.position.x + (
-      mapWidth >= mapDepth
-        ? end * (mapWidth / 2 - wallThickness / 2)
-        : 0
-    ),
-    groundTop + wallHeight / 2,
-    ground.position.z + (
-      mapWidth >= mapDepth
-        ? 0
-        : end * (mapDepth / 2 - wallThickness / 2)
-    )
-  );
-
+  wall.position.set(x, 2.5, 0);
   wall.castShadow = true;
   wall.receiveShadow = true;
   scene.add(wall);
 }
-
 // =====================
 // FLOATING STONE PLAYER
 // =====================
