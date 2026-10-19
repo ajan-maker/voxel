@@ -227,9 +227,7 @@ input{font-family:Arial,sans-serif}
 <script type="module">
 import * as THREE from "three";
 
-// =====================
 // SCENE AND LIGHTING
-// =====================
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87ceeb);
 scene.fog = new THREE.Fog(0x87ceeb, 100, 280);
@@ -254,9 +252,7 @@ sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
 scene.add(sun);
 
-// =====================
 // GRASS PLATFORM
-// =====================
 const grassCanvas = document.createElement("canvas");
 grassCanvas.width = 256;
 grassCanvas.height = 256;
@@ -298,10 +294,7 @@ ground.receiveShadow = true;
 ground.castShadow = true;
 scene.add(ground);
 
-// =====================
-// RED CARPET + GREY WALLS
-// =====================
-
+// RED CARPET AND END WALLS
 const carpetLength = 150;
 const carpetWidth = 5;
 
@@ -315,17 +308,14 @@ const wallMaterial = new THREE.MeshStandardMaterial({
   roughness: 1
 });
 
-// RED CARPET
 const carpet = new THREE.Mesh(
   new THREE.BoxGeometry(carpetLength, 0.14, carpetWidth),
   carpetMaterial
 );
-
 carpet.position.set(0, 0.07, 0);
 carpet.receiveShadow = true;
 scene.add(carpet);
 
-// GREY WALLS — AT BOTH ENDS OF THE CARPET
 const wallHeight = 4;
 const wallThickness = 0.6;
 
@@ -334,23 +324,65 @@ for (const x of [
   carpetLength / 2 - wallThickness / 2
 ]) {
   const wall = new THREE.Mesh(
-    new THREE.BoxGeometry(
-      wallThickness,
-      wallHeight,
-      carpetWidth
-    ),
+    new THREE.BoxGeometry(wallThickness, wallHeight, carpetWidth),
     wallMaterial
   );
-
   wall.position.set(x, wallHeight / 2, 0);
   wall.castShadow = true;
   wall.receiveShadow = true;
   scene.add(wall);
 }
 
-// =====================
+// STONE AREA, DARK STONE SQUARE, AND GREEN PLATE
+// Place everything near the back-left corner, away from the red carpet.
+const stoneGroundMaterial = new THREE.MeshStandardMaterial({
+  color: 0x85898d,
+  roughness: 1,
+  flatShading: true
+});
+
+const stoneGround = new THREE.Mesh(
+  new THREE.BoxGeometry(13, 0.7, 11),
+  stoneGroundMaterial
+);
+stoneGround.position.set(-64, 0.35, -15);
+stoneGround.receiveShadow = true;
+stoneGround.castShadow = true;
+scene.add(stoneGround);
+
+// Smaller, darker square on top of the stone area.
+const darkStoneMaterial = new THREE.MeshStandardMaterial({
+  color: 0x45494e,
+  roughness: 1,
+  flatShading: true
+});
+
+const darkStone = new THREE.Mesh(
+  new THREE.BoxGeometry(3.5, 0.25, 3.5),
+  darkStoneMaterial
+);
+darkStone.position.set(-64, 0.825, -15);
+darkStone.receiveShadow = true;
+darkStone.castShadow = true;
+scene.add(darkStone);
+
+// Green plate in front of the dark square, toward the middle of the map.
+const greenPlateMaterial = new THREE.MeshStandardMaterial({
+  color: 0x25d43b,
+  roughness: 0.8,
+  metalness: 0
+});
+
+const greenPlate = new THREE.Mesh(
+  new THREE.BoxGeometry(3.2, 0.18, 2),
+  greenPlateMaterial
+);
+greenPlate.position.set(-64, 0.79, -11.7);
+greenPlate.receiveShadow = true;
+greenPlate.castShadow = true;
+scene.add(greenPlate);
+
 // FLOATING STONE PLAYER
-// =====================
 const playerStone = new THREE.Mesh(
   new THREE.BoxGeometry(1.35, 1.35, 1.35),
   new THREE.MeshStandardMaterial({
@@ -359,16 +391,14 @@ const playerStone = new THREE.Mesh(
     flatShading: true
   })
 );
-playerStone.position.set(0, 4, 0);
+
+// Start a little beyond the center of the map, not on the stone area.
+playerStone.position.set(0, 4, 8);
 playerStone.castShadow = true;
 playerStone.receiveShadow = true;
 scene.add(playerStone);
 
-
-
-// =====================
 // CAMERA AND MOVEMENT
-// =====================
 const mobileDevice = matchMedia("(pointer: coarse), (max-width: 800px)");
 const mobileControls = document.getElementById("mobileControls");
 const overlay = document.getElementById("overlay");
@@ -388,7 +418,6 @@ function updateCameraRotation() {
     playerStone.position.z + Math.cos(yaw) * distance
   );
 
-  // Camera target remains level: no vertical camera rotation.
   camera.lookAt(
     playerStone.position.x,
     playerStone.position.y,
@@ -397,7 +426,7 @@ function updateCameraRotation() {
 }
 
 function respawnPlayer() {
-  playerStone.position.set(0, 4, 0);
+  playerStone.position.set(0, 4, 8);
   yaw = 0;
   updateCameraRotation();
 }
@@ -418,22 +447,14 @@ function updatePlayer(delta) {
     playerStone.position.add(direction);
   }
 
-  playerStone.position.x = THREE.MathUtils.clamp(
-    playerStone.position.x, -73, 73
-  );
-  playerStone.position.z = THREE.MathUtils.clamp(
-    playerStone.position.z, -21, 21
-  );
-  playerStone.position.y = THREE.MathUtils.clamp(
-    playerStone.position.y, 1, 80
-  );
+  playerStone.position.x = THREE.MathUtils.clamp(playerStone.position.x, -73, 73);
+  playerStone.position.z = THREE.MathUtils.clamp(playerStone.position.z, -21, 21);
+  playerStone.position.y = THREE.MathUtils.clamp(playerStone.position.y, 1, 80);
 
   updateCameraRotation();
 }
 
-// =====================
 // GAME START / MENU
-// =====================
 function startGame() {
   stopHalloweenEvent();
   isLocked = true;
@@ -492,19 +513,15 @@ document.addEventListener("mousemove", event => {
 
 document.addEventListener("keydown", event => {
   const active = document.activeElement;
-  const typing = active &&
-    (active.tagName === "INPUT" || active.tagName === "TEXTAREA");
+  const typing = active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA");
   if (typing) return;
 
   keys[event.code] = true;
 
   if (event.code === "Escape" && isLocked) {
     event.preventDefault();
-    if (mobileDevice.matches) {
-      stopMobileGame();
-    } else {
-      document.exitPointerLock();
-    }
+    if (mobileDevice.matches) stopMobileGame();
+    else document.exitPointerLock();
   }
 });
 
@@ -512,9 +529,7 @@ document.addEventListener("keyup", event => {
   keys[event.code] = false;
 });
 
-// =====================
 // MOBILE ARROW MOVEMENT
-// =====================
 function mobileButton(id, keyCode) {
   const btn = document.getElementById(id);
 
@@ -545,7 +560,7 @@ document.getElementById("mobileMenu").addEventListener("click", () => {
   if (mobileDevice.matches) stopMobileGame();
 });
 
-// Mobile drag: horizontal camera rotation only.
+// MOBILE CAMERA: HORIZONTAL ROTATION ONLY
 let mobileLooking = false;
 let lookPointerId = null;
 let lastTouchX = 0;
@@ -561,11 +576,9 @@ renderer.domElement.addEventListener("pointerdown", event => {
 
 renderer.domElement.addEventListener("pointermove", event => {
   if (!mobileLooking || event.pointerId !== lookPointerId) return;
-
   const dx = event.clientX - lastTouchX;
   lastTouchX = event.clientX;
   lastTouchY = event.clientY;
-
   yaw -= dx * 0.006;
 });
 
@@ -576,9 +589,7 @@ function stopMobileLooking() {
 renderer.domElement.addEventListener("pointerup", stopMobileLooking);
 renderer.domElement.addEventListener("pointercancel", stopMobileLooking);
 
-// =====================
 // MESSAGES
-// =====================
 let messageTimeout = null;
 
 function showMessage(text) {
@@ -589,9 +600,7 @@ function showMessage(text) {
   messageTimeout = setTimeout(() => el.style.opacity = "0", 1800);
 }
 
-// =====================
 // SECRET PANELS
-// =====================
 function closeAllSecretPanels() {
   document.getElementById("verityPanel").style.display = "none";
   document.getElementById("adminPanel").style.display = "none";
@@ -602,9 +611,7 @@ function closeAllSecretPanels() {
   document.getElementById("indexPanel").style.display = "none";
 }
 
-// =====================
 // CODE MACHINE
-// =====================
 const codeMachineInput = document.getElementById("codeMachineInput");
 const codeMachineCheck = document.getElementById("codeMachineCheck");
 const verityButton = document.getElementById("verityButton");
@@ -674,9 +681,7 @@ codeMachineInput.addEventListener("keydown", event => {
   }
 });
 
-// =====================
 // ADMIN QUICK LOGIN
-// =====================
 quickLoginButton.addEventListener("click", () => {
   const opening = quickLoginSection.style.display !== "block";
   quickLoginSection.style.display = opening ? "block" : "none";
@@ -742,9 +747,7 @@ document.getElementById("adminClose").addEventListener("click", () => {
   adminPanel.style.display = "none";
 });
 
-// =====================
 // ADMIN COMMANDS
-// =====================
 function checkAdminCode() {
   const code = adminCodeInput.value.trim().toUpperCase();
 
@@ -775,9 +778,7 @@ adminCodeInput.addEventListener("keydown", event => {
   }
 });
 
-// =====================
 // HALLOWEEN EVENT
-// =====================
 const halloweenPanel = document.getElementById("halloweenPanel");
 const halloweenMusic = document.getElementById("halloweenMusic");
 let halloweenTimer = null;
@@ -819,9 +820,7 @@ document.getElementById("summonButton").addEventListener("click", () => {
   halloweenTimer = setTimeout(stopHalloweenEvent, 30000);
 });
 
-// =====================
 // NORMAL VERITY
-// =====================
 verityButton.addEventListener("click", () => {
   if (overlay.style.display === "none") return;
   closeAllSecretPanels();
@@ -849,9 +848,7 @@ verityInput.addEventListener("keydown", event => {
   }
 });
 
-// =====================
 // ADMIN VERITY / COMMANDS
-// =====================
 document.getElementById("adminVerityClose").addEventListener("click", () => {
   adminVerityPanel.style.display = "none";
   commandsPanel.style.display = "none";
@@ -884,9 +881,7 @@ commandInput.addEventListener("keydown", event => {
   }
 });
 
-// =====================
 // INDEX SYSTEM
-// =====================
 const indexButton = document.getElementById("indexButton");
 const indexLoginPanel = document.getElementById("indexLoginPanel");
 const indexUserInput = document.getElementById("indexUserInput");
@@ -930,9 +925,7 @@ indexUserInput.addEventListener("keydown", event => {
   }
 });
 
-// =====================
 // ANIMATION
-// =====================
 let lastTime = performance.now();
 
 function animate(now) {
@@ -951,9 +944,7 @@ function animate(now) {
 
 requestAnimationFrame(animate);
 
-// =====================
 // RESIZE
-// =====================
 addEventListener("resize", () => {
   camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
