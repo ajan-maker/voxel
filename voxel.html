@@ -350,6 +350,68 @@ ground.position.set(0, -1.5, 0);
 ground.receiveShadow = true;
 ground.castShadow = true;
 scene.add(ground);
+ 
+ // =====================
+// RED CARPET + GREY WALLS
+// =====================
+
+const mapWidth = ground.geometry.parameters.width;
+const mapDepth = ground.geometry.parameters.depth;
+const mapHeight = ground.geometry.parameters.height || 0;
+
+const groundTop = ground.position.y + mapHeight / 2;
+
+const carpetLength = Math.max(mapWidth, mapDepth);
+const carpetWidth = 3;
+const wallHeight = 4;
+const wallThickness = 0.5;
+
+const carpetMaterial = new THREE.MeshStandardMaterial({
+  color: 0xff0000,
+  roughness: 1
+});
+
+const wallMaterial = new THREE.MeshStandardMaterial({
+  color: 0x858585,
+  roughness: 1
+});
+
+// Red carpet, centered along the long side
+const carpetGeometry = mapWidth >= mapDepth
+  ? new THREE.BoxGeometry(carpetLength, 0.06, carpetWidth)
+  : new THREE.BoxGeometry(carpetWidth, 0.06, carpetLength);
+
+const carpet = new THREE.Mesh(carpetGeometry, carpetMaterial);
+carpet.position.set(ground.position.x, groundTop + 0.035, ground.position.z);
+carpet.receiveShadow = true;
+scene.add(carpet);
+
+// Grey walls at both ends of the carpet
+for (const end of [-1, 1]) {
+  const wallGeometry = mapWidth >= mapDepth
+    ? new THREE.BoxGeometry(wallThickness, wallHeight, mapDepth)
+    : new THREE.BoxGeometry(mapWidth, wallHeight, wallThickness);
+
+  const wall = new THREE.Mesh(wallGeometry, wallMaterial);
+
+  if (mapWidth >= mapDepth) {
+    wall.position.set(
+      ground.position.x + end * (mapWidth / 2 - wallThickness / 2),
+      groundTop + wallHeight / 2,
+      ground.position.z
+    );
+  } else {
+    wall.position.set(
+      ground.position.x,
+      groundTop + wallHeight / 2,
+      ground.position.z + end * (mapDepth / 2 - wallThickness / 2)
+    );
+  }
+
+  wall.castShadow = true;
+  wall.receiveShadow = true;
+  scene.add(wall);
+}
 
 // =====================
 // FLOATING STONE PLAYER
