@@ -388,25 +388,27 @@ scene.add(carpet);
 
 // Grey walls at both ends of the carpet
 for (const end of [-1, 1]) {
-const wallGeometry = mapWidth >= mapDepth
-  ? new THREE.BoxGeometry(wallThickness, wallHeight, mapDepth)
-  : new THREE.BoxGeometry(mapWidth, wallHeight, wallThickness);
+  const wallGeometry = new THREE.BoxGeometry(
+    mapWidth >= mapDepth ? wallThickness : mapWidth,
+    wallHeight,
+    mapWidth >= mapDepth ? mapDepth : wallThickness
+  );
 
   const wall = new THREE.Mesh(wallGeometry, wallMaterial);
 
-  if (mapWidth >= mapDepth) {
-    wall.position.set(
-      ground.position.x + end * (mapWidth / 2 - wallThickness / 2),
-      groundTop + wallHeight / 2,
-      ground.position.z
-    );
-  } else {
-    wall.position.set(
-      ground.position.x,
-      groundTop + wallHeight / 2,
-      ground.position.z + end * (mapDepth / 2 - wallThickness / 2)
-    );
-  }
+  wall.position.set(
+    ground.position.x + (
+      mapWidth >= mapDepth
+        ? end * (mapWidth / 2 - wallThickness / 2)
+        : 0
+    ),
+    groundTop + wallHeight / 2,
+    ground.position.z + (
+      mapWidth >= mapDepth
+        ? 0
+        : end * (mapDepth / 2 - wallThickness / 2)
+    )
+  );
 
   wall.castShadow = true;
   wall.receiveShadow = true;
