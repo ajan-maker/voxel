@@ -385,12 +385,15 @@ const CAMERA_DISTANCE = 7;
 const CAMERA_HEIGHT = 2.1;
 
 function updateCameraRotation() {
-  const horizontal = Math.cos(pitch) * CAMERA_DISTANCE;
+  const distance = 7;
+  const height = 2.5;
+
   camera.position.set(
-    playerStone.position.x + Math.sin(yaw) * horizontal,
-    playerStone.position.y + CAMERA_HEIGHT + Math.sin(pitch) * CAMERA_DISTANCE,
-    playerStone.position.z + Math.cos(yaw) * horizontal
+    playerStone.position.x + Math.sin(yaw) * distance,
+    playerStone.position.y + height,
+    playerStone.position.z + Math.cos(yaw) * distance
   );
+
   camera.lookAt(
     playerStone.position.x,
     playerStone.position.y,
