@@ -363,7 +363,7 @@ const groundTop = ground.position.y + mapHeight / 2;
 
 const carpetLength = Math.max(mapWidth, mapDepth);
 const carpetWidth = 4.5;
-const wallHeight = 2;
+const wallHeight = 4;
 const wallThickness = 0.5;
 
 const carpetMaterial = new THREE.MeshStandardMaterial({
@@ -388,9 +388,9 @@ scene.add(carpet);
 
 // Grey walls at both ends of the carpet
 for (const end of [-1, 1]) {
-  const wallGeometry = mapWidth >= mapDepth
-    ? new THREE.BoxGeometry(wallThickness, wallHeight, mapDepth)
-    : new THREE.BoxGeometry(mapWidth, wallHeight, wallThickness);
+const wallGeometry = mapWidth >= mapDepth
+  ? new THREE.BoxGeometry(wallThickness, wallHeight, mapDepth)
+  : new THREE.BoxGeometry(mapWidth, wallHeight, wallThickness);
 
   const wall = new THREE.Mesh(wallGeometry, wallMaterial);
 
