@@ -299,48 +299,50 @@ ground.castShadow = true;
 scene.add(ground);
 
 // =====================
-// RED CARPET
+// RED CARPET + GREY WALLS
 // =====================
+
+const carpetLength = 150;
+const carpetWidth = 5;
+
 const carpetMaterial = new THREE.MeshStandardMaterial({
   color: 0xff0000,
   roughness: 1
 });
 
-// The carpet runs from one long end of the map to the other.
-const carpet = new THREE.Mesh(
-  new THREE.BoxGeometry(MAP_WIDTH, 0.12, 5.5),
-  carpetMaterial
-);
-carpet.position.set(0, GROUND_TOP + 0.06, 0);
-carpet.receiveShadow = true;
-scene.add(carpet);
-
-// =====================
-// GREY WALLS
-// One at each end of the carpet.
-// Each wall spans the entire short side of the map.
-// =====================
 const wallMaterial = new THREE.MeshStandardMaterial({
   color: 0x858585,
   roughness: 1
 });
 
-const wallHeight = 5;
-const wallThickness = 1;
-const wallLength = MAP_DEPTH;
+// RED CARPET
+const carpet = new THREE.Mesh(
+  new THREE.BoxGeometry(carpetLength, 0.14, carpetWidth),
+  carpetMaterial
+);
 
-for (const end of [-1, 1]) {
+carpet.position.set(0, 0.07, 0);
+carpet.receiveShadow = true;
+scene.add(carpet);
+
+// GREY WALLS — BOTH SIDES, FULL CARPET LENGTH
+const wallHeight = 4;
+const wallThickness = 0.6;
+
+for (const z of [
+  -(carpetWidth / 2 + wallThickness / 2),
+  carpetWidth / 2 + wallThickness / 2
+]) {
   const wall = new THREE.Mesh(
-    new THREE.BoxGeometry(wallThickness, wallHeight, wallLength),
+    new THREE.BoxGeometry(
+      carpetLength,
+      wallHeight,
+      wallThickness
+    ),
     wallMaterial
   );
 
-  wall.position.set(
-    end * (MAP_WIDTH / 2 - wallThickness / 2),
-    GROUND_TOP + wallHeight / 2,
-    0
-  );
-
+  wall.position.set(0, wallHeight / 2, z);
   wall.castShadow = true;
   wall.receiveShadow = true;
   scene.add(wall);
@@ -361,6 +363,8 @@ playerStone.position.set(0, 4, 0);
 playerStone.castShadow = true;
 playerStone.receiveShadow = true;
 scene.add(playerStone);
+
+
 
 // =====================
 // CAMERA AND MOVEMENT
