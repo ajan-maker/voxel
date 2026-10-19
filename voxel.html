@@ -333,8 +333,10 @@ for (const x of [
   scene.add(wall);
 }
 
-// STONE AREA, DARK STONE SQUARE, AND GREEN PLATE
-// Place everything near the back-left corner, away from the red carpet.
+// =====================
+// STONE AREA + 4 DARK STONES + 4 GREEN PLATES
+// =====================
+
 const stoneGroundMaterial = new THREE.MeshStandardMaterial({
   color: 0x85898d,
   roughness: 1,
@@ -345,58 +347,62 @@ const stoneGround = new THREE.Mesh(
   new THREE.BoxGeometry(13, 0.7, 11),
   stoneGroundMaterial
 );
+
 stoneGround.position.set(-64, 0.35, -15);
 stoneGround.receiveShadow = true;
 stoneGround.castShadow = true;
 scene.add(stoneGround);
 
-// Smaller, darker square on top of the stone area.
+// FOUR DARK GREY SQUARES
 const darkStoneMaterial = new THREE.MeshStandardMaterial({
   color: 0x45494e,
   roughness: 1,
   flatShading: true
 });
 
-const darkStone = new THREE.Mesh(
-  new THREE.BoxGeometry(3.5, 0.25, 3.5),
-  darkStoneMaterial
-);
-darkStone.position.set(-64, 0.825, -15);
-darkStone.receiveShadow = true;
-darkStone.castShadow = true;
-scene.add(darkStone);
+const darkStonePositions = [
+  [-67, -17],
+  [-61, -17],
+  [-67, -12],
+  [-61, -12]
+];
 
-// Green plate in front of the dark square, toward the middle of the map.
+for (const [x, z] of darkStonePositions) {
+  const darkStone = new THREE.Mesh(
+    new THREE.BoxGeometry(3, 0.25, 3),
+    darkStoneMaterial
+  );
+
+  darkStone.position.set(x, 0.825, z);
+  darkStone.castShadow = true;
+  darkStone.receiveShadow = true;
+  scene.add(darkStone);
+}
+
+// FOUR GREEN PLATES IN FRONT OF THE DARK STONES
 const greenPlateMaterial = new THREE.MeshStandardMaterial({
   color: 0x25d43b,
-  roughness: 0.8,
-  metalness: 0
+  roughness: 0.8
 });
 
-const greenPlate = new THREE.Mesh(
-  new THREE.BoxGeometry(3.2, 0.18, 2),
-  greenPlateMaterial
-);
-greenPlate.position.set(-64, 0.79, -11.7);
-greenPlate.receiveShadow = true;
-greenPlate.castShadow = true;
-scene.add(greenPlate);
+const greenPlatePositions = [
+  [-67, -13.5],
+  [-61, -13.5],
+  [-67, -8.5],
+  [-61, -8.5]
+];
 
-// FLOATING STONE PLAYER
-const playerStone = new THREE.Mesh(
-  new THREE.BoxGeometry(1.35, 1.35, 1.35),
-  new THREE.MeshStandardMaterial({
-    color: 0x777d83,
-    roughness: 1,
-    flatShading: true
-  })
-);
+for (const [x, z] of greenPlatePositions) {
+  const greenPlate = new THREE.Mesh(
+    new THREE.BoxGeometry(2.5, 0.18, 1.5),
+    greenPlateMaterial
+  );
 
-// Start a little beyond the center of the map, not on the stone area.
-playerStone.position.set(0, 4, 8);
-playerStone.castShadow = true;
-playerStone.receiveShadow = true;
-scene.add(playerStone);
+  greenPlate.position.set(x, 0.79, z);
+  greenPlate.castShadow = true;
+  greenPlate.receiveShadow = true;
+  scene.add(greenPlate);
+}
 
 // CAMERA AND MOVEMENT
 const mobileDevice = matchMedia("(pointer: coarse), (max-width: 800px)");
