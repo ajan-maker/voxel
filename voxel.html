@@ -416,6 +416,20 @@ for (const [x, z] of greenPlatePositions) {
   scene.add(greenPlate);
 }
 
+  // STARTER PLATE MONEY SYSTEM
+const moneyDisplay = document.getElementById("moneyDisplay");
+
+// Only the green plate directly in front of STARTER THE DOO
+const starterPlatePosition = new THREE.Vector3(-61, 0.79, -8.5);
+
+let money = 0;
+let starterPlateMoney = 0;
+let starterPlateTimer = 0;
+
+function formatMoney(amount) {
+  return amount.toFixed(2).padStart(5, "0");
+}
+  
 // TEXT SPRITES FOR THE PLATES AND STARTER CUBE
 function makeTextSprite(text, options = {}) {
   const canvas = document.createElement("canvas");
@@ -454,7 +468,9 @@ function makeTextSprite(text, options = {}) {
   return sprite;
 }
 
-// SHOW 00.00 ABOVE EACH GREEN PLATE
+// SHOW MONEY LABELS ABOVE GREEN PLATES
+const plateMoneyLabels = [];
+
 for (const [x, z] of greenPlatePositions) {
   const plateText = makeTextSprite("00.00", {
     fontSize: 64,
@@ -466,6 +482,8 @@ for (const [x, z] of greenPlatePositions) {
   plateText.position.set(x, 1.45, z);
   plateText.scale.set(2.7, 0.68, 1);
   scene.add(plateText);
+
+  plateMoneyLabels.push({ x, z, sprite: plateText });
 }
 
 // FLOATING PLAYER CUBE
@@ -1052,6 +1070,82 @@ indexUserInput.addEventListener("keydown", event => {
 // ANIMATION
 let lastTime = performance.now();
 
+  // STARTER PLATE REWARD SYSTEM
+function updateStarterPlate(delta) {
+  starterPlateTimer += delta;
+
+  // Increase the plate value by 0.50 every 5 seconds
+  while (starterPlateTimer >= 5) {
+    starterPlateTimer -= 5;
+    starterPlateMoney += 0.50;
+  }
+
+  // Update only the plate in front of STARTER THE DOO
+  const starterLabel = plateMoneyLabels.find(
+    label => label.x === -61 && label.z === -8.5
+  );
+
+  if (starterLabel) {
+    starterLabel.sprite.material.map.dispose();
+
+    const newTextureCanvas = document.createElement("canvas");
+    newTextureCanvas.width = 512;
+    newTextureCanvas.height = 128;
+
+    const ctx = newTextureCanvas.getContext("2d");
+    ctx.font = "900 64px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.lineJoin = "round";
+    ctx.lineWidth = 10;
+    ctx.strokeStyle = "#126d20";
+    ctx.strokeText(formatMoney(starterPlateMoney), 256, 64);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(formatMoney(starterPlateMoney), 256, 64);
+
+    const texture = new THREE.CanvasTexture(newTextureCanvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    starterLabel.sprite.material.map = texture;
+    starterLabel.sprite.material.needsUpdate = true;
+  }
+
+  // Collect the money when the player reaches the starter plate
+  const dx = playerStone.position.x - starterPlatePosition.x;
+  const dz = playerStone.position.z - starterPlatePosition.z;
+  const isOnPlate = Math.abs(dx) < 1.5 && Math.abs(dz) < 1;
+
+  if (isLocked && isOnPlate && starterPlateMoney > 0) {
+    money += starterPlateMoney;
+    starterPlateMoney = 0;
+    starterPlateTimer = 0;
+
+    moneyDisplay.textContent = formatMoney(money);
+    showMessage("+" + formatMoney(money) + " MONEY!");
+
+    if (starterLabel) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 512;
+      canvas.height = 128;
+
+      const ctx = canvas.getContext("2d");
+      ctx.font = "900 64px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.lineJoin = "round";
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = "#126d20";
+      ctx.strokeText("00.00", 256, 64);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText("00.00", 256, 64);
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      starterLabel.sprite.material.map = texture;
+      starterLabel.sprite.material.needsUpdate = true;
+    }
+  }
+}
+  
 function animate(now) {
   requestAnimationFrame(animate);
 
@@ -1061,7 +1155,8 @@ function animate(now) {
   // Starter cube keeps rotating even while the menu is open.
   starterCube.rotation.y += delta * 0.8;
   starterCube.rotation.x = Math.sin(now * 0.0008) * 0.08;
-
+  updateStarterPlate(delta);
+  
   if (isLocked) {
     playerStone.rotation.y += delta * 0.3;
     updatePlayer(delta);
