@@ -404,6 +404,21 @@ for (const [x, z] of greenPlatePositions) {
   scene.add(greenPlate);
 }
 
+
+// FLOATING STONE PLAYER
+const playerStone = new THREE.Mesh(
+  new THREE.BoxGeometry(1.35, 1.35, 1.35),
+  new THREE.MeshStandardMaterial({
+    color: 0x888888,
+    roughness: 1
+  })
+);
+
+playerStone.position.set(-64, 4, -5);
+playerStone.castShadow = true;
+playerStone.receiveShadow = true;
+scene.add(playerStone);
+  
 // CAMERA AND MOVEMENT
 const mobileDevice = matchMedia("(pointer: coarse), (max-width: 800px)");
 const mobileControls = document.getElementById("mobileControls");
