@@ -500,8 +500,6 @@ document.addEventListener("mousemove", event => {
   if (!isLocked || mobileDevice.matches) return;
 
   yaw -= event.movementX * 0.002;
-  pitch -= event.movementY * 0.006;
-  pitch = THREE.MathUtils.clamp(pitch, -1.35, 1.35);
 });
 
 document.addEventListener("keydown", event => {
