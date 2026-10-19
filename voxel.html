@@ -422,7 +422,9 @@ const moneyDisplay = document.getElementById("moneyDisplay");
 // Only the green plate directly in front of STARTER THE DOO
 const starterPlatePosition = new THREE.Vector3(-61, 0.79, -8.5);
 
-let money = 0;
+let money = Number(localStorage.getItem("voxelMoney")) || 0;
+document.getElementById("moneyDisplay").textContent =
+  money.toFixed(2).padStart(5, "0");
 let starterPlateMoney = 0;
 let starterPlateTimer = 0;
 
@@ -1115,9 +1117,13 @@ function updateStarterPlate(delta) {
   const isOnPlate = Math.abs(dx) < 1.5 && Math.abs(dz) < 1;
 
   if (isLocked && isOnPlate && starterPlateMoney > 0) {
-    money += starterPlateMoney;
-    starterPlateMoney = 0;
-    starterPlateTimer = 0;
+money += starterPlateMoney;
+
+// Save money so it survives page refreshes
+localStorage.setItem("voxelMoney", money.toFixed(2));
+
+starterPlateMoney = 0;
+starterPlateTimer = 0;
 
     moneyDisplay.textContent = formatMoney(money);
     showMessage("+" + formatMoney(money) + " MONEY!");
