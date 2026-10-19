@@ -352,6 +352,23 @@ ground.castShadow = true;
 scene.add(ground);
 
 // =====================
+// FLOATING STONE PLAYER
+// =====================
+const playerStone = new THREE.Mesh(
+  new THREE.BoxGeometry(1.35, 1.35, 1.35),
+  new THREE.MeshStandardMaterial({
+    color: 0x777d83,
+    roughness: 1,
+    flatShading: true
+  })
+);
+
+playerStone.position.set(0, 4, 0);
+playerStone.castShadow = true;
+playerStone.receiveShadow = true;
+scene.add(playerStone);
+ 
+// =====================
 // CAMERA AND MOVEMENT
 // =====================
 const mobileDevice = matchMedia("(pointer: coarse), (max-width: 800px)");
