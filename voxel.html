@@ -13,15 +13,25 @@ canvas{display:block}
 button{padding:10px 13px;background:#222d;border:1px solid #ffffff66;color:white;border-radius:6px;cursor:pointer;font-weight:bold;touch-action:manipulation}
 button:hover{filter:brightness(1.2)}
 input{font-family:Arial,sans-serif}
+
 #top{position:fixed;top:15px;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none;text-shadow:2px 2px 4px black;z-index:5}
 #logo{font-size:32px;font-weight:900;letter-spacing:5px}
 #status{margin-top:7px;font-size:12px}
+
+#moneyDisplay{
+position:fixed;top:18px;right:20px;z-index:5;
+font-size:25px;font-weight:900;letter-spacing:2px;
+color:#fff;text-shadow:2px 2px 4px #000;
+pointer-events:none
+}
+
 #overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background-color:#777;background-image:linear-gradient(#0002 1px,transparent 1px),linear-gradient(90deg,#0002 1px,transparent 1px);background-size:32px 32px}
 #panel{width:min(700px,95%);padding:20px;text-align:center}
 #panel h1{color:black;font-size:clamp(55px,9vw,100px);font-weight:900;letter-spacing:10px;margin:0 0 35px;text-shadow:2px 2px 0 #aaa}
 .menu-button{display:block;width:100%;min-height:100px;margin:0 auto 20px;padding:15px;color:black;background-color:#a66d48;background-image:linear-gradient(#ffffff0c 1px,transparent 1px),linear-gradient(90deg,#00000018 1px,transparent 1px);background-size:16px 16px;border:3px solid #805132;border-radius:0;font-size:clamp(25px,5vw,48px);font-weight:400}
 .menu-button:hover{background-color:#bd8259}
 #message{position:fixed;top:100px;left:50%;transform:translateX(-50%);padding:8px 15px;background:#000b;border-radius:6px;opacity:0;pointer-events:none;z-index:100}
+
 #mobileControls{display:none;position:fixed;inset:0;z-index:25;pointer-events:none}
 #mobileMenu{position:absolute;top:12px;left:12px;pointer-events:auto;min-width:90px;min-height:42px}
 #mobileMove{position:absolute;left:14px;bottom:18px;width:150px;height:150px;pointer-events:auto}
@@ -31,11 +41,13 @@ input{font-family:Arial,sans-serif}
 #moveLeft{top:51px;left:0}
 #moveBack{top:51px;left:51px}
 #moveRight{top:51px;left:102px}
+
 #codeMachine{position:absolute;right:18px;bottom:18px;width:min(330px,calc(100vw - 24px));padding:12px;background:#242424ee;border:2px solid #111;color:white;text-align:left;z-index:25}
 #codeMachineTitle{margin-bottom:9px;font-size:14px;font-weight:900;letter-spacing:2px}
 #codeMachineRow{display:flex;gap:7px}
 #codeMachineInput{flex:1;min-width:0;height:40px;padding:0 10px;background:#111;color:white;border:2px solid #777;border-radius:0;font-size:15px;touch-action:auto;user-select:text}
 #codeMachineCheck{width:44px;height:40px;padding:0;border:2px solid #6b9561;border-radius:0;background:#387b35;font-size:25px}
+
 #verityButton{position:absolute;top:18px;right:18px;display:none;padding:14px 25px;background:#ffdf32;color:#171717;border:3px solid #b99b00;border-radius:0;font-size:20px;font-weight:900;letter-spacing:2px;z-index:30}
 #verityPanel{display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(440px,90vw);padding:22px;background:#ffdf32;border:4px solid #b99b00;color:#171717;z-index:31}
 .panelHeader{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px;font-size:25px;font-weight:900;letter-spacing:3px}
@@ -44,6 +56,7 @@ input{font-family:Arial,sans-serif}
 .formRow input{flex:1;min-width:0;height:44px;padding:0 10px;background:#fff7bd;color:#171717;border:3px solid #b99b00;border-radius:0;font-size:15px;outline:none;touch-action:auto;user-select:text}
 .formRow button{width:48px;min-width:48px;height:44px;padding:0;background:#222;color:white;border:2px solid #111;border-radius:0;font-size:24px}
 .response{min-height:42px;margin-top:16px;padding:10px;background:#f7d52a;border:2px solid #b99b00;font-weight:900;overflow-wrap:anywhere}
+
 #adminPanel{display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(460px,94vw);max-height:90vh;overflow-y:auto;padding:25px;background:#080808;color:white;border:3px solid #555;z-index:45;text-align:left}
 #adminClose{position:absolute;right:8px;top:8px;width:34px;height:34px;padding:0;background:#222;border:2px solid #555;border-radius:0}
 #adminTitle{font-size:24px;font-weight:900;letter-spacing:3px;margin:5px 40px 20px 0}
@@ -57,6 +70,7 @@ input{font-family:Arial,sans-serif}
 #quickLoginInput{display:block;width:100%;height:42px;padding:0 10px;background:#171717;color:white;border:2px solid #777;border-radius:0;font-size:15px;outline:none;touch-action:auto;user-select:text}
 #quickLoginSubmit{width:100%;height:42px;margin-top:10px;background:#eee;color:#111;border:2px solid #999;border-radius:0;font-weight:900}
 #quickLoginMessage{margin-top:10px;min-height:18px;color:#ff6464;font-size:12px;font-weight:bold}
+
 #adminVerityPanel,#commandsPanel{display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(470px,92vw);max-height:90vh;overflow:auto;padding:22px;background:#ffdf32;color:#171717;border:4px solid #b99b00;box-shadow:8px 8px 0 #0005;z-index:46}
 #commandsPanel{z-index:47}
 #commandsButton{width:100%;min-height:44px;background:#222;color:white;border:2px solid #111;border-radius:0;font-weight:900;letter-spacing:2px}
@@ -65,9 +79,11 @@ input{font-family:Arial,sans-serif}
 #commandInput{flex:1;min-width:0;height:42px;padding:0 10px;background:#fff7bd;color:#171717;border:3px solid #b99b00;border-radius:0;font-size:15px;outline:none;touch-action:auto;user-select:text}
 #commandResponse{margin-top:12px;padding:10px;min-height:40px;background:#f7d52a;border:2px solid #b99b00;font-weight:900;overflow-wrap:anywhere}
 #moreComing{margin-top:15px;text-align:center;font-size:13px;font-weight:900;letter-spacing:2px}
+
 #halloweenPanel{display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(430px,90vw);padding:26px;text-align:center;color:white;background:linear-gradient(135deg,#ff7a00 0%,#ff7a00 48%,#7026a8 52%,#35104f 100%);border:4px solid #ffb14a;box-shadow:9px 9px 0 #0008;z-index:48}
 #halloweenTitle{font-size:clamp(27px,6vw,42px);font-weight:900;letter-spacing:4px;margin:4px 0 25px;text-shadow:3px 3px 0 #35104f}
 #summonButton{width:100%;min-height:54px;background:#999;color:#171717;border:3px solid #555;border-radius:0;font-size:20px;font-weight:900;letter-spacing:3px}
+
 #indexButton{position:absolute;right:18px;bottom:166px;width:min(330px,calc(100vw - 24px));min-height:44px;padding:10px;background:#a88953;color:#17120a;border:2px solid #6f5730;border-radius:0;font-size:16px;font-weight:900;letter-spacing:2px;z-index:26}
 #indexLoginPanel{display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(400px,90vw);padding:22px;background:#c9ad7a;color:#21190d;border:4px solid #8b7045;box-shadow:8px 8px 0 #0005;z-index:52}
 #indexLoginHeader{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px;font-size:21px;font-weight:900}
@@ -89,8 +105,10 @@ input{font-family:Arial,sans-serif}
 #indexProgressFill{position:absolute;left:0;top:0;height:100%;width:50%;background:#777;border-right:2px solid #555}
 #indexProgressLabel{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#171717;font-size:15px;font-weight:900}
 #indexProgressCaption{margin-top:7px;text-align:center;color:#21190d;font-size:11px;font-weight:900;letter-spacing:2px}
+
 @media(pointer:coarse),(max-width:800px){
 #top{top:8px}#logo{font-size:25px}
+#moneyDisplay{top:12px;right:10px;font-size:18px;letter-spacing:1px}
 #codeMachine{right:8px;bottom:8px;width:min(290px,calc(100vw - 16px))}
 #verityButton{top:10px;right:10px;padding:10px 14px;font-size:15px}
 #indexButton{right:8px;bottom:166px;width:min(290px,calc(100vw - 16px))}
@@ -122,6 +140,7 @@ input{font-family:Arial,sans-serif}
 
 <body>
 <div id="top"><div id="logo">VOXEL</div><div id="status">READY TO FLY</div></div>
+<div id="moneyDisplay">00.00</div>
 <div id="message"></div>
 
 <div id="mobileControls">
@@ -283,7 +302,6 @@ const groundMaterials = [
 
 const MAP_WIDTH = 150;
 const MAP_DEPTH = 45;
-const GROUND_TOP = 0;
 
 const ground = new THREE.Mesh(
   new THREE.BoxGeometry(MAP_WIDTH, 3, MAP_DEPTH),
@@ -333,10 +351,7 @@ for (const x of [
   scene.add(wall);
 }
 
-// =====================
-// STONE AREA + 4 DARK STONES + 4 GREEN PLATES
-// =====================
-
+// STONE AREA
 const stoneGroundMaterial = new THREE.MeshStandardMaterial({
   color: 0x85898d,
   roughness: 1,
@@ -347,13 +362,12 @@ const stoneGround = new THREE.Mesh(
   new THREE.BoxGeometry(13, 0.7, 11),
   stoneGroundMaterial
 );
-
 stoneGround.position.set(-64, 0.35, -15);
 stoneGround.receiveShadow = true;
 stoneGround.castShadow = true;
 scene.add(stoneGround);
 
-// FOUR DARK GREY SQUARES
+// FOUR DARK GREY STONES
 const darkStoneMaterial = new THREE.MeshStandardMaterial({
   color: 0x45494e,
   roughness: 1,
@@ -372,14 +386,13 @@ for (const [x, z] of darkStonePositions) {
     new THREE.BoxGeometry(3, 0.25, 3),
     darkStoneMaterial
   );
-
   darkStone.position.set(x, 0.825, z);
   darkStone.castShadow = true;
   darkStone.receiveShadow = true;
   scene.add(darkStone);
 }
 
-// FOUR GREEN PLATES IN FRONT OF THE DARK STONES
+// FOUR GREEN PLATES
 const greenPlateMaterial = new THREE.MeshStandardMaterial({
   color: 0x25d43b,
   roughness: 0.8
@@ -397,15 +410,65 @@ for (const [x, z] of greenPlatePositions) {
     new THREE.BoxGeometry(3, 0.18, 2),
     greenPlateMaterial
   );
-
   greenPlate.position.set(x, 0.79, z);
   greenPlate.castShadow = true;
   greenPlate.receiveShadow = true;
   scene.add(greenPlate);
 }
 
+// TEXT SPRITES FOR THE PLATES AND STARTER CUBE
+function makeTextSprite(text, options = {}) {
+  const canvas = document.createElement("canvas");
+  canvas.width = options.width || 512;
+  canvas.height = options.height || 128;
 
-// FLOATING STONE PLAYER
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (options.background) {
+    ctx.fillStyle = options.background;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  ctx.font = `900 ${options.fontSize || 58}px Arial`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.lineJoin = "round";
+  ctx.lineWidth = options.outlineWidth || 8;
+  ctx.strokeStyle = options.outline || "#202020";
+  ctx.strokeText(text, canvas.width / 2, canvas.height / 2);
+  ctx.fillStyle = options.color || "#ffffff";
+  ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+
+  const material = new THREE.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    depthTest: false
+  });
+
+  const sprite = new THREE.Sprite(material);
+  sprite.renderOrder = 10;
+  return sprite;
+}
+
+// SHOW 00.00 ABOVE EACH GREEN PLATE
+for (const [x, z] of greenPlatePositions) {
+  const plateText = makeTextSprite("00.00", {
+    fontSize: 64,
+    color: "#ffffff",
+    outline: "#126d20",
+    outlineWidth: 10
+  });
+
+  plateText.position.set(x, 1.45, z);
+  plateText.scale.set(2.7, 0.68, 1);
+  scene.add(plateText);
+}
+
+// FLOATING PLAYER CUBE
 const playerStone = new THREE.Mesh(
   new THREE.BoxGeometry(1.35, 1.35, 1.35),
   new THREE.MeshStandardMaterial({
@@ -418,7 +481,47 @@ playerStone.position.set(-64, 4, -5);
 playerStone.castShadow = true;
 playerStone.receiveShadow = true;
 scene.add(playerStone);
-  
+
+// STARTER CUBE ON THE FRONT-RIGHT DARK STONE
+const starterCube = new THREE.Mesh(
+  new THREE.BoxGeometry(1.35, 1.35, 1.35),
+  new THREE.MeshStandardMaterial({
+    color: 0xc99a6b,
+    roughness: 0.85
+  })
+);
+
+// Front-right dark stone is at x=-61, z=-12.
+// Its top is at y=0.95, so the cube sits on top of it.
+starterCube.position.set(-61, 1.625, -12);
+starterCube.castShadow = true;
+starterCube.receiveShadow = true;
+scene.add(starterCube);
+
+// STARTER NAME ABOVE THE CUBE
+const starterName = makeTextSprite("STARTER THE DOO", {
+  width: 768,
+  height: 128,
+  fontSize: 52,
+  color: "#ffffff",
+  outline: "#583c25",
+  outlineWidth: 9
+});
+starterName.position.set(-61, 3.55, -12);
+starterName.scale.set(4.2, 0.7, 1);
+scene.add(starterName);
+
+// PRICE BELOW THE NAME
+const starterPrice = makeTextSprite("00.50", {
+  fontSize: 64,
+  color: "#fff1c9",
+  outline: "#583c25",
+  outlineWidth: 9
+});
+starterPrice.position.set(-61, 2.85, -12);
+starterPrice.scale.set(2.2, 0.58, 1);
+scene.add(starterPrice);
+
 // CAMERA AND MOVEMENT
 const mobileDevice = matchMedia("(pointer: coarse), (max-width: 800px)");
 const mobileControls = document.getElementById("mobileControls");
@@ -447,7 +550,7 @@ function updateCameraRotation() {
 }
 
 function respawnPlayer() {
-  playerStone.position.set(0, 4, 8);
+  playerStone.position.set(-64, 4, -5);
   yaw = 0;
   updateCameraRotation();
 }
@@ -954,6 +1057,10 @@ function animate(now) {
 
   const delta = Math.min((now - lastTime) / 1000, 0.05);
   lastTime = now;
+
+  // Starter cube keeps rotating even while the menu is open.
+  starterCube.rotation.y += delta * 0.8;
+  starterCube.rotation.x = Math.sin(now * 0.0008) * 0.08;
 
   if (isLocked) {
     playerStone.rotation.y += delta * 0.3;
