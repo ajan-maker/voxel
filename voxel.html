@@ -131,6 +131,47 @@ pointer-events:none
 #indexScrollArea{padding:7px}
 #indexComingSoon{font-size:15px}
 }
+
+
+#normalContent {
+  display: none;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.normalRow {
+  display: grid;
+  grid-template-columns: repeat(4, 75px);
+  gap: 22px;
+  margin-bottom: 28px;
+}
+
+.normalRow.second {
+  grid-template-columns: repeat(4, 75px);
+}
+
+.normalItem {
+  width: 75px;
+  text-align: center;
+}
+
+.normalBox {
+  width: 75px;
+  height: 75px;
+  background: #454545;
+  border: 1px solid #353535;
+  border-radius: 5px;
+}
+
+.normalCaption {
+  margin-top: 8px;
+  font-size: 10px;
+  color: white;
+  text-align: center;
+  white-space: nowrap;
+}
+  
 </style>
 
 <script type="importmap">
@@ -227,11 +268,47 @@ pointer-events:none
 <div id="indexHeader"><span id="indexTitle">INDEX</span><button id="indexPanelClose">X</button></div>
 <div id="indexLayout">
 <div id="indexLeftMenu">
-<button class="indexMenuButton">YIN YANG</button>
-<button class="indexMenuButton">MORE COMING SOON...</button>
+  <button class="indexMenuButton" id="yinYangButton">YIN YANG</button>
+  <button class="indexMenuButton" id="normalButton">NORMAL</button>
+  <button class="indexMenuButton">MORE COMING SOON...</button>
 </div>
 <div id="indexRightSide">
-<div id="indexScrollArea"><div id="indexComingSoon">COMING SOON...</div></div>
+<div id="indexScrollArea">
+<div id="indexComingSoon">COMING SOON...</div>
+
+<div id="normalContent">
+  <div class="normalRow">
+    <div class="normalItem">
+      <div class="normalBox"></div>
+      <div class="normalCaption">COMING SOON...</div>
+    </div>
+    <div class="normalItem">
+      <div class="normalBox"></div>
+      <div class="normalCaption">COMING SOON...</div>
+    </div>
+    <div class="normalItem">
+      <div class="normalBox"></div>
+      <div class="normalCaption">COMING SOON...</div>
+    </div>
+    <div class="normalItem">
+      <div class="normalBox"></div>
+      <div class="normalCaption">COMING SOON...</div>
+    </div>
+  </div>
+
+  <div class="normalRow second">
+    <div class="normalItem">
+      <div class="normalBox"></div>
+      <div class="normalCaption">COMING SOON...</div>
+    </div>
+    <div class="normalItem">
+      <div class="normalBox"></div>
+      <div class="normalCaption">COMING SOON...</div>
+    </div>
+  </div>
+</div>
+
+</div>
 <div id="indexProgressSection">
 <div id="indexProgressOuter"><div id="indexProgressFill"></div><div id="indexProgressLabel">%0</div></div>
 <div id="indexProgressCaption">PROGRESS</div>
@@ -1053,10 +1130,29 @@ function checkIndexUser() {
     indexLoginPanel.style.display = "none";
     indexPanel.style.display = "block";
     indexMessage.textContent = "";
+    indexComingSoon.style.display = "flex";
+    indexComingSoon.textContent = "COMING SOON...";
+    normalContent.style.display = "none";
   } else {
     indexMessage.textContent = "INVALID INDEX USER";
   }
 }
+
+  const yinYangButton = document.getElementById("yinYangButton");
+const normalButton = document.getElementById("normalButton");
+const normalContent = document.getElementById("normalContent");
+const indexComingSoon = document.getElementById("indexComingSoon");
+
+yinYangButton.addEventListener("click", () => {
+  indexComingSoon.style.display = "flex";
+  indexComingSoon.textContent = "COMING SOON...";
+  normalContent.style.display = "none";
+});
+
+normalButton.addEventListener("click", () => {
+  indexComingSoon.style.display = "none";
+  normalContent.style.display = "block";
+});
 
 document.getElementById("checkIndexButton").addEventListener("click", checkIndexUser);
 indexUserInput.addEventListener("keydown", event => {
