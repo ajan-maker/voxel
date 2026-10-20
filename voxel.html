@@ -896,13 +896,10 @@ function checkAdminCode() {
   const code = adminCodeInput.value.trim().toUpperCase();
 
   if (code === "/HALLOWEEN.EVENT") {
-    adminPanel.style.display = "none";
-    adminVerityPanel.style.display = "none";
-    commandsPanel.style.display = "none";
-    document.getElementById("halloweenPanel").style.display = "block";
-    adminCodeMessage.textContent = "";
+    document.getElementById("halloweenPanel").style.display = "none";
+    adminCodeMessage.textContent = "NO LONGER AVAILABLE";
     adminCodeInput.value = "";
-  } else if (code === "VERITY.MODED") {
+  } else if (code === "/VERITY.MODED") {
     adminPanel.style.display = "none";
     adminVerityPanel.style.display = "block";
     commandsPanel.style.display = "none";
